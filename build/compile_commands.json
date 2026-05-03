@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/home/uwo/Projects/PI-NSGA-II/build",
+  "command": "/usr/bin/clang++ -I/home/uwo/Projects/PI-NSGA-II/include -O3 -march=native -DNDEBUG -std=gnu++17 -o CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o -c /home/uwo/Projects/PI-NSGA-II/src/tree_node.cpp",
+  "file": "/home/uwo/Projects/PI-NSGA-II/src/tree_node.cpp",
+  "output": "/home/uwo/Projects/PI-NSGA-II/build/CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o"
+},
+{
+  "directory": "/home/uwo/Projects/PI-NSGA-II/build",
+  "command": "/usr/bin/clang++ -I/home/uwo/Projects/PI-NSGA-II/include -O3 -march=native -DNDEBUG -std=gnu++17 -o CMakeFiles/pi_nsga2.dir/src/pde_problems.cpp.o -c /home/uwo/Projects/PI-NSGA-II/src/pde_problems.cpp",
+  "file": "/home/uwo/Projects/PI-NSGA-II/src/pde_problems.cpp",
+  "output": "/home/uwo/Projects/PI-NSGA-II/build/CMakeFiles/pi_nsga2.dir/src/pde_problems.cpp.o"
+},
+{
+  "directory": "/home/uwo/Projects/PI-NSGA-II/build",
+  "command": "/usr/bin/clang++ -I/home/uwo/Projects/PI-NSGA-II/include -O3 -march=native -DNDEBUG -std=gnu++17 -o CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o -c /home/uwo/Projects/PI-NSGA-II/src/koza_bnf.cpp",
+  "file": "/home/uwo/Projects/PI-NSGA-II/src/koza_bnf.cpp",
+  "output": "/home/uwo/Projects/PI-NSGA-II/build/CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o"
+},
+{
+  "directory": "/home/uwo/Projects/PI-NSGA-II/build",
+  "command": "/usr/bin/clang++ -I/home/uwo/Projects/PI-NSGA-II/include -O3 -march=native -DNDEBUG -std=gnu++17 -o CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o -c /home/uwo/Projects/PI-NSGA-II/src/pi_solver.cpp",
+  "file": "/home/uwo/Projects/PI-NSGA-II/src/pi_solver.cpp",
+  "output": "/home/uwo/Projects/PI-NSGA-II/build/CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o"
+},
+{
+  "directory": "/home/uwo/Projects/PI-NSGA-II/build",
+  "command": "/usr/bin/clang++ -I/home/uwo/Projects/PI-NSGA-II/include -O3 -march=native -DNDEBUG -std=gnu++17 -o CMakeFiles/pi_nsga2.dir/main.cpp.o -c /home/uwo/Projects/PI-NSGA-II/main.cpp",
+  "file": "/home/uwo/Projects/PI-NSGA-II/main.cpp",
+  "output": "/home/uwo/Projects/PI-NSGA-II/build/CMakeFiles/pi_nsga2.dir/main.cpp.o"
+}
+]

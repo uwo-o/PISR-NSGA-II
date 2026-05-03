@@ -1,0 +1,7 @@
+{
+	"InstallScripts" : 
+	[
+		"/home/uwo/Projects/PI-NSGA-II/build/cmake_install.cmake"
+	],
+	"Parallel" : false
+}
