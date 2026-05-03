@@ -194,10 +194,6 @@ def plot_boxplot_mse(df: pd.DataFrame, outpath: str):
             ax = axes[row][col]
             data_koza = sub[sub["method"] == "Koza"][metric].values
             data_pi   = sub[sub["method"] == "PI-NSGA-II"][metric].values
-            
-            # Clip at 1e-4 to avoid squeezing the boxplot and log scale issues
-            data_koza = np.clip(data_koza, 1e-4, None)
-            data_pi   = np.clip(data_pi, 1e-4, None)
 
             bp = ax.boxplot(
                 [data_koza, data_pi],
@@ -226,8 +222,7 @@ def plot_boxplot_mse(df: pd.DataFrame, outpath: str):
                          fontsize=9, fontweight="bold")
             ax.set_xticks([1, 2])
             ax.set_xticklabels(METHOD_LIST)
-            ax.set_yscale("log")
-            ax.set_ylim(bottom=5e-5)
+            ax.set_yscale("symlog", linthresh=1e-3)
             ax.set_ylabel(label)
             ax.grid(True, axis="y", ls="--", alpha=0.4)
             ax.spines[["top", "right"]].set_visible(False)

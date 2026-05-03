@@ -237,7 +237,7 @@ def plot_summary_bars():
                     else:
                         vals.append(1e-3)
                 offset = (i - 0.5) * width
-                bars = ax.bar(x + offset, vals, width,
+                bars = ax.bar(x + offset, vals, width, bottom=1e-4,
                               color=STYLE[method]["color"],
                               label=method, alpha=0.85, edgecolor="white", linewidth=0.6)
                 for bar, v in zip(bars, vals):
@@ -262,7 +262,7 @@ def plot_summary_bars():
                     for pde in PDE_ORDER
                 ]
                 offset = (i - 0.5) * width
-                bars = ax.bar(x + offset, vals, width,
+                bars = ax.bar(x + offset, vals, width, bottom=1e-4,
                               color=STYLE[method]["color"],
                               label=method, alpha=0.85, edgecolor="white", linewidth=0.6)
                 for bar, v in zip(bars, vals):
