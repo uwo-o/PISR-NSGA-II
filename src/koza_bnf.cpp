@@ -55,13 +55,13 @@ NodePtr bnf_to_tree(const std::vector<int>& codons,
         NodeType op = (op_code == 0) ? NodeType::ADD
                     : (op_code == 1) ? NodeType::SUB
                     :                  NodeType::MUL;
-        return make_binary(op, L, R);
+        return make_binary(op, std::move(L), std::move(R));
     }
     else if (rule == 1) {
         // <unary>(<expr>) — todos los operadores PDE/ODE
         NodeType op = UNARY_OPS[next_codon() % N_UNARY];
         NodePtr child = bnf_to_tree(codons, idx, depth + 1, max_depth);
-        return make_unary(op, child);
+        return make_unary(op, std::move(child));
     }
     else if (rule == 2) {
         // <var>
@@ -86,6 +86,9 @@ void KozaIndividual::evaluate(const PDEProblem& prob,
                               const std::vector<Point>& bnd)
 {
     if (!tree) decode();
+    if (!tree) { mse_domain = 1e10; mse_boundary = 1e10; tree_size = 0; root_type = NodeType::UNKNOWN; return; }
+    tree_size = tree->count_nodes();
+    root_type = tree->get_type();
 
     // MSE dominio — Laplaciano por diferencias finitas
     double sum_dom = 0.0;
@@ -181,7 +184,7 @@ std::vector<KozaIndividual> KozaSolver::run(int pop_size, int max_gen) {
         // Combinar y seleccionar
         std::vector<KozaIndividual> combined;
         combined.reserve(pop_size * 2);
-        for (auto& x : population_) combined.push_back(x);
+        for (auto& x : population_) combined.push_back(std::move(x)); // unique_ptr must move!
         for (auto& x : offspring)   combined.push_back(std::move(x));
         population_ = nsga2_select_next(std::move(combined), pop_size);
 

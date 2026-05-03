@@ -26,7 +26,7 @@ matplotlib.rcParams.update({
 })
 warnings.filterwarnings("ignore")
 
-RESULTS_DIR = "results"
+RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 PDE_ORDER   = ["Laplace", "Poisson", "Helmholtz"]
 
 STYLE = {
@@ -46,7 +46,7 @@ def load_all():
         raise FileNotFoundError("No CSV files found. Run ./build/pi_nsga2 first.")
     frames = [pd.read_csv(f) for f in files]
     df = pd.concat(frames, ignore_index=True)
-    df = df[df["rank"] == 1].copy()   # keep only Pareto-front individuals
+    # df = df[df["rank"] == 1].copy()   # keep only Pareto-front individuals
     # Registrar si un valor era exactamente 0 antes de aplicar epsilon
     df["dom_is_zero"] = df["mse_domain"]   == 0.0
     df["bnd_is_zero"] = df["mse_boundary"] == 0.0
@@ -66,6 +66,32 @@ def efficient_frontier(df_method, x_col, y_col):
     ys = sorted_df[y_col].values
     running_min = np.minimum.accumulate(ys)
     return xs, running_min
+
+# ─── Identificar puntos no dominados (Global) ────────────────────────────────
+def identify_non_dominated(df, x_col, y_col):
+    """Retorna una máscara booleana de los puntos no dominados globalmente."""
+    if df.empty: return np.array([], dtype=bool)
+    
+    # Asegurarnos de que el índice sea único para el mapeo final
+    temp = df.copy()
+    temp['orig_index'] = temp.index
+    
+    # Ordenar por x (asc) y luego y (asc)
+    df_sorted = temp.sort_values([x_col, y_col])
+    
+    non_dominated_indices = []
+    min_y = float('inf')
+    
+    for _, row in df_sorted.iterrows():
+        if row[y_col] < min_y:
+            non_dominated_indices.append(row['orig_index'])
+            min_y = row[y_col]
+            
+    mask = np.zeros(len(temp), dtype=bool)
+    # Crear máscara basada en la posición original
+    res = pd.Series(False, index=df.index)
+    res.loc[non_dominated_indices] = True
+    return res.values
 
 # ─── Anotación: cuando un método alcanza exactamente 0 ───────────────────────
 def annotate_zeros(ax, m_df, x_col, y_col, color, side="left"):
@@ -105,13 +131,28 @@ def plot_pareto_fronts(df):
             xs, ys = efficient_frontier(m, "mse_domain", "mse_boundary")
             # Fill bajo la curva de Pareto
             ax.fill_between(xs, ys, ys.max() * 10, alpha=0.07, color=st["color"])
-            # Línea del frente de Pareto
-            ax.plot(xs, ys, "-", color=st["color"], lw=st["lw"], alpha=0.9)
-            # Puntos scatter
-            ax.scatter(m["mse_domain"], m["mse_boundary"],
+            # Línea del frente de Pareto (comentada a petición del usuario)
+            # ax.plot(xs, ys, "-", color=st["color"], lw=st["lw"], alpha=0.9)
+
+            # Calcular cuáles de estos puntos (que eran locales de cada run) 
+            # son dominados GLOBALMENTE por otros runs
+            is_global = identify_non_dominated(m, "mse_domain", "mse_boundary")
+            m = m.assign(is_global=is_global)
+
+            # Puntos dominados globalmente (transparentes)
+            dominated = m[~m["is_global"]]
+            if not dominated.empty:
+                ax.scatter(dominated["mse_domain"], dominated["mse_boundary"],
+                           color=st["color"], marker=st["marker"],
+                           s=15, edgecolors="none", linewidths=0,
+                           alpha=0.15, zorder=st["zorder"]-1)
+
+            # Frente de Pareto Global (destacados)
+            pareto = m[m["is_global"]]
+            ax.scatter(pareto["mse_domain"], pareto["mse_boundary"],
                        color=st["color"], marker=st["marker"],
-                       s=28, edgecolors="white", linewidths=0.4,
-                       zorder=st["zorder"], label=method)
+                       s=35, edgecolors="none", linewidths=0,
+                       alpha=1.0, zorder=st["zorder"], label=method)
             # Anotar cuántos puntos eran exactamente 0
             annotate_zeros(ax, m, "mse_domain", "mse_boundary",
                            st["color"], side="left" if i == 0 else "right")
@@ -168,8 +209,9 @@ def plot_sensitivity(df):
             domain_vals = m_sorted["mse_domain"].values
             running_dom = np.minimum.accumulate(domain_vals)
             ax_left.plot(bc_budgets, running_dom,
-                         color=st["color"], lw=st["lw"], marker=st["marker"],
-                         markersize=4, markevery=max(1, len(bc_budgets)//15),
+                         color=st["color"], lw=0, marker=st["marker"],
+                         markersize=4, markeredgecolor="none", markeredgewidth=0,
+                         markevery=max(1, len(bc_budgets)//15),
                          label=method)
 
             # ── Right: mejor MSE BC dado dominio ≤ τ ────────────────────────
@@ -178,8 +220,9 @@ def plot_sensitivity(df):
             bc_vals     = m_sorted2["mse_boundary"].values
             running_bc  = np.minimum.accumulate(bc_vals)
             ax_right.plot(dom_budgets, running_bc,
-                          color=st["color"], lw=st["lw"], marker=st["marker"],
-                          markersize=4, markevery=max(1, len(dom_budgets)//15),
+                          color=st["color"], lw=0, marker=st["marker"],
+                          markersize=4, markeredgecolor="none", markeredgewidth=0,
+                          markevery=max(1, len(dom_budgets)//15),
                           label=method)
 
         # Formatting — symlog para manejar 0 y grandes valores
@@ -311,17 +354,32 @@ def plot_dominance_scatter(df):
             sub[col + "_n"] = (sub[col] - col_min) / rng if rng > 0 else 0.0
 
         for method, st in STYLE.items():
-            m = sub[sub["method"] == method]
+            m = sub[sub["method"] == method].copy()
             if m.empty:
                 continue
+            
+            # Re-calcular dominancia global para este plot
+            m["is_global"] = identify_non_dominated(m, "mse_domain", "mse_boundary")
+
             dist  = np.sqrt(m["mse_domain_n"]**2 + m["mse_boundary_n"]**2) + 1e-9
             sizes = 1.0 / dist
             sizes = 10 + 120 * (sizes - sizes.min()) / (sizes.max() - sizes.min() + 1e-12)
+            m = m.assign(sizes=sizes)
 
-            ax.scatter(m["mse_domain"], m["mse_boundary"],
+            # Dominadas (transparentes)
+            dominated = m[~m["is_global"]]
+            if not dominated.empty:
+                ax.scatter(dominated["mse_domain"], dominated["mse_boundary"],
+                           c=st["color"], marker=st["marker"],
+                           s=dominated["sizes"]*0.5, alpha=0.15, edgecolors="none",
+                           linewidths=0, zorder=st["zorder"]-1)
+
+            # Frente (sólidas)
+            pareto = m[m["is_global"]]
+            ax.scatter(pareto["mse_domain"], pareto["mse_boundary"],
                        c=st["color"], marker=st["marker"],
-                       s=sizes, alpha=0.7, edgecolors="white",
-                       linewidths=0.4, label=method, zorder=st["zorder"])
+                       s=pareto["sizes"], alpha=0.8, edgecolors="none",
+                       linewidths=0, label=method, zorder=st["zorder"])
 
         ax.set_title(f"{pde}'s Equation", fontweight="bold")
         ax.set_xlabel("MSE Domain (PDE residual)")

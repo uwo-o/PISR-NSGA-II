@@ -12,7 +12,9 @@ void PIIndividual::evaluate(const PDEProblem& prob,
                             const std::vector<Point>& dom,
                             const std::vector<Point>& bnd)
 {
-    if (!tree) { mse_domain = 1e10; mse_boundary = 1e10; return; }
+    if (!tree) { mse_domain = 1e10; mse_boundary = 1e10; tree_size = 0; root_type = NodeType::UNKNOWN; return; }
+    tree_size = tree->count_nodes();
+    root_type = tree->get_type();
 
     // MSE dominio — residuo del PDE con AD simbólico exacto
     double sum_dom = 0.0;
@@ -55,7 +57,7 @@ PIIndividual PISolver::make_offspring(const PIIndividual& a, const PIIndividual&
     PIIndividual child;
     if (prob(gen_) < Config::CROSSOVER_PROB) {
         auto [c1, c2] = tree_crossover(a.tree, b.tree, gen_);
-        child.tree = c1; // tomamos el primer hijo
+        child.tree = std::move(c1); // tomamos el primer hijo
     } else {
         child.tree = a.tree->clone();
     }
@@ -90,7 +92,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
 
         std::vector<PIIndividual> combined;
         combined.reserve(pop_size * 2);
-        for (auto& x : population_) combined.push_back(x);
+        for (auto& x : population_) combined.push_back(std::move(x)); // unique_ptr must move!
         for (auto& x : offspring)   combined.push_back(std::move(x));
         population_ = nsga2_select_next(std::move(combined), pop_size);
 

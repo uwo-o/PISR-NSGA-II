@@ -16,6 +16,20 @@
 struct PIIndividual : public Individual {
     NodePtr tree;
 
+    PIIndividual() = default;
+    PIIndividual(const PIIndividual& other) : Individual(other) {
+        if (other.tree) tree = other.tree->clone();
+    }
+    PIIndividual(PIIndividual&&) noexcept = default;
+    PIIndividual& operator=(const PIIndividual& other) {
+        if (this != &other) {
+            Individual::operator=(other);
+            tree = other.tree ? other.tree->clone() : nullptr;
+        }
+        return *this;
+    }
+    PIIndividual& operator=(PIIndividual&&) noexcept = default;
+
     // Evalúa MSE dominio (AD simbólico) + MSE frontera
     void evaluate(const PDEProblem& prob,
                   const std::vector<Point>& dom,

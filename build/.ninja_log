@@ -1,16 +1,5 @@
 # ninja log v7
-0	718	1777828626917838353	CMakeFiles/pi_nsga2.dir/src/pde_problems.cpp.o	4146262c7d72d54a
-0	1087	1777828626916411914	CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o	6deebda4e79b53b9
-1	1444	1777828626918114922	CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o	cfd0607ed2b6873f
-0	1516	1777828626917975307	CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o	fd1a096f9bb1f90c
-1	1013	1777828690249294840	CMakeFiles/pi_nsga2.dir/main.cpp.o	a47a454f0c095555
-1013	1116	1777828691262607217	pi_nsga2	9f3fe93777a304af
 2	1321	1777831386849456872	CMakeFiles/pi_nsga2.dir/src/pde_problems.cpp.o	aa54cdccd372b021
-2	1573	1777831386849012258	CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o	2fed6af342511165
-2	1750	1777831386849781449	CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o	7bc34d1f5980abeb
-2	1897	1777831386849613368	CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o	e30ef0e0a3acae2c
-2	2055	1777831386849901057	CMakeFiles/pi_nsga2.dir/main.cpp.o	7474b61fd6e63dad
-2055	2228	1777831388901963188	pi_nsga2	cf181e7b3f5a9cdc
 69	2267	1777833533416080987	CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o	2fed6af342511165
 69	2500	1777833533416565087	CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o	7bc34d1f5980abeb
 69	2591	1777833533416444593	CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o	e30ef0e0a3acae2c

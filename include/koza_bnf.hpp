@@ -17,6 +17,21 @@ struct KozaIndividual : public Individual {
     std::vector<int> codons;    // genotipo: secuencia de enteros
     NodePtr          tree;      // fenotipo: árbol generado por BNF
 
+    KozaIndividual() = default;
+    KozaIndividual(const KozaIndividual& other) : Individual(other), codons(other.codons) {
+        if (other.tree) tree = other.tree->clone();
+    }
+    KozaIndividual(KozaIndividual&&) noexcept = default;
+    KozaIndividual& operator=(const KozaIndividual& other) {
+        if (this != &other) {
+            Individual::operator=(other);
+            codons = other.codons;
+            tree = other.tree ? other.tree->clone() : nullptr;
+        }
+        return *this;
+    }
+    KozaIndividual& operator=(KozaIndividual&&) noexcept = default;
+
     // Mapea codones → árbol usando la gramática BNF
     void decode();
 

@@ -23,6 +23,19 @@ inline std::string pde_name(PDE p) {
 // ─── 2-D point ────────────────────────────────────────────────────────────────
 struct Point { double x, y; };
 
+// ─── Tipos de nodo (NodeType) ─────────────────────────────────────────────────
+enum class NodeType {
+    VAR_X, VAR_Y, ERC,            // terminales
+    ADD, SUB, MUL,                 // operadores binarios
+    SIN,  COS,                     // trigonométricas
+    SINH, COSH, TANH,              // hiperbólicas  (Laplace, difusión, onda)
+    EXP,                           // exponencial   (calor, amortiguamiento)
+    SQRT,                          // raíz cuadrada (Bessel, potencial)
+    LOG,                           // log(|·|+ε)    (Laplace polar, Green)
+    ATAN,                          // arctan        (Laplace polar)
+    UNKNOWN                        // fallback
+};
+
 // ─── Automatic Differentiation value ─────────────────────────────────────────
 // Holds u(x,y) and its first/second partials computed in a single tree pass.
 struct AD {
@@ -39,6 +52,8 @@ struct Individual {
     double mse_boundary = std::numeric_limits<double>::max();
     int    rank         = 0;
     double crowding     = 0.0;
+    int    tree_size    = 0;
+    NodeType root_type  = NodeType::UNKNOWN;
 };
 
 // ─── Parámetros globales ──────────────────────────────────────────────────────
