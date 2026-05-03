@@ -14,12 +14,12 @@ import matplotlib.patches as mpatches
 from matplotlib.lines import Line2D
 matplotlib.rcParams.update({
     "font.family":       "DejaVu Sans",
-    "font.size":         10,
-    "axes.titlesize":    11,
-    "axes.labelsize":    10,
-    "legend.fontsize":   8.5,
-    "xtick.labelsize":   8.5,
-    "ytick.labelsize":   8.5,
+    "font.size":         12,
+    "axes.titlesize":    13,
+    "axes.labelsize":    12,
+    "legend.fontsize":   10.5,
+    "xtick.labelsize":   10.5,
+    "ytick.labelsize":   10.5,
     "axes.linewidth":    0.8,
     "grid.linewidth":    0.5,
     "figure.dpi":        150,
@@ -34,28 +34,56 @@ STYLE = {
     "PI-NSGA-II": dict(color="#2E86C1", marker="o", zorder=4, lw=1.8),
 }
 
+# ─── Epsilon para escala log (evita log(0) = -inf) ──────────────────────────
+LOG_EPS = 1e-9
+
 # ─── Load data ────────────────────────────────────────────────────────────────
 def load_all():
-    frames = [pd.read_csv(f) for f in glob.glob(os.path.join(RESULTS_DIR, "*_pareto.csv"))]
-    if not frames:
+    files = glob.glob(os.path.join(RESULTS_DIR, "run_*", "*_pareto.csv"))
+    if not files:
+        files = glob.glob(os.path.join(RESULTS_DIR, "*_pareto.csv"))
+    if not files:
         raise FileNotFoundError("No CSV files found. Run ./build/pi_nsga2 first.")
+    frames = [pd.read_csv(f) for f in files]
     df = pd.concat(frames, ignore_index=True)
     df = df[df["rank"] == 1].copy()   # keep only Pareto-front individuals
+    # Registrar si un valor era exactamente 0 antes de aplicar epsilon
+    df["dom_is_zero"] = df["mse_domain"]   == 0.0
+    df["bnd_is_zero"] = df["mse_boundary"] == 0.0
+    # Reemplazar 0 exacto con epsilon para escala log
+    df["mse_domain"]   = df["mse_domain"].clip(lower=LOG_EPS)
+    df["mse_boundary"] = df["mse_boundary"].clip(lower=LOG_EPS)
     return df
 
 # ─── Build efficient frontier (lower envelope) ────────────────────────────────
-def efficient_frontier(df_method, x_col, y_col, n_pts=300):
+def efficient_frontier(df_method, x_col, y_col):
     """
-    For each threshold τ on x_col (ascending),
-    return the minimum achievable y_col value.
-    This gives the 'best Y reachable given X ≤ τ' curve.
+    Para cada umbral τ en x_col (ascendente),
+    devuelve el mínimo valor de y_col alcanzable.
     """
     sorted_df = df_method.sort_values(x_col).reset_index(drop=True)
     xs = sorted_df[x_col].values
     ys = sorted_df[y_col].values
-    # running minimum of y
     running_min = np.minimum.accumulate(ys)
     return xs, running_min
+
+# ─── Anotación: cuando un método alcanza exactamente 0 ───────────────────────
+def annotate_zeros(ax, m_df, x_col, y_col, color, side="left"):
+    """Añade flecha indicando que algunos puntos son exactamente 0."""
+    zero_col = "dom_is_zero" if x_col == "mse_domain" else "bnd_is_zero"
+    n_zero_x = (m_df["dom_is_zero"] if x_col == "mse_domain" else m_df["bnd_is_zero"]).sum()
+    n_zero_y = (m_df["dom_is_zero"] if y_col == "mse_domain" else m_df["bnd_is_zero"]).sum()
+    msgs = []
+    if n_zero_x > 0:
+        msgs.append(f"{n_zero_x} pts with exact 0 {x_col.split('_')[1]}")
+    if n_zero_y > 0:
+        msgs.append(f"{n_zero_y} pts with exact 0 {y_col.split('_')[1]}")
+    if msgs:
+        xpos = 0.03 if side == "left" else 0.55
+        ax.text(xpos, 0.97, "\n".join(msgs),
+                transform=ax.transAxes, fontsize=6.5, color=color,
+                va="top", ha="left",
+                bbox=dict(boxstyle="round,pad=0.2", fc="white", alpha=0.6, ec=color, lw=0.6))
 
 # ─── Figure 1: Pareto fronts (one panel per PDE) ─────────────────────────────
 def plot_pareto_fronts(df):
@@ -68,37 +96,45 @@ def plot_pareto_fronts(df):
 
     for ax, pde in zip(axes, PDE_ORDER):
         sub = df[df["pde"] == pde]
-        for method, st in STYLE.items():
+        has_data = False
+        for i, (method, st) in enumerate(STYLE.items()):
             m = sub[sub["method"] == method].sort_values("mse_domain")
             if m.empty:
                 continue
+            has_data = True
             xs, ys = efficient_frontier(m, "mse_domain", "mse_boundary")
-            # Fill under Pareto curve
-            ax.fill_between(xs, ys, ys.max()*10, alpha=0.07, color=st["color"])
-            # Pareto front line
+            # Fill bajo la curva de Pareto
+            ax.fill_between(xs, ys, ys.max() * 10, alpha=0.07, color=st["color"])
+            # Línea del frente de Pareto
             ax.plot(xs, ys, "-", color=st["color"], lw=st["lw"], alpha=0.9)
-            # Scatter points
+            # Puntos scatter
             ax.scatter(m["mse_domain"], m["mse_boundary"],
                        color=st["color"], marker=st["marker"],
                        s=28, edgecolors="white", linewidths=0.4,
                        zorder=st["zorder"], label=method)
+            # Anotar cuántos puntos eran exactamente 0
+            annotate_zeros(ax, m, "mse_domain", "mse_boundary",
+                           st["color"], side="left" if i == 0 else "right")
 
         ax.set_title(f"{pde}'s Equation", fontweight="bold")
         ax.set_xlabel("MSE Domain  (PDE residual)")
         ax.set_ylabel("MSE Boundary  (BC residual)")
-        ax.set_xscale("log"); ax.set_yscale("log")
+        # symlog permite mostrar valores muy pequeños (~0) y grandes a la vez
+        ax.set_xscale("symlog", linthresh=1e-6)
+        ax.set_yscale("symlog", linthresh=1e-6)
         ax.grid(True, which="both", ls="--", alpha=0.35)
         ax.legend(loc="upper right")
-
-        # Annotate the 'ideal' corner
         ax.annotate("Ideal", xy=(0.02, 0.02), xycoords="axes fraction",
                     fontsize=7.5, color="gray", style="italic")
+        if not has_data:
+            ax.text(0.5, 0.5, "No data", transform=ax.transAxes,
+                    ha="center", va="center", color="gray", fontsize=12)
 
     fig.tight_layout()
     out = os.path.join(RESULTS_DIR, "pareto_fronts.png")
     fig.savefig(out, dpi=160, bbox_inches="tight")
     print(f"  Saved: {out}")
-    plt.show()
+    plt.close(fig)
 
 # ─── Figure 2: Single-objective sensitivity ───────────────────────────────────
 def plot_sensitivity(df):
@@ -106,6 +142,7 @@ def plot_sensitivity(df):
     Two columns × three rows:
       Left  (col 0): Fix BC budget τ, minimize Domain MSE  → x=τ, y=best domain
       Right (col 1): Fix Domain budget τ, minimize BC MSE  → x=τ, y=best BC
+    Usa symlog para manejar valores = 0.
     """
     fig, axes = plt.subplots(3, 2, figsize=(12, 10))
     fig.suptitle(
@@ -117,65 +154,69 @@ def plot_sensitivity(df):
 
     for row, pde in enumerate(PDE_ORDER):
         sub = df[df["pde"] == pde]
-        ax_left  = axes[row][0]   # minimize domain, vary BC budget
-        ax_right = axes[row][1]   # minimize BC,     vary domain budget
+        ax_left  = axes[row][0]
+        ax_right = axes[row][1]
 
         for method, st in STYLE.items():
             m = sub[sub["method"] == method]
             if m.empty:
                 continue
 
-            # ── Left: best domain MSE achievable given BC ≤ τ ──────────────
-            m_sorted = m.sort_values("mse_boundary")
-            bc_budgets   = m_sorted["mse_boundary"].values
-            domain_vals  = m_sorted["mse_domain"].values
-            running_dom  = np.minimum.accumulate(domain_vals)
+            # ── Left: mejor MSE dominio dado BC ≤ τ ─────────────────────────
+            m_sorted    = m.sort_values("mse_boundary")
+            bc_budgets  = m_sorted["mse_boundary"].values
+            domain_vals = m_sorted["mse_domain"].values
+            running_dom = np.minimum.accumulate(domain_vals)
             ax_left.plot(bc_budgets, running_dom,
                          color=st["color"], lw=st["lw"], marker=st["marker"],
-                         markersize=4, markevery=5, label=method)
+                         markersize=4, markevery=max(1, len(bc_budgets)//15),
+                         label=method)
 
-            # ── Right: best BC MSE achievable given Domain ≤ τ ─────────────
-            m_sorted2 = m.sort_values("mse_domain")
-            dom_budgets  = m_sorted2["mse_domain"].values
-            bc_vals      = m_sorted2["mse_boundary"].values
-            running_bc   = np.minimum.accumulate(bc_vals)
+            # ── Right: mejor MSE BC dado dominio ≤ τ ────────────────────────
+            m_sorted2   = m.sort_values("mse_domain")
+            dom_budgets = m_sorted2["mse_domain"].values
+            bc_vals     = m_sorted2["mse_boundary"].values
+            running_bc  = np.minimum.accumulate(bc_vals)
             ax_right.plot(dom_budgets, running_bc,
                           color=st["color"], lw=st["lw"], marker=st["marker"],
-                          markersize=4, markevery=5, label=method)
+                          markersize=4, markevery=max(1, len(dom_budgets)//15),
+                          label=method)
 
-        # Formatting left
-        ax_left.set_title(f"{pde} — Minimize Domain MSE", fontweight="bold")
-        ax_left.set_xlabel("BC Budget  (max allowed MSE Boundary)")
-        ax_left.set_ylabel("Best achievable MSE Domain")
-        ax_left.set_xscale("log"); ax_left.set_yscale("log")
-        ax_left.grid(True, which="both", ls="--", alpha=0.35)
-        ax_left.legend()
-
-        # Formatting right
-        ax_right.set_title(f"{pde} — Minimize BC MSE", fontweight="bold")
-        ax_right.set_xlabel("Domain Budget  (max allowed MSE Domain)")
-        ax_right.set_ylabel("Best achievable MSE Boundary")
-        ax_right.set_xscale("log"); ax_right.set_yscale("log")
-        ax_right.grid(True, which="both", ls="--", alpha=0.35)
-        ax_right.legend()
+        # Formatting — symlog para manejar 0 y grandes valores
+        for ax, title, xlabel, ylabel in [
+            (ax_left,  f"{pde} — Minimize Domain MSE",
+             "BC Budget  (max allowed MSE Boundary)",
+             "Best achievable MSE Domain"),
+            (ax_right, f"{pde} — Minimize BC MSE",
+             "Domain Budget  (max allowed MSE Domain)",
+             "Best achievable MSE Boundary"),
+        ]:
+            ax.set_title(title, fontweight="bold")
+            ax.set_xlabel(xlabel)
+            ax.set_ylabel(ylabel)
+            ax.set_xscale("symlog", linthresh=1e-6)
+            ax.set_yscale("symlog", linthresh=1e-6)
+            ax.grid(True, which="both", ls="--", alpha=0.35)
+            ax.legend()
+            # Línea punteada en y=0 para indicar perfección
+            ax.axhline(LOG_EPS, color="green", ls=":", lw=0.8, alpha=0.5,
+                       label="MSE=0 (perfect)")
 
     fig.tight_layout()
     out = os.path.join(RESULTS_DIR, "pareto_sensitivity.png")
     fig.savefig(out, dpi=160, bbox_inches="tight")
     print(f"  Saved: {out}")
-    plt.show()
+    plt.close(fig)
 
 # ─── Figure 3: Summary comparison bar chart ───────────────────────────────────
 def plot_summary_bars():
-    path = os.path.join(RESULTS_DIR, "comparison_summary.csv")
-    if not os.path.exists(path):
-        return
-    df = pd.read_csv(path)
-
+    stats_path = os.path.join(RESULTS_DIR, "stats_table.csv")
+    comp_path = os.path.join(RESULTS_DIR, "comparison_summary.csv")
+    
     metrics = {
-        "Best Domain MSE":   "best_mse_domain",
-        "Best BC MSE":       "best_mse_boundary",
-        "Runtime (s)":       "runtime_s",
+        "Best Domain MSE":   ("best_mse_domain", "Best MSE Domain ↓"),
+        "Best BC MSE":       ("best_mse_boundary", "Best MSE BC ↓"),
+        "Runtime (s)":       ("runtime_s", "Runtime (s) ↓"),
     }
     fig, axes = plt.subplots(1, 3, figsize=(13, 4))
     fig.suptitle("Method Comparison Summary — All Equations",
@@ -184,44 +225,74 @@ def plot_summary_bars():
     x = np.arange(len(PDE_ORDER))
     width = 0.32
 
-    for ax, (metric_name, col) in zip(axes, metrics.items()):
-        for i, method in enumerate(["Koza", "PI-NSGA-II"]):
-            vals = [
-                df[(df["method"] == method) & (df["pde"] == pde)][col].values[0]
-                if len(df[(df["method"] == method) & (df["pde"] == pde)]) > 0 else 0
-                for pde in PDE_ORDER
-            ]
-            offset = (i - 0.5) * width
-            bars = ax.bar(x + offset, vals, width,
-                          color=STYLE[method]["color"],
-                          label=method, alpha=0.85, edgecolor="white", linewidth=0.6)
-            # Value labels on bars
-            for bar, v in zip(bars, vals):
-                ax.text(bar.get_x() + bar.get_width()/2,
-                        bar.get_height() * 1.03,
-                        f"{v:.2g}", ha="center", va="bottom",
-                        fontsize=7, color="#333333")
+    if os.path.exists(stats_path):
+        df = pd.read_csv(stats_path)
+        for ax, (metric_name, (comp_col, stats_col)) in zip(axes, metrics.items()):
+            for i, method in enumerate(["Koza", "PI-NSGA-II"]):
+                vals = []
+                for pde in PDE_ORDER:
+                    sub = df[(df["PDE"] == pde) & (df["Metric"] == stats_col)]
+                    if not sub.empty:
+                        vals.append(max(sub[f"{method}_mean"].values[0], 1e-3))
+                    else:
+                        vals.append(1e-3)
+                offset = (i - 0.5) * width
+                bars = ax.bar(x + offset, vals, width,
+                              color=STYLE[method]["color"],
+                              label=method, alpha=0.85, edgecolor="white", linewidth=0.6)
+                for bar, v in zip(bars, vals):
+                    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() * 1.03,
+                            f"{v:.2g}", ha="center", va="bottom", fontsize=7, color="#333333")
+            ax.set_title(metric_name, fontweight="bold")
+            ax.set_xticks(x)
+            ax.set_xticklabels(PDE_ORDER)
+            ax.set_yscale("log")
+            ax.set_ylim(bottom=1e-4)
+            ax.set_ylabel(metric_name)
+            ax.grid(True, axis="y", ls="--", alpha=0.4)
+            ax.legend()
+            ax.spines[["top", "right"]].set_visible(False)
+    elif os.path.exists(comp_path):
+        df = pd.read_csv(comp_path)
+        for ax, (metric_name, (comp_col, stats_col)) in zip(axes, metrics.items()):
+            for i, method in enumerate(["Koza", "PI-NSGA-II"]):
+                vals = [
+                    max(df[(df["method"] == method) & (df["pde"] == pde)][comp_col].values[0], 1e-3)
+                    if len(df[(df["method"] == method) & (df["pde"] == pde)]) > 0 else 1e-3
+                    for pde in PDE_ORDER
+                ]
+                offset = (i - 0.5) * width
+                bars = ax.bar(x + offset, vals, width,
+                              color=STYLE[method]["color"],
+                              label=method, alpha=0.85, edgecolor="white", linewidth=0.6)
+                for bar, v in zip(bars, vals):
+                    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() * 1.03,
+                            f"{v:.2g}", ha="center", va="bottom", fontsize=7, color="#333333")
+            ax.set_title(metric_name, fontweight="bold")
+            ax.set_xticks(x)
+            ax.set_xticklabels(PDE_ORDER)
+            ax.set_yscale("log")
+            ax.set_ylim(bottom=1e-4)
+            ax.set_ylabel(metric_name)
+            ax.grid(True, axis="y", ls="--", alpha=0.4)
+            ax.legend()
+            ax.spines[["top", "right"]].set_visible(False)
+    else:
+        return
 
-        ax.set_title(metric_name, fontweight="bold")
-        ax.set_xticks(x)
-        ax.set_xticklabels(PDE_ORDER)
-        ax.set_yscale("log")
-        ax.set_ylabel(metric_name)
-        ax.grid(True, axis="y", ls="--", alpha=0.4)
-        ax.legend()
-        ax.spines[["top", "right"]].set_visible(False)
 
     fig.tight_layout()
     out = os.path.join(RESULTS_DIR, "summary_bars.png")
     fig.savefig(out, dpi=160, bbox_inches="tight")
     print(f"  Saved: {out}")
-    plt.show()
+    plt.close(fig)
 
 # ─── Figure 4: Hypervolume-style coverage (dominance map) ────────────────────
 def plot_dominance_scatter(df):
     """
     One panel per PDE. Each point colored by method, size encodes
     'goodness' (inverse of Chebyshev distance to ideal point).
+    Usa symlog para manejar valores = 0.
     """
     fig, axes = plt.subplots(1, 3, figsize=(14, 4.5))
     fig.suptitle(
@@ -232,7 +303,7 @@ def plot_dominance_scatter(df):
 
     for ax, pde in zip(axes, PDE_ORDER):
         sub = df[df["pde"] == pde].copy()
-        # Normalize objectives to [0,1] for each PDE
+        # Normalizar objetivos a [0,1]
         for col in ["mse_domain", "mse_boundary"]:
             col_min = sub[col].min()
             col_max = sub[col].max()
@@ -243,9 +314,8 @@ def plot_dominance_scatter(df):
             m = sub[sub["method"] == method]
             if m.empty:
                 continue
-            # Size: bigger = closer to ideal (0,0) in normalized space
-            dist = np.sqrt(m["mse_domain_n"]**2 + m["mse_boundary_n"]**2) + 1e-9
-            sizes = (1.0 / dist)
+            dist  = np.sqrt(m["mse_domain_n"]**2 + m["mse_boundary_n"]**2) + 1e-9
+            sizes = 1.0 / dist
             sizes = 10 + 120 * (sizes - sizes.min()) / (sizes.max() - sizes.min() + 1e-12)
 
             ax.scatter(m["mse_domain"], m["mse_boundary"],
@@ -256,7 +326,8 @@ def plot_dominance_scatter(df):
         ax.set_title(f"{pde}'s Equation", fontweight="bold")
         ax.set_xlabel("MSE Domain (PDE residual)")
         ax.set_ylabel("MSE Boundary (BC residual)")
-        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xscale("symlog", linthresh=1e-6)
+        ax.set_yscale("symlog", linthresh=1e-6)
         ax.grid(True, which="both", ls="--", alpha=0.35)
         ax.legend(loc="upper right")
 
@@ -264,7 +335,7 @@ def plot_dominance_scatter(df):
     out = os.path.join(RESULTS_DIR, "dominance_map.png")
     fig.savefig(out, dpi=160, bbox_inches="tight")
     print(f"  Saved: {out}")
-    plt.show()
+    plt.close(fig)
 
 # ─── Print analysis ───────────────────────────────────────────────────────────
 def print_analysis(df_summary):
@@ -334,9 +405,10 @@ if __name__ == "__main__":
     df_summary = pd.read_csv(os.path.join(RESULTS_DIR, "comparison_summary.csv"))
     print_analysis(df_summary)
 
-    print("\n  Generating plots...")
+    print("\n  Generando plots...")
+    matplotlib.use("Agg")   # modo no-interactivo, evita errores de display
     plot_pareto_fronts(df)
     plot_sensitivity(df)
     plot_summary_bars()
     plot_dominance_scatter(df)
-    print("\n  All figures saved to ./results/")
+    print("\n  Todas las figuras guardadas en ./results/")

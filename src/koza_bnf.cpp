@@ -11,9 +11,9 @@
 // ─── Gramática BNF ────────────────────────────────────────────────────────────
 //  <expr>  ::= <expr> <op> <expr>  | <unary>(<expr>) | <var> | <erc>
 //  <op>    ::= + | - | *
-//  <unary> ::= sin | cos | exp
+//  <unary> ::= sin | cos | sinh | cosh | tanh | exp | sqrt | log | atan
 //  <var>   ::= x | y
-//  <erc>   ::= 1..9
+//  <erc>   ::= constante flotante en [-5, 5]
 // Se usa "wrapping" circular cuando se agotan los codones.
 NodePtr bnf_to_tree(const std::vector<int>& codons,
                     int& idx, int depth, int max_depth)
@@ -26,12 +26,23 @@ NodePtr bnf_to_tree(const std::vector<int>& codons,
         return c;
     };
 
+    // Lista completa de unarios PDE/ODE
+    static const NodeType UNARY_OPS[] = {
+        NodeType::SIN,  NodeType::COS,
+        NodeType::SINH, NodeType::COSH, NodeType::TANH,
+        NodeType::EXP,  NodeType::SQRT,
+        NodeType::LOG,  NodeType::ATAN
+    };
+    static constexpr int N_UNARY = 9;
+
     if (depth >= max_depth) {
         // Forzar terminal
         int c = next_codon();
         if (c % 3 == 0) return make_var('x');
         if (c % 3 == 1) return make_var('y');
-        return make_erc((double)((next_codon() % 9) + 1));
+        // ERC flotante en [-5, 5] con resolución 0.25
+        double val = (double)((next_codon() % 41) - 20) * 0.25;
+        return make_erc(val);
     }
 
     int rule = next_codon() % 4;
@@ -47,11 +58,8 @@ NodePtr bnf_to_tree(const std::vector<int>& codons,
         return make_binary(op, L, R);
     }
     else if (rule == 1) {
-        // <unary>(<expr>)
-        int u_code = next_codon() % 3;
-        NodeType op = (u_code == 0) ? NodeType::SIN
-                    : (u_code == 1) ? NodeType::COS
-                    :                 NodeType::EXP;
+        // <unary>(<expr>) — todos los operadores PDE/ODE
+        NodeType op = UNARY_OPS[next_codon() % N_UNARY];
         NodePtr child = bnf_to_tree(codons, idx, depth + 1, max_depth);
         return make_unary(op, child);
     }
@@ -60,8 +68,9 @@ NodePtr bnf_to_tree(const std::vector<int>& codons,
         return (next_codon() % 2 == 0) ? make_var('x') : make_var('y');
     }
     else {
-        // <erc>  — constante entera rígida (característica de Koza)
-        return make_erc((double)((next_codon() % 9) + 1));
+        // <erc> — constante flotante en [-5, 5]
+        double val = (double)((next_codon() % 41) - 20) * 0.25;
+        return make_erc(val);
     }
 }
 

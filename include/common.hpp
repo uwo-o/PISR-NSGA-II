@@ -43,13 +43,13 @@ struct Individual {
 
 // ─── Parámetros globales ──────────────────────────────────────────────────────
 namespace Config {
-    constexpr int    POP_SIZE       = 80;
-    constexpr int    MAX_GEN        = 100;
-    constexpr int    N_DOMAIN       = 256;   // puntos de colocación interiores
-    constexpr int    N_BOUNDARY     = 64;    // puntos en ∂Ω
-    constexpr double ERC_SIGMA      = 0.15;  // perturbación Gaussiana en ERCs
-    constexpr int    MAX_TREE_DEPTH = 4;
-    constexpr int    CODON_LENGTH   = 48;    // longitud del genotipo BNF (Koza)
+    constexpr int    POP_SIZE       = 120;   // +50% diversidad en frente de Pareto
+    constexpr int    MAX_GEN        = 200;   // 2x generaciones → mejor convergencia
+    constexpr int    N_DOMAIN       = 400;   // más puntos de colocación interiores
+    constexpr int    N_BOUNDARY     = 80;    // mejor representación de ∂Ω
+    constexpr double ERC_SIGMA      = 0.20;  // mayor exploración de constantes
+    constexpr int    MAX_TREE_DEPTH = 5;     // expresiones más complejas
+    constexpr int    CODON_LENGTH   = 64;    // genotipos BNF más largos
     constexpr double CROSSOVER_PROB = 0.85;
     constexpr double MUTATION_PROB  = 0.15;
 }

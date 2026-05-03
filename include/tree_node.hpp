@@ -4,6 +4,15 @@
 //   Usado por AMBOS métodos (PI propuesto y Koza).
 //   El método propuesto usa derivadas simbólicas (AD).
 //   El método Koza usa diferencias finitas externas.
+//
+//   Operadores PDE/ODE — incluye todas las funciones elementales relevantes:
+//     Trigonométricas:  SIN, COS
+//     Hiperbólicas:     SINH, COSH, TANH  (soluciones Laplace, onda, difusión)
+//     Exponencial:      EXP               (calor, ondas amortiguadas)
+//     Potencias:        SQRT              (ecuaciones de Bessel)
+//     Logarítmica:      LOG               (Laplace en polares, Green)
+//     Inversa trig:     ATAN              (Laplace en polares)
+//     Aritméticas:      ADD, SUB, MUL     (combinaciones)
 // =============================================================================
 
 #include "common.hpp"
@@ -15,14 +24,28 @@
 
 // ─── Tipos de nodo ────────────────────────────────────────────────────────────
 enum class NodeType {
-    VAR_X, VAR_Y, ERC,        // terminales
-    ADD, SUB, MUL,             // operadores binarios
-    SIN, COS, EXP              // operadores unarios
+    VAR_X, VAR_Y, ERC,            // terminales
+    ADD, SUB, MUL,                 // operadores binarios
+    SIN,  COS,                     // trigonométricas
+    SINH, COSH, TANH,              // hiperbólicas  (Laplace, difusión, onda)
+    EXP,                           // exponencial   (calor, amortiguamiento)
+    SQRT,                          // raíz cuadrada (Bessel, potencial)
+    LOG,                           // log(|·|+ε)    (Laplace polar, Green)
+    ATAN,                          // arctan        (Laplace polar)
 };
 
-inline bool is_binary(NodeType t) { return t==NodeType::ADD || t==NodeType::SUB || t==NodeType::MUL; }
-inline bool is_unary(NodeType t)  { return t==NodeType::SIN || t==NodeType::COS || t==NodeType::EXP; }
-inline bool is_terminal(NodeType t){ return t==NodeType::VAR_X || t==NodeType::VAR_Y || t==NodeType::ERC; }
+inline bool is_binary(NodeType t) {
+    return t == NodeType::ADD || t == NodeType::SUB || t == NodeType::MUL;
+}
+inline bool is_unary(NodeType t) {
+    return t == NodeType::SIN  || t == NodeType::COS  ||
+           t == NodeType::SINH || t == NodeType::COSH || t == NodeType::TANH ||
+           t == NodeType::EXP  || t == NodeType::SQRT ||
+           t == NodeType::LOG  || t == NodeType::ATAN;
+}
+inline bool is_terminal(NodeType t) {
+    return t == NodeType::VAR_X || t == NodeType::VAR_Y || t == NodeType::ERC;
+}
 
 // ─── Nodo del árbol ───────────────────────────────────────────────────────────
 struct Node {
@@ -47,6 +70,7 @@ struct Node {
 
     // ── Impresión ─────────────────────────────────────────────────────────────
     void print(std::ostream& os) const;
+    void print_latex(std::ostream& os) const;
 
     // ── Acceso al k-ésimo nodo (DFS, in-order); counter decrementado ──────────
     std::shared_ptr<Node>& get_node_ref(int& counter);

@@ -52,7 +52,7 @@ build cmake_object_order_depends_target_pi_nsga2: phony || .
 build CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o: CXX_COMPILER__pi_nsga2_unscanned_Release /home/uwo/Projects/PI-NSGA-II/src/tree_node.cpp || cmake_object_order_depends_target_pi_nsga2
   CONFIG = Release
   DEP_FILE = CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o.d
-  FLAGS = -O3 -march=native -DNDEBUG -std=gnu++17
+  FLAGS = -O3 -O3 -march=native -DNDEBUG -std=gnu++17
   INCLUDES = -I/home/uwo/Projects/PI-NSGA-II/include
   OBJECT_DIR = CMakeFiles/pi_nsga2.dir
   OBJECT_FILE_DIR = CMakeFiles/pi_nsga2.dir/src
@@ -61,7 +61,7 @@ build CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o: CXX_COMPILER__pi_nsga2_unscan
 build CMakeFiles/pi_nsga2.dir/src/pde_problems.cpp.o: CXX_COMPILER__pi_nsga2_unscanned_Release /home/uwo/Projects/PI-NSGA-II/src/pde_problems.cpp || cmake_object_order_depends_target_pi_nsga2
   CONFIG = Release
   DEP_FILE = CMakeFiles/pi_nsga2.dir/src/pde_problems.cpp.o.d
-  FLAGS = -O3 -march=native -DNDEBUG -std=gnu++17
+  FLAGS = -O3 -O3 -march=native -DNDEBUG -std=gnu++17
   INCLUDES = -I/home/uwo/Projects/PI-NSGA-II/include
   OBJECT_DIR = CMakeFiles/pi_nsga2.dir
   OBJECT_FILE_DIR = CMakeFiles/pi_nsga2.dir/src
@@ -70,7 +70,7 @@ build CMakeFiles/pi_nsga2.dir/src/pde_problems.cpp.o: CXX_COMPILER__pi_nsga2_uns
 build CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o: CXX_COMPILER__pi_nsga2_unscanned_Release /home/uwo/Projects/PI-NSGA-II/src/koza_bnf.cpp || cmake_object_order_depends_target_pi_nsga2
   CONFIG = Release
   DEP_FILE = CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o.d
-  FLAGS = -O3 -march=native -DNDEBUG -std=gnu++17
+  FLAGS = -O3 -O3 -march=native -DNDEBUG -std=gnu++17
   INCLUDES = -I/home/uwo/Projects/PI-NSGA-II/include
   OBJECT_DIR = CMakeFiles/pi_nsga2.dir
   OBJECT_FILE_DIR = CMakeFiles/pi_nsga2.dir/src
@@ -79,7 +79,7 @@ build CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o: CXX_COMPILER__pi_nsga2_unscann
 build CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o: CXX_COMPILER__pi_nsga2_unscanned_Release /home/uwo/Projects/PI-NSGA-II/src/pi_solver.cpp || cmake_object_order_depends_target_pi_nsga2
   CONFIG = Release
   DEP_FILE = CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o.d
-  FLAGS = -O3 -march=native -DNDEBUG -std=gnu++17
+  FLAGS = -O3 -O3 -march=native -DNDEBUG -std=gnu++17
   INCLUDES = -I/home/uwo/Projects/PI-NSGA-II/include
   OBJECT_DIR = CMakeFiles/pi_nsga2.dir
   OBJECT_FILE_DIR = CMakeFiles/pi_nsga2.dir/src
@@ -88,7 +88,7 @@ build CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o: CXX_COMPILER__pi_nsga2_unscan
 build CMakeFiles/pi_nsga2.dir/main.cpp.o: CXX_COMPILER__pi_nsga2_unscanned_Release /home/uwo/Projects/PI-NSGA-II/main.cpp || cmake_object_order_depends_target_pi_nsga2
   CONFIG = Release
   DEP_FILE = CMakeFiles/pi_nsga2.dir/main.cpp.o.d
-  FLAGS = -O3 -march=native -DNDEBUG -std=gnu++17
+  FLAGS = -O3 -O3 -march=native -DNDEBUG -std=gnu++17
   INCLUDES = -I/home/uwo/Projects/PI-NSGA-II/include
   OBJECT_DIR = CMakeFiles/pi_nsga2.dir
   OBJECT_FILE_DIR = CMakeFiles/pi_nsga2.dir
@@ -105,7 +105,7 @@ build CMakeFiles/pi_nsga2.dir/main.cpp.o: CXX_COMPILER__pi_nsga2_unscanned_Relea
 build pi_nsga2: CXX_EXECUTABLE_LINKER__pi_nsga2_Release CMakeFiles/pi_nsga2.dir/src/tree_node.cpp.o CMakeFiles/pi_nsga2.dir/src/pde_problems.cpp.o CMakeFiles/pi_nsga2.dir/src/koza_bnf.cpp.o CMakeFiles/pi_nsga2.dir/src/pi_solver.cpp.o CMakeFiles/pi_nsga2.dir/main.cpp.o
   CONFIG = Release
   DEP_FILE = CMakeFiles/pi_nsga2.dir/link.d
-  FLAGS = -O3 -march=native -DNDEBUG
+  FLAGS = -O3 -O3 -march=native -DNDEBUG
   LINK_FLAGS = -Xlinker --dependency-file=CMakeFiles/pi_nsga2.dir/link.d
   LINK_LIBRARIES = -lm  -lstdc++fs
   OBJECT_DIR = CMakeFiles/pi_nsga2.dir

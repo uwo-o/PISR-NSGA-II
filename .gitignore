@@ -1,2 +1,10 @@
 .cache/
 results/
+report/
+build/
+*.pdf
+*.png
+*.csv
+*.tex
+*.out
+*.log
