@@ -2,8 +2,11 @@
 set -e
 cd /home/uwo/Projects/PI-NSGA-II
 
-echo "Step 1: Generating stats runs (10 runs)"
+echo "Step 1: Generating stats runs (20 runs)"
 ./build/pi_nsga2 --runs 20
+
+echo "Step 1.5: Running PINN baseline"
+python3 pinn_baseline.py --epochs 1000 --runs 1
 
 echo "Step 2: Stats Analysis"
 python3 stats_analysis.py

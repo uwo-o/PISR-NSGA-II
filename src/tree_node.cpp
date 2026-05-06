@@ -190,8 +190,14 @@ void BinaryNode::print_latex(std::ostream& os) const {
 // ─── Constructores ───────────────────────────────────────────────────────────
 NodePtr make_var(char v) { return std::make_unique<TerminalNode>(v == 'x' ? NodeType::VAR_X : NodeType::VAR_Y); }
 NodePtr make_erc(double val) { return std::make_unique<TerminalNode>(NodeType::ERC, val); }
-NodePtr make_binary(NodeType op, NodePtr l, NodePtr r) { return std::make_unique<BinaryNode>(op, std::move(l), std::move(r)); }
-NodePtr make_unary(NodeType op, NodePtr c) { return std::make_unique<UnaryNode>(op, std::move(c)); }
+NodePtr make_binary(NodeType op, NodePtr l, NodePtr r) { 
+    auto node = std::make_unique<BinaryNode>(op, std::move(l), std::move(r));
+    return node->simplify();
+}
+NodePtr make_unary(NodeType op, NodePtr c) { 
+    auto node = std::make_unique<UnaryNode>(op, std::move(c));
+    return node->simplify();
+}
 
 // ─── Generación Aleatoria ────────────────────────────────────────────────────
 NodePtr random_tree(int max_depth, std::mt19937& gen, bool force_terminal) {
@@ -274,6 +280,129 @@ NodePtr tree_mutate(const NodePtr& tree, std::mt19937& gen) {
     NodePtr new_sub = random_tree(3, gen); // Max depth 3 for subtrees
     replace_node_at(t, target, new_sub);
     return t;
+}
+
+// ─── Simplificación Simbólica ────────────────────────────────────────────────
+bool is_structurally_equal(const Node* n1, const Node* n2) {
+    if (!n1 || !n2) return n1 == n2;
+    if (n1->get_type() != n2->get_type()) return false;
+    
+    if (auto* t1 = dynamic_cast<const TerminalNode*>(n1)) {
+        auto* t2 = dynamic_cast<const TerminalNode*>(n2);
+        if (t1->type == NodeType::ERC) return std::abs(t1->erc_val - t2->erc_val) < 1e-9;
+        return true; 
+    }
+    if (auto* u1 = dynamic_cast<const UnaryNode*>(n1)) {
+        auto* u2 = dynamic_cast<const UnaryNode*>(n2);
+        return is_structurally_equal(u1->child.get(), u2->child.get());
+    }
+    if (auto* b1 = dynamic_cast<const BinaryNode*>(n1)) {
+        auto* b2 = dynamic_cast<const BinaryNode*>(n2);
+        return is_structurally_equal(b1->left.get(), b2->left.get()) &&
+               is_structurally_equal(b1->right.get(), b2->right.get());
+    }
+    return false;
+}
+
+// Helper para detectar f(x)^2 representado como MUL(f(x), f(x))
+const Node* get_arg_of_square(const Node* n, NodeType func) {
+    if (!n || n->get_type() != NodeType::MUL) return nullptr;
+    auto* b = dynamic_cast<const BinaryNode*>(n);
+    if (b->left->get_type() == func && b->right->get_type() == func) {
+        auto* uL = dynamic_cast<const UnaryNode*>(b->left.get());
+        auto* uR = dynamic_cast<const UnaryNode*>(b->right.get());
+        if (is_structurally_equal(uL->child.get(), uR->child.get())) {
+            return uL->child.get();
+        }
+    }
+    return nullptr;
+}
+
+NodePtr TerminalNode::simplify() const {
+    return clone();
+}
+
+NodePtr UnaryNode::simplify() const {
+    NodePtr s_child = child->simplify();
+    
+    // Constant folding
+    if (s_child->get_type() == NodeType::ERC) {
+        double val = eval(0, 0); // dummy eval
+        return make_erc(val);
+    }
+    
+    // Pattern: exp(log(x)) -> x, log(exp(x)) -> x
+    if (type == NodeType::EXP && s_child->get_type() == NodeType::LOG) {
+        return dynamic_cast<UnaryNode*>(s_child.get())->child->clone();
+    }
+    if (type == NodeType::LOG && s_child->get_type() == NodeType::EXP) {
+        return dynamic_cast<UnaryNode*>(s_child.get())->child->clone();
+    }
+    
+    // Pattern: sqrt(x*x) -> x (simplificación agresiva)
+    if (type == NodeType::SQRT && s_child->get_type() == NodeType::MUL) {
+        auto* b = dynamic_cast<BinaryNode*>(s_child.get());
+        if (is_structurally_equal(b->left.get(), b->right.get())) {
+            return b->left->clone();
+        }
+    }
+
+    return std::make_unique<UnaryNode>(type, std::move(s_child));
+}
+
+NodePtr BinaryNode::simplify() const {
+    NodePtr s_l = left->simplify();
+    NodePtr s_r = right->simplify();
+    
+    bool l_erc = (s_l->get_type() == NodeType::ERC);
+    bool r_erc = (s_r->get_type() == NodeType::ERC);
+    double lv = l_erc ? dynamic_cast<TerminalNode*>(s_l.get())->erc_val : 0;
+    double rv = r_erc ? dynamic_cast<TerminalNode*>(s_r.get())->erc_val : 0;
+
+    // Constant folding
+    if (l_erc && r_erc) {
+        // Evaluate logic (copied from eval but simplified)
+        if (type == NodeType::ADD) return make_erc(lv + rv);
+        if (type == NodeType::SUB) return make_erc(lv - rv);
+        if (type == NodeType::MUL) return make_erc(lv * rv);
+        if (type == NodeType::DIV) return make_erc(std::abs(rv) < 1e-5 ? 1.0 : lv / rv);
+    }
+    
+    // Identities
+    if (type == NodeType::ADD) {
+        if (l_erc && lv == 0) return s_r;
+        if (r_erc && rv == 0) return s_l;
+        
+        // Identity: sin^2(x) + cos^2(x) = 1
+        const Node* arg_sin_l = get_arg_of_square(s_l.get(), NodeType::SIN);
+        const Node* arg_cos_r = get_arg_of_square(s_r.get(), NodeType::COS);
+        if (arg_sin_l && arg_cos_r && is_structurally_equal(arg_sin_l, arg_cos_r)) return make_erc(1.0);
+
+        const Node* arg_cos_l = get_arg_of_square(s_l.get(), NodeType::COS);
+        const Node* arg_sin_r = get_arg_of_square(s_r.get(), NodeType::SIN);
+        if (arg_cos_l && arg_sin_r && is_structurally_equal(arg_cos_l, arg_sin_r)) return make_erc(1.0);
+    }
+    if (type == NodeType::SUB) {
+        if (r_erc && rv == 0) return s_l;
+        if (is_structurally_equal(s_l.get(), s_r.get())) return make_erc(0);
+
+        // Identity: cosh^2(x) - sinh^2(x) = 1
+        const Node* arg_cosh_l = get_arg_of_square(s_l.get(), NodeType::COSH);
+        const Node* arg_sinh_r = get_arg_of_square(s_r.get(), NodeType::SINH);
+        if (arg_cosh_l && arg_sinh_r && is_structurally_equal(arg_cosh_l, arg_sinh_r)) return make_erc(1.0);
+    }
+    if (type == NodeType::MUL) {
+        if (l_erc && lv == 0) return make_erc(0);
+        if (r_erc && rv == 0) return make_erc(0);
+        if (l_erc && lv == 1) return s_r;
+        if (r_erc && rv == 1) return s_l;
+    }
+    if (type == NodeType::DIV) {
+        if (r_erc && rv == 1) return s_l;
+        if (is_structurally_equal(s_l.get(), s_r.get())) return make_erc(1);
+    }
+
+    return std::make_unique<BinaryNode>(type, std::move(s_l), std::move(s_r));
 }
 
 // ─── Laplaciano por diferencias finitas (Koza) ────────────────────────────────

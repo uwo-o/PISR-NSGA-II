@@ -39,9 +39,10 @@ warnings.filterwarnings("ignore")
 COLORS = {
     "Tsoulos":    "#E07535",
     "PI-NSGA-II": "#2E86C1",
+    "PINN":       "#27AE60",
 }
 PDE_ORDER   = ["Laplace", "Poisson", "Helmholtz", "Schrodinger"]
-METHOD_LIST = ["Tsoulos", "PI-NSGA-II"]
+METHOD_LIST = ["Tsoulos", "PI-NSGA-II", "PINN"]
 
 # ─── Carga de datos ───────────────────────────────────────────────────────────
 def load_data(path: str) -> pd.DataFrame:
@@ -56,6 +57,9 @@ def load_data(path: str) -> pd.DataFrame:
     if missing:
         print(f"[ERROR] Columnas faltantes: {missing}")
         sys.exit(1)
+    # Normalizar HV a [0,1] si aún está en escala legacy (~1e8)
+    if df["hypervolume"].max() > 1.5:
+        df["hypervolume"] = df["hypervolume"] / 1e8
     return df
 
 # ─── Test de Wilcoxon + tamaño de efecto r ───────────────────────────────────
@@ -107,12 +111,16 @@ def build_stats_table(df: pd.DataFrame) -> pd.DataFrame:
                 row[f"{m}_std"]    = np.std(v, ddof=1) if len(v) > 1 else np.nan
                 row[f"{m}_median"] = np.median(v) if len(v) > 0 else np.nan
 
-            # Wilcoxon test entre los dos métodos
-            U, p, r = wilcoxon_test(vals["Tsoulos"], vals["PI-NSGA-II"])
-            row["U_stat"]       = U
-            row["p_value"]      = p
-            row["effect_r"]     = r
-            row["effect_label"] = effect_label(r) if r is not None else "n/a"
+            # Wilcoxon test entre los dos métodos principales (GP)
+            if "Tsoulos" in vals and "PI-NSGA-II" in vals:
+                U, p, r = wilcoxon_test(vals["Tsoulos"], vals["PI-NSGA-II"])
+                row["U_stat"]       = U
+                row["p_value"]      = p
+                row["effect_r"]     = r
+                row["effect_label"] = effect_label(r) if r is not None else "n/a"
+            else:
+                row["U_stat"] = row["p_value"] = row["effect_r"] = np.nan
+                row["effect_label"] = "n/a"
 
             # ¿Cuál método es mejor?
             k_mean = row.get("Tsoulos_mean")
@@ -138,11 +146,12 @@ def plot_boxplot_hv(df: pd.DataFrame, outpath: str):
 
     for ax, pde in zip(axes, PDE_ORDER):
         sub = df[df["pde"] == pde]
-        data_tsoulos = sub[sub["method"] == "Tsoulos"]["hypervolume"].values
-        data_pi      = sub[sub["method"] == "PI-NSGA-II"]["hypervolume"].values
+        box_data = []
+        for m in METHOD_LIST:
+            box_data.append(sub[sub["method"] == m]["hypervolume"].values)
 
         bp = ax.boxplot(
-            [data_tsoulos, data_pi],
+            box_data,
             patch_artist=True,
             widths=0.45,
             medianprops=dict(color="white", linewidth=2),
@@ -155,16 +164,17 @@ def plot_boxplot_hv(df: pd.DataFrame, outpath: str):
             patch.set_alpha(0.8)
 
         # Añadir jitter (puntos individuales)
-        for j, (data, method) in enumerate(zip([data_tsoulos, data_pi], METHOD_LIST), 1):
-            jitter = np.random.default_rng(42).uniform(-0.15, 0.15, size=len(data))
-            ax.scatter(np.full(len(data), j) + jitter, data,
-                       color=COLORS[method], alpha=0.5, s=18, zorder=3)
+        for j, (data, method) in enumerate(zip(box_data, METHOD_LIST), 1):
+            if len(data) > 0:
+                jitter = np.random.default_rng(42).uniform(-0.15, 0.15, size=len(data))
+                ax.scatter(np.full(len(data), j) + jitter, data,
+                           color=COLORS[method], alpha=0.5, s=18, zorder=3)
 
-        # p-value en el plot
-        U, p, r = wilcoxon_test(data_tsoulos, data_pi)
+        # p-value en el plot (sigue comparando los dos principales para evitar ruido)
+        U, p, r = wilcoxon_test(box_data[0], box_data[1])
         p_str = f"p={p:.3f}" if p is not None else ""
         ax.set_title(f"{pde}  ({p_str})", fontweight="bold")
-        ax.set_xticks([1, 2])
+        ax.set_xticks(range(1, len(METHOD_LIST) + 1))
         ax.set_xticklabels(METHOD_LIST, rotation=25)
         ax.set_ylabel("Hypervolume")
         ax.grid(True, axis="y", ls="--", alpha=0.4)
@@ -191,11 +201,12 @@ def plot_boxplot_mse(df: pd.DataFrame, outpath: str):
         sub = df[df["pde"] == pde]
         for row, metric in enumerate(["best_mse_domain", "best_mse_boundary"]):
             ax = axes[row][col]
-            data_tsoulos = sub[sub["method"] == "Tsoulos"][metric].values
-            data_pi      = sub[sub["method"] == "PI-NSGA-II"][metric].values
+            box_data = []
+            for m in METHOD_LIST:
+                box_data.append(sub[sub["method"] == m][metric].values)
 
             bp = ax.boxplot(
-                [data_tsoulos, data_pi],
+                box_data,
                 patch_artist=True,
                 widths=0.45,
                 medianprops=dict(color="white", linewidth=2),
@@ -208,20 +219,22 @@ def plot_boxplot_mse(df: pd.DataFrame, outpath: str):
                 patch.set_alpha(0.8)
 
             # Jitter
-            for j, (data, method) in enumerate(zip([data_tsoulos, data_pi], METHOD_LIST), 1):
-                jitter = np.random.default_rng(42).uniform(-0.15, 0.15, size=len(data))
-                ax.scatter(np.full(len(data), j) + jitter, data,
-                           color=COLORS[method], alpha=0.5, s=15, zorder=3)
+            for j, (data, method) in enumerate(zip(box_data, METHOD_LIST), 1):
+                if len(data) > 0:
+                    jitter = np.random.default_rng(42).uniform(-0.15, 0.15, size=len(data))
+                    ax.scatter(np.full(len(data), j) + jitter, data,
+                               color=COLORS[method], alpha=0.5, s=15, zorder=3)
 
-            U, p, r = wilcoxon_test(data_tsoulos, data_pi)
+            # Estadísticas (comparando los dos principales)
+            U, p, r = wilcoxon_test(box_data[0], box_data[1])
             p_str = f"p={p:.3f}" if p is not None else ""
             label = "Domain MSE" if row == 0 else "Boundary MSE"
-            ax.set_title(f"{pde} — {label}\n({p_str}, r={r:.2f} [{effect_label(r)}])"
+            ax.set_title(f"{pde} — {label}\n({p_str}, r={r:.2f})"
                          if r is not None else f"{pde} — {label}",
                          fontsize=9, fontweight="bold")
-            ax.set_xticks([1, 2])
+            ax.set_xticks(range(1, len(METHOD_LIST) + 1))
             ax.set_xticklabels(METHOD_LIST, rotation=25)
-            ax.set_yscale("symlog", linthresh=1e-3)
+            ax.set_yscale("log")
             ax.set_ylabel(label)
             ax.grid(True, axis="y", ls="--", alpha=0.4)
             ax.spines[["top", "right"]].set_visible(False)

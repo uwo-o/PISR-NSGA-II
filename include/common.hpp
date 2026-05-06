@@ -59,14 +59,14 @@ struct Individual {
 
 // ─── Parámetros globales ──────────────────────────────────────────────────────
 namespace Config {
-    constexpr int    POP_SIZE       = 120;   // +50% diversidad en frente de Pareto
-    constexpr int    MAX_GEN        = 300;   // 2x generaciones → mejor convergencia
+    constexpr int    POP_SIZE       = 250;   // +50% diversidad en frente de Pareto
+    constexpr int    MAX_GEN        = 400;   // 2x generaciones → mejor convergencia
     constexpr int    N_DOMAIN       = 400;   // más puntos de colocación interiores
     constexpr int    N_BOUNDARY     = 80;    // mejor representación de ∂Ω
     constexpr double ERC_SIGMA      = 0.20;  // mayor exploración de constantes
-    constexpr int    MAX_TREE_DEPTH = 4;    // expresiones más complejas
+    constexpr int    MAX_TREE_DEPTH = 5;    // expresiones más complejas
     constexpr int    CODON_LENGTH   = 64;    // genotipos BNF más largos
-    constexpr double CROSSOVER_PROB  = 0.8;
-    constexpr double MUTATION_PROB   = 0.05;
-    constexpr double ALPHA_WEIGHT    = 0.7; // Peso para Dominio (Beta = 1 - Alpha para BC)
+    constexpr double CROSSOVER_PROB  = 0.75;
+    constexpr double MUTATION_PROB   = 0.3;
+    constexpr double ALPHA_WEIGHT    = 0.4; // Peso para Dominio (Beta = 1 - Alpha para BC)
 }

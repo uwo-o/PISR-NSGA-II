@@ -90,7 +90,8 @@ double compute_hypervolume(const std::vector<Ind>& pop,
     }
     // Último rectángulo hasta ref_dom
     hv += (ref_dom - prev_x) * (ref_bnd - cur_min_y);
-    return hv;
+    // Normalizar a [0,1]: dividir entre el área máxima posible
+    return hv / (ref_dom * ref_bnd);
 }
 
 template<typename Ind>

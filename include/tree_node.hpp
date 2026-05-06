@@ -38,6 +38,7 @@ public:
 
     virtual void print(std::ostream& os) const = 0;
     virtual void print_latex(std::ostream& os) const = 0;
+    virtual NodePtr simplify() const = 0;
 };
 
 // ─── Clases derivadas ─────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@ public:
     void mutate_erc(std::mt19937& gen, double sigma = Config::ERC_SIGMA) override;
     void print(std::ostream& os) const override;
     void print_latex(std::ostream& os) const override;
+    NodePtr simplify() const override;
 };
 
 class UnaryNode : public Node {
@@ -72,6 +74,7 @@ public:
     void mutate_erc(std::mt19937& gen, double sigma = Config::ERC_SIGMA) override { child->mutate_erc(gen, sigma); }
     void print(std::ostream& os) const override;
     void print_latex(std::ostream& os) const override;
+    NodePtr simplify() const override;
 };
 
 class BinaryNode : public Node {
@@ -92,6 +95,7 @@ public:
     }
     void print(std::ostream& os) const override;
     void print_latex(std::ostream& os) const override;
+    NodePtr simplify() const override;
 };
 
 // ─── Constructores de nodos ───────────────────────────────────────────────────
