@@ -153,11 +153,11 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
 
     std::uniform_real_distribution<double> dist(0.0, 1.0);
 
-    // Inicializar puntos fijos (50% de la cuota total)
-    fixed_dom_pts_.clear();
-    fixed_bnd_pts_.clear();
-    for(int i=0; i<Config::N_DOMAIN/2; ++i) fixed_dom_pts_.push_back({dist(gen_), dist(gen_)});
-    for(int i=0; i<Config::N_BOUNDARY/2; ++i) fixed_bnd_pts_.push_back({dist(gen_), dist(gen_)});
+    // Generación Única de Puntos (Estáticos para máxima estabilidad)
+    dom_pts_.clear();
+    bnd_pts_.clear();
+    for(int i=0; i<Config::N_DOMAIN; ++i) dom_pts_.push_back({dist(gen_), dist(gen_)});
+    for(int i=0; i<Config::N_BOUNDARY; ++i) bnd_pts_.push_back({dist(gen_), dist(gen_)});
 
     for (int g = 0; g < max_gen; ++g) {
         // 1. Verificar Estancamiento
@@ -191,11 +191,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
             stagnation_counter_ = 0; // Reset tras el evento
         }
 
-        // Remuestreo dinámico (el otro 50%)
-        dom_pts_ = fixed_dom_pts_;
-        bnd_pts_ = fixed_bnd_pts_;
-        for(int i=0; i<Config::N_DOMAIN/2; ++i) dom_pts_.push_back({dist(gen_), dist(gen_)});
-        for(int i=0; i<Config::N_BOUNDARY/2; ++i) bnd_pts_.push_back({dist(gen_), dist(gen_)});
+        // Los puntos dom_pts_ y bnd_pts_ ahora son estáticos durante toda la ejecución.
         
         for(auto& ind : population_) ind.evaluate(prob_, dom_pts_, bnd_pts_);
 
