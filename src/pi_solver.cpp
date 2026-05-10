@@ -279,18 +279,37 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
     std::vector<double*> ercs;
     ind.tree->collect_ercs(ercs);
     if (ercs.empty()) return;
+    
     std::normal_distribution<double> noise(0.0, Config::ERC_SIGMA);
-    std::uniform_int_distribution<int> select_erc(0, ercs.size() - 1);
+    std::uniform_int_distribution<int> select_erc(0, (int)ercs.size() - 1);
+
     for (int i = 0; i < iterations; ++i) {
-        double old_err = ind.mse_domain + ind.mse_boundary;
+        // Guardamos estado inicial
+        double old_dom = ind.mse_domain;
+        double old_bnd = ind.mse_boundary;
+        int    old_sz  = ind.tree_size;
+
         int idx = select_erc(gen_);
         double old_val = *ercs[idx];
+        
+        // Mutación de la constante
         *ercs[idx] += noise(gen_);
         ind.evaluate(prob_, dom_pts_, bnd_pts_);
-        double new_err = ind.mse_domain + ind.mse_boundary;
-        if (new_err > old_err) {
+
+        // Verificamos dominancia de Pareto (3 Objetivos)
+        // Solo revertimos si el nuevo estado es ESTRICTAMENTE PEOR (dominado por el anterior)
+        bool old_dominates_new = (old_dom <= ind.mse_domain   && 
+                                  old_bnd <= ind.mse_boundary && 
+                                  old_sz  <= ind.tree_size)    &&
+                                 (old_dom < ind.mse_domain    || 
+                                  old_bnd < ind.mse_boundary  || 
+                                  old_sz  < ind.tree_size);
+
+        if (old_dominates_new) {
             *ercs[idx] = old_val;
-            ind.evaluate(prob_, dom_pts_, bnd_pts_); 
+            ind.mse_domain = old_dom;
+            ind.mse_boundary = old_bnd;
+            ind.tree_size = old_sz;
         }
     }
 }

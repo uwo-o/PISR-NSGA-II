@@ -268,49 +268,53 @@ static NodePtr random_tree_restricted(int max_depth, std::mt19937& gen, const st
 }
 
 NodePtr random_tree_special(int max_depth, std::mt19937& gen, int dim) {
-    std::uniform_int_distribution<int> arch_dist(0, 3);
+    std::uniform_int_distribution<int> arch_dist(0, 4);
     int archetype = arch_dist(gen);
 
     if (dim == 1) {
-        // En 1D: Paridad f(x^2) o Separabilidad f(x) + C
-        if (std::uniform_real_distribution<double>(0,1)(gen) < 0.5) {
+        // En 1D: Paridad f(x^2), Gaussiana o Separabilidad
+        double p = std::uniform_real_distribution<double>(0,1)(gen);
+        if (p < 0.33) {
              auto x2 = make_binary(NodeType::MUL, make_var('x'), make_var('x'));
-             return make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(1.0), std::move(x2))); // e.g. sin(ax^2)
+             return make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(1.0), std::move(x2))); 
+        } else if (p < 0.66) {
+             auto dx = make_binary(NodeType::SUB, make_var('x'), make_erc(0.5));
+             auto dx2 = make_binary(NodeType::MUL, std::move(dx), make_binary(NodeType::SUB, make_var('x'), make_erc(0.5)));
+             return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-1.0), std::move(dx2)));
         } else {
              return random_tree_restricted(max_depth, gen, {NodeType::VAR_X});
         }
     }
 
     // Archetypes for 2D
-    if (archetype == 0) { // Separable: f(x) + g(y) or f(x) * g(y)
+    if (archetype == 0) { // Altamente Separable: f(x) * g(y)
         auto fx = random_tree_restricted(max_depth - 1, gen, {NodeType::VAR_X});
         auto gy = random_tree_restricted(max_depth - 1, gen, {NodeType::VAR_Y});
-        NodeType op = (std::uniform_real_distribution<double>(0,1)(gen) < 0.7) ? NodeType::ADD : NodeType::MUL;
-        return make_binary(op, std::move(fx), std::move(gy));
+        return make_binary(NodeType::MUL, std::move(fx), std::move(gy));
     } 
-    else if (archetype == 1) { // Radial: f(x^2 + y^2)
+    else if (archetype == 1) { // Radial Puro: exp(-a*( (x-0.5)^2 + (y-0.5)^2 ))
+        auto dx = make_binary(NodeType::SUB, make_var('x'), make_erc(0.5));
+        auto dy = make_binary(NodeType::SUB, make_var('y'), make_erc(0.5));
+        auto r2 = make_binary(NodeType::ADD, make_binary(NodeType::MUL, dx->clone(), dx->clone()), 
+                                              make_binary(NodeType::MUL, dy->clone(), dy->clone()));
+        return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-1.0), std::move(r2)));
+    } 
+    else if (archetype == 2) { // Simetría Par: f(x^2) + g(y^2)
         auto x2 = make_binary(NodeType::MUL, make_var('x'), make_var('x'));
         auto y2 = make_binary(NodeType::MUL, make_var('y'), make_var('y'));
-        auto r2 = make_binary(NodeType::ADD, std::move(x2), std::move(y2));
-        // Aplicamos una función aleatoria al radio al cuadrado
-        NodePtr core = random_tree_restricted(max_depth - 2, gen, {}); // f(C)
-        // Sustituimos la constante por r2 (simplificado: usamos unario/binario)
-        return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-0.5), std::move(r2)));
-    } 
-    else if (archetype == 2) { // Even Symmetry: f(x^2, y^2)
-        auto x2 = make_binary(NodeType::MUL, make_var('x'), make_var('x'));
-        auto y2 = make_binary(NodeType::MUL, make_var('y'), make_var('y'));
-        // Construimos un árbol que use x2 y y2 como sus "variables"
-        return make_binary(NodeType::ADD, make_binary(NodeType::MUL, make_erc(1.0), std::move(x2)),
-                                          make_binary(NodeType::MUL, make_erc(1.0), std::move(y2)));
+        return make_binary(NodeType::ADD, make_unary(NodeType::SIN, std::move(x2)), 
+                                          make_unary(NodeType::SIN, std::move(y2)));
     }
-    else { // Periodic: f(sin(x), cos(x), sin(y), cos(y))
-        auto sx = make_unary(NodeType::SIN, make_var('x'));
-        auto cx = make_unary(NodeType::COS, make_var('x'));
-        auto sy = make_unary(NodeType::SIN, make_var('y'));
-        auto cy = make_unary(NodeType::COS, make_var('y'));
-        return make_binary(NodeType::ADD, make_binary(NodeType::MUL, make_erc(1.0), std::move(sx)),
-                                          make_binary(NodeType::MUL, make_erc(1.0), std::move(cy)));
+    else if (archetype == 3) { // Productos Sinusoidales: sin(ax)*sin(by)
+        auto sx = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(3.14159), make_var('x')));
+        auto sy = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(3.14159), make_var('y')));
+        return make_binary(NodeType::MUL, std::move(sx), std::move(sy));
+    }
+    else { // Polinómico base: a*x + b*y + c*x*y
+        auto term1 = make_binary(NodeType::MUL, make_erc(1.0), make_var('x'));
+        auto term2 = make_binary(NodeType::MUL, make_erc(1.0), make_var('y'));
+        auto term3 = make_binary(NodeType::MUL, make_erc(1.0), make_binary(NodeType::MUL, make_var('x'), make_var('y')));
+        return make_binary(NodeType::ADD, std::move(term1), make_binary(NodeType::ADD, std::move(term2), std::move(term3)));
     }
 }
 
@@ -468,6 +472,7 @@ NodePtr BinaryNode::simplify() const {
     }
     if (type == NodeType::DIV) {
         if (r_erc && rv == 1) return s_l;
+        if (l_erc && lv == 0) return make_erc(0);
         if (is_structurally_equal(s_l.get(), s_r.get())) return make_erc(1);
     }
 
