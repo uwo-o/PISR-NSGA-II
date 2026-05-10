@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-cd /home/uwo/Projects/PI-NSGA-II
 
 # 1. Build
 mkdir -p build && cd build
@@ -27,8 +26,3 @@ cd report
 pdflatex -interaction=nonstopmode results.tex > /dev/null
 pdflatex -interaction=nonstopmode results.tex > /dev/null
 cd ..
-
-echo "=========================================================="
-echo "  PIPELINE FINISHED SUCCESSFULLY"
-echo "  Report available at: /home/uwo/Projects/PI-NSGA-II/report/results.pdf"
-echo "=========================================================="
