@@ -137,6 +137,8 @@ NodePtr make_unary(NodeType op, NodePtr child);
 // ─── Generación aleatoria de árbol ────────────────────────────────────────────
 NodePtr random_tree(int max_depth, std::mt19937& gen, bool force_terminal = false);
 NodePtr random_tree_special(int max_depth, std::mt19937& gen, const PDEProblem& prob);
+NodePtr get_exact_solution_tree(const PDEProblem& prob);
+NodePtr remove_nested_polynomials(NodePtr node, bool inside_poly = false);
 
 // ─── Operadores evolutivos ────────────────────────────────────────────────────
 // Cruce homólogo estructural

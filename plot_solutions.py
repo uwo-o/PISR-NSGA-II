@@ -73,38 +73,31 @@ def plot_1d(pde, df_pi, df_pn=None):
 
     x = df_pi["x"].values
     u_exact  = df_pi["u_exact"].values
-    u_approx = df_pi["u_approx"].values
 
     # Panel superior: soluciones
     ax_sol.plot(x, u_exact,  "k-",  lw=2.2, label=truth_label(pde), alpha=0.75, zorder=3)
-    ax_sol.plot(x, u_approx, "b--", lw=1.8, label="PI-NSGA-II (simbólico)", zorder=4)
+    
+    if df_pi is not None:
+        u_pi = df_pi["u_approx"].values
+        ax_sol.plot(x, u_pi, "b--", lw=1.8, label="PI-NSGA-II", zorder=4)
+        err_pi = np.abs(u_exact - u_pi)
+        ax_err.plot(x, err_pi, "b-", lw=1.5, label="Error PI-NSGA-II")
+
     if df_pn is not None:
-        ax_sol.plot(df_pn["x"], df_pn["u_approx"], "g-.", lw=1.5, label="PINN", zorder=5)
-    ax_sol.fill_between(x, u_exact, u_approx, alpha=0.10, color="blue")
+        ax_sol.plot(df_pn["x"], df_pn["u_approx"], "g-.", lw=1.5, label="PINN", zorder=6)
+        err_pn = np.abs(df_pn["u_exact"].values - df_pn["u_approx"].values)
+        ax_err.plot(df_pn["x"], err_pn, "g-", lw=1.2, label="Error PINN")
+
     ax_sol.set_ylabel("u(x)")
     ax_sol.legend(framealpha=0.85)
     ax_sol.grid(True, alpha=0.3)
 
     # Panel inferior: error absoluto (log)
-    err = np.abs(u_exact - u_approx)
-    # Evitar log de cero
-    err_pos = err[err > 0]
-    ax_err.plot(x, err, "b-", lw=1.5, label="Error PI-NSGA-II")
-    if df_pn is not None:
-        err_pn = np.abs(df_pn["u_exact"].values - df_pn["u_approx"].values)
-        ax_err.plot(df_pn["x"], err_pn, "g-", lw=1.2, label="Error PINN")
-    if len(err_pos) > 0:
-        ax_err.set_yscale("log")
+    ax_err.set_yscale("log")
     ax_err.set_xlabel("x")
     ax_err.set_ylabel(r"$|u - u^*|$")
     ax_err.legend(framealpha=0.85)
     ax_err.grid(True, which="both", alpha=0.3)
-
-    # Anotación: MSE
-    mse = np.mean(err**2)
-    ax_err.annotate(f"MSE = {mse:.3e}", xy=(0.02, 0.92), xycoords="axes fraction",
-                    fontsize=8, color="blue",
-                    bbox=dict(boxstyle="round,pad=0.2", fc="white", alpha=0.7))
 
     out = os.path.join(RESULTS_DIR, f"solution_1d_{pde}.png")
     fig.savefig(out, bbox_inches="tight")
@@ -122,14 +115,22 @@ def plot_2d(pde, df_pi, df_pn=None):
     X = df_pi["x"].values.reshape(N, N)
     Y = df_pi["y"].values.reshape(N, N)
     Z_ex  = df_pi["u_exact"].values.reshape(N, N)
-    Z_pi  = df_pi["u_approx"].values.reshape(N, N)
-    E_pi  = np.abs(Z_ex - Z_pi)
 
+    has_pi = df_pi is not None
     has_pinn = df_pn is not None
-    n_cols = 3 if not has_pinn else 4
-    fig = plt.figure(figsize=(6 * n_cols, 11))
-    fig.suptitle(PDE_LABELS.get(pde, pde) + "  —  2D",
-                 fontweight="bold", fontsize=12, y=0.99)
+    
+    cols = []
+    cols.append(("Exacta", Z_ex, None, CMAP_SOLUTION))
+    if has_pi:
+        Z_pi = df_pi["u_approx"].values.reshape(N, N)
+        cols.append(("PI-NSGA-II", Z_pi, np.abs(Z_ex - Z_pi), CMAP_SOLUTION))
+    if has_pinn:
+        Z_pn = df_pn["u_approx"].values.reshape(N, N)
+        cols.append(("PINN", Z_pn, np.abs(Z_ex - Z_pn), CMAP_SOLUTION))
+
+    n_cols = len(cols)
+    fig = plt.figure(figsize=(5 * n_cols, 10))
+    fig.suptitle(PDE_LABELS.get(pde, pde) + "  —  2D", fontweight="bold", fontsize=12, y=0.99)
 
     def surface(pos, Z, title, cmap=CMAP_SOLUTION):
         ax = fig.add_subplot(2, n_cols, pos, projection="3d")
@@ -148,20 +149,15 @@ def plot_2d(pde, df_pi, df_pn=None):
         return ax
 
     # Fila 1: superficies 3D
-    surface(1, Z_ex,  truth_label(pde))
-    surface(2, Z_pi,  "PI-NSGA-II")
-    surface(3, E_pi,  "Error |u - u*|", cmap=CMAP_ERROR)
-    if has_pinn:
-        Z_pn = df_pn["u_approx"].values.reshape(N, N)
-        surface(4, Z_pn, "PINN", cmap="summer")
+    for idx, (name, Z, _, cmap) in enumerate(cols):
+        surface(idx + 1, Z, name, cmap)
 
     # Fila 2: heatmaps
-    heatmap(n_cols + 1, Z_ex,  truth_label(pde) + " (top view)")
-    heatmap(n_cols + 2, Z_pi,  "PI-NSGA-II (top view)")
-    heatmap(n_cols + 3, E_pi,  "Error (top view)", cmap=CMAP_ERROR)
-    if has_pinn:
-        E_pn = np.abs(Z_ex - df_pn["u_approx"].values.reshape(N, N))
-        heatmap(n_cols + 4, E_pn, "Error PINN (top view)", cmap="magma")
+    for idx, (name, Z, E, cmap) in enumerate(cols):
+        if E is None:
+            heatmap(n_cols + idx + 1, Z, name + " (top)", cmap)
+        else:
+            heatmap(n_cols + idx + 1, E, f"Error {name}", CMAP_ERROR)
 
     fig.tight_layout(rect=[0, 0, 1, 0.97])
     out = os.path.join(RESULTS_DIR, f"solution_2d_{pde}.png")
@@ -184,11 +180,10 @@ def plot_equation(pde, dim):
         df_pi = pd.read_csv(path_pi)
         df_pn = pd.read_csv(path_pn) if path_pn else None
 
-        # Si u_exact es todo ceros o NaN → no graficamos la "verdad" (log de error no tiene sentido)
         u_ex = df_pi["u_exact"].values
         if np.all(u_ex == 0) or np.all(~np.isfinite(u_ex)):
             print(f"  [WARN] {pde} {dim}D: u_exact todo cero/NaN, graficando solo aprox.")
-            df_pi["u_exact"] = df_pi["u_approx"]   # fallback: error = 0
+            df_pi["u_exact"] = df_pi["u_approx"]
 
         if dim == 1:
             plot_1d(pde, df_pi, df_pn)
@@ -203,7 +198,7 @@ def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
     skips_1d = {"NonlinearPoisson", "Liouville", "Sine-Gordon"}   # solo 2D
-    skips_2d = {"Airy"}                                            # solo 1D
+    skips_2d = set()
 
     for pde in PDE_ORDER:
         if pde not in skips_1d:

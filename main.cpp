@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <numeric>
 #include <cstring>
+#include <omp.h>
 
 #include "common.hpp"
 #include "pde_problems.hpp"
@@ -216,8 +217,9 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
         problems.push_back(make_helmholtz(d, 1.0));
         problems.push_back(make_schrodinger(d));
         problems.push_back(make_harmonic_oscillator(d));
+        problems.push_back(make_airy(d));
     }
-    problems.push_back(make_airy());
+
     problems.push_back(make_nonlinear_poisson());
     problems.push_back(make_liouville());
     problems.push_back(make_sine_gordon());
@@ -232,27 +234,97 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
             prob.numerical_truth = NumericalSolver::solve(prob, 50);
         }
 
-        auto t0 = std::chrono::steady_clock::now();
-        PISolver pi(prob, seed_base + 500u);
-        auto pi_pop = pi.run(Config::POP_SIZE, Config::MAX_GEN);
-        double pi_rt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
-        
-        save_pareto_csv(pi_pop, out_dir + "/" + lbl + "_pi_pareto.csv", "PI-NSGA-II", prob.name(), prob.dim);
-        save_convergence_csv(pi.history(), out_dir + "/" + lbl + "_pi_convergence.csv");
-        save_best_expression(pi_pop, out_dir + "/expr_" + lbl + "_PI-NSGA-II.tex");
-        save_best_grid(pi_pop, prob, out_dir + "/grid_" + lbl + "_PI-NSGA-II.csv");
-        
-        Stats ps = compute_stats(pi_pop, "PI-NSGA-II", lbl, pi_rt);
-        if (verbose) print_table(lbl, ps);
-        all_stats.push_back(ps);
+        // Run Numerical Solver (RK4/FDM) baseline for comparison
+        bool has_numerical = false;
+        double num_rt = 0.0;
+        double num_mse_dom = 0.0;
+        double num_mse_bnd = 0.0;
+
+        if (prob.dim == 1 || prob.type == PDE::LAPLACE || prob.type == PDE::POISSON || prob.type == PDE::HELMHOLTZ) {
+            has_numerical = true;
+            auto t_num0 = std::chrono::steady_clock::now();
+            auto num_sol = NumericalSolver::solve(prob, 50);
+            num_rt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t_num0).count();
+
+            if (prob.is_numerical) {
+                // For numerical equations, the numerical solution is the ground truth
+                num_mse_dom = 0.0;
+                num_mse_bnd = 0.0;
+            } else {
+                double sum_sq_dom = 0.0;
+                if (prob.dim == 1) {
+                    int N = num_sol.size();
+                    double h = 1.0 / (N - 1);
+                    for (int i = 0; i < N; ++i) {
+                        double x = i * h;
+                        double diff = std::abs(num_sol[i] - prob.exact(x, 0.0));
+                        sum_sq_dom += diff * diff;
+                    }
+                    num_mse_dom = sum_sq_dom / N;
+                    num_mse_bnd = 0.0;
+                } else {
+                    int N = std::sqrt(num_sol.size());
+                    double h = 1.0 / (N - 1);
+                    for (int i = 0; i < N; ++i) {
+                        for (int j = 0; j < N; ++j) {
+                            double x = i * h;
+                            double y = j * h;
+                            double diff = std::abs(num_sol[i * N + j] - prob.exact(x, y));
+                            sum_sq_dom += diff * diff;
+                        }
+                    }
+                    num_mse_dom = sum_sq_dom / (N * N);
+                    num_mse_bnd = 0.0;
+                }
+            }
+        }
+
+        {
+            auto t0 = std::chrono::steady_clock::now();
+            PISolver pi(prob, seed_base + 500u);
+            auto pi_pop = pi.run(Config::POP_SIZE, Config::MAX_GEN);
+            double pi_rt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+            
+            save_pareto_csv(pi_pop, out_dir + "/" + lbl + "_pi_gn_pareto.csv", "PI-NSGA-II", prob.name(), prob.dim);
+            save_convergence_csv(pi.history(), out_dir + "/" + lbl + "_pi_gn_convergence.csv");
+            save_best_expression(pi_pop, out_dir + "/expr_" + lbl + "_PI-NSGA-II.tex");
+            save_best_grid(pi_pop, prob, out_dir + "/grid_" + lbl + "_PI-NSGA-II.csv");
+            
+            Stats ps = compute_stats(pi_pop, "PI-NSGA-II", lbl, pi_rt);
+            if (verbose) print_table(lbl, ps);
+            all_stats.push_back(ps);
+        }
+
+        if (has_numerical) {
+            Stats ns;
+            ns.method = "RK4/FDM";
+            ns.pde = lbl;
+            ns.front_size = 1;
+            ns.best_domain = num_mse_dom;
+            ns.best_bnd = num_mse_bnd;
+            ns.mean_domain = num_mse_dom;
+            ns.mean_bnd = num_mse_bnd;
+            ns.runtime_s = num_rt;
+            ns.hypervolume = 0.0;
+            all_stats.push_back(ns);
+        }
     }
     return all_stats;
 }
 
 int main(int argc, char* argv[]) {
     int n_runs = 1;
+    bool is_test = false;
     for (int i = 1; i < argc; ++i) {
         if (std::strcmp(argv[i], "--runs") == 0 && i+1 < argc) n_runs = std::atoi(argv[i+1]);
+        if (std::strcmp(argv[i], "--test") == 0) is_test = true;
+    }
+
+    if (is_test) {
+        int max_threads = omp_get_max_threads();
+        int threads_to_use = std::max(1, max_threads - 2);
+        omp_set_num_threads(threads_to_use);
+        std::cout << "[INFO] Modo --test activado. Usando " << threads_to_use << " nucleos.\n";
     }
 
     std::cout << "=============================================================\n";
@@ -285,14 +357,12 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    if (n_runs > 1) {
-        std::ofstream f_all("results/all_runs_summary.csv");
-        f_all << "run,method,pde,pareto_size,best_mse_domain,best_mse_boundary,mean_mse_domain,mean_mse_boundary,hypervolume,runtime_s\n";
-        for (int r = 0; r < n_runs; ++r) {
-            for (auto& s : all_runs[r]) {
-                f_all << r << "," << s.method << "," << s.pde << "," << s.front_size << "," << s.best_domain << ","
-                      << s.best_bnd << "," << s.mean_domain << "," << s.mean_bnd << "," << s.hypervolume << "," << s.runtime_s << "\n";
-            }
+    std::ofstream f_all("results/all_runs_summary.csv");
+    f_all << "run,method,pde,pareto_size,best_mse_domain,best_mse_boundary,mean_mse_domain,mean_mse_boundary,hypervolume,runtime_s\n";
+    for (int r = 0; r < n_runs; ++r) {
+        for (auto& s : all_runs[r]) {
+            f_all << r << "," << s.method << "," << s.pde << "," << s.front_size << "," << s.best_domain << ","
+                  << s.best_bnd << "," << s.mean_domain << "," << s.mean_bnd << "," << s.hypervolume << "," << s.runtime_s << "\n";
         }
     }
 

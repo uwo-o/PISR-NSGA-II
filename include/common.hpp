@@ -38,6 +38,7 @@ inline std::string pde_name(PDE t) {
 enum class NodeType {
     ADD, SUB, MUL, DIV,
     SIN, COS, SINH, COSH, EXP, SQR,
+    LEGENDRE, HERMITE, BESSEL_J,
     VAR_X, VAR_Y, ERC, CONST_I,
     UNKNOWN
 };
@@ -77,12 +78,12 @@ struct ConvergenceStats {
 
 // ─── Parámetros globales ──────────────────────────────────────────────────────
 namespace Config {
-    constexpr int    POP_SIZE       = 500;   
-    constexpr int    MAX_GEN        = 500;   
+    constexpr int    POP_SIZE       = 250;   
+    constexpr int    MAX_GEN        = 150;   
     constexpr int    N_DOMAIN       = 600;   
     constexpr int    N_BOUNDARY     = 200;   
     constexpr double ERC_SIGMA      = 0.20;  
-    constexpr int    MAX_TREE_DEPTH = 8;    
+    constexpr int    MAX_TREE_DEPTH = 8;
     constexpr int    CODON_LENGTH   = 64;    
     constexpr double CROSSOVER_PROB = 0.80;  
     constexpr double MUTATION_PROB  = 0.3;  

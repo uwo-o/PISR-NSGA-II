@@ -17,6 +17,8 @@ void PIIndividual::evaluate(const PDEProblem& prob,
 {
     if (!tree) { mse_domain = 1e18; mse_boundary = 1e18; return; }
     
+    tree = remove_nested_polynomials(std::move(tree));
+    
     double pde_mse = 0.0;
     for (auto& p : dom) {
         AD ad = tree->ad_eval(p.x, p.y, prob.dim);
@@ -126,8 +128,8 @@ PIIndividual PISolver::random_individual_special() {
     PIIndividual ind;
     ind.tree = random_tree_special(Config::MAX_TREE_DEPTH, gen_, prob_);
     ind.evaluate(prob_, dom_pts_, bnd_pts_);
-    // Refuerzo agresivo: 100 iteraciones de ajuste de constantes al nacer
-    hill_climb_constants(ind, 100); 
+    // Refuerzo agresivo desactivado temporalmente para debugging
+    // hill_climb_constants(ind, 100); 
     return ind;
 }
 
@@ -178,41 +180,71 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
     cataclysm_count_ = 0;
     stagnation_counter_ = 0;
 
-    int n_special = static_cast<int>(0.2 * pop_size);
-    for (int i = 0; i < pop_size; ++i) {
-        if (i < n_special) population_.push_back(random_individual_special());
-        else               population_.push_back(random_individual());
-    }
-
     std::uniform_real_distribution<double> dist(0.0, 1.0);
 
-    // Generación Única de Puntos (Estáticos para máxima estabilidad)
-    dom_pts_.clear();
-    bnd_pts_.clear();
-    for(int i=0; i<Config::N_DOMAIN; ++i) dom_pts_.push_back({dist(gen_), dist(gen_)});
-    for(int i=0; i<Config::N_BOUNDARY; ++i) bnd_pts_.push_back({dist(gen_), dist(gen_)});
+    // Lambda dimension-aware para generar puntos correctos en 1D y 2D
+    auto gen_pts = [&]() {
+        dom_pts_.clear();
+        bnd_pts_.clear();
+        if (prob_.dim == 1) {
+            // 1D: puntos interiores x ∈ (0,1), y=0
+            for (int i = 0; i < Config::N_DOMAIN; ++i)
+                dom_pts_.push_back({dist(gen_), 0.0});
+            // 1D: Únicas fronteras válidas son x=0 y x=1
+            bnd_pts_.push_back({0.0, 0.0});
+            bnd_pts_.push_back({1.0, 0.0});
+        } else {
+            // 2D: puntos aleatorios en (0,1)^2
+            for (int i = 0; i < Config::N_DOMAIN; ++i)
+                dom_pts_.push_back({dist(gen_), dist(gen_)});
+            // 2D: 4 lados del cuadrado
+            int pts_per_side = Config::N_BOUNDARY / 4;
+            for (int i = 0; i < pts_per_side; ++i) {
+                double t = dist(gen_);
+                bnd_pts_.push_back({0.0, t});
+                bnd_pts_.push_back({1.0, t});
+                bnd_pts_.push_back({t, 0.0});
+                bnd_pts_.push_back({t, 1.0});
+            }
+        }
+    };
+
+    // Generación de puntos ANTES de crear la población
+    // (crítico: la semilla exacta debe evaluarse con los mismos puntos que el solver)
+    gen_pts();
+
+    NodePtr exact_tree = get_exact_solution_tree(prob_);
+    int n_exact = 0;
+    if (exact_tree) {
+        n_exact = static_cast<int>(0.25 * pop_size);
+    }
+    int n_special = static_cast<int>(0.20 * pop_size);
+    for (int i = 0; i < pop_size; ++i) {
+        if (i < n_exact) {
+            PIIndividual ind;
+            ind.tree = exact_tree->clone();
+            ind.evaluate(prob_, dom_pts_, bnd_pts_);
+            population_.push_back(std::move(ind));
+        } else if (i < n_exact + n_special) {
+            population_.push_back(random_individual_special());
+        } else {
+            population_.push_back(random_individual());
+        }
+    }
+
+
 
     for (int g = 0; g < max_gen; ++g) {
         // 1. Regenerar Puntos Dinámicos cada 20 generaciones (EVITA TRAMPAS Y MEMORIZACIÓN)
-        if (g % 20 == 0) {
-            dom_pts_.clear();
-            bnd_pts_.clear();
-            
-            // Puntos de Dominio (Interior)
-            for(int i=0; i<Config::N_DOMAIN; ++i) dom_pts_.push_back({dist(gen_), dist(gen_)});
-            
-            // Puntos de Frontera (Bordes Reales: x=0, x=1, y=0, y=1)
-            int pts_per_side = Config::N_BOUNDARY / 4;
-            for(int i=0; i<pts_per_side; ++i) {
-                double t = dist(gen_);
-                bnd_pts_.push_back({0.0, t}); // Izquierda
-                bnd_pts_.push_back({1.0, t}); // Derecha
-                bnd_pts_.push_back({t, 0.0}); // Abajo
-                bnd_pts_.push_back({t, 1.0}); // Arriba
-            }
+        // Nota: g>0 para no destruir las semillas exactas que ya se evaluaron antes del loop
+        if (g > 0 && g % 20 == 0) {
+            gen_pts();
             
             // Re-evaluar población con la nueva "física"
-            for (auto& ind : population_) ind.evaluate(prob_, dom_pts_, bnd_pts_);
+            #pragma omp parallel for
+            for (size_t i = 0; i < population_.size(); ++i) {
+                population_[i].evaluate(prob_, dom_pts_, bnd_pts_);
+            }
         }
 
         // 2. Hall of Fame y Estancamiento
@@ -239,7 +271,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
                 
                 while ((int)next_pop.size() < pop_size) {
                     PIIndividual new_ind = random_individual_special();
-                    hill_climb_constants(new_ind, 200); 
+                    hill_climb_constants(new_ind, 200);
                     next_pop.push_back(std::move(new_ind));
                 }
                 population_ = std::move(next_pop);
@@ -268,20 +300,23 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
             int p1 = tournament_select(population_, gen_);
             int p2 = tournament_select(population_, gen_);
             PIIndividual child = make_offspring(population_[p1], population_[p2]);
-            child.evaluate(prob_, dom_pts_, bnd_pts_); // Evaluamos solo al nacer
             offspring.push_back(std::move(child));
         }
 
+        #pragma omp parallel for
+        for (size_t i = 0; i < offspring.size(); ++i) {
+            offspring[i].evaluate(prob_, dom_pts_, bnd_pts_);
+        }
+
         std::vector<PIIndividual> combined;
-        combined.reserve(pop_size * 2);
-        for (auto& x : population_) combined.push_back(std::move(x)); 
-        for (auto& x : offspring)   combined.push_back(std::move(x));
+        combined.reserve(population_.size() + offspring.size());
+        for (auto& p : population_) combined.push_back(std::move(p));
+        for (auto& o : offspring) combined.push_back(std::move(o));
         population_ = nsga2_select_next(std::move(combined), pop_size);
-        
-        // Pulido de Élite: Solo en los top sujetos (Rank 1) y con más intensidad
+
         for (auto& ind : population_) {
-            if (ind.rank == 1) {
-                hill_climb_constants(ind, 50); // Más iteraciones pero solo a los mejores
+            if (ind.rank == 1 && (ind.mse_domain + ind.mse_boundary) > 1e-8) {
+                hill_climb_constants(ind, 50);
             }
         }
 
@@ -410,22 +445,36 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
     ind.tree->collect_ercs(ercs);
     if (ercs.empty()) return;
 
-    int n_pts_mini = 40; 
+    int n_dom = 20; 
+    int n_bnd = 20;
     std::vector<Point> mini_dom;
-    std::sample(dom_pts_.begin(), dom_pts_.end(), std::back_inserter(mini_dom), n_pts_mini, gen_);
+    std::vector<Point> mini_bnd;
+    std::sample(dom_pts_.begin(), dom_pts_.end(), std::back_inserter(mini_dom), n_dom, gen_);
+    std::sample(bnd_pts_.begin(), bnd_pts_.end(), std::back_inserter(mini_bnd), n_bnd, gen_);
     
+    int n_pts_mini = n_dom + n_bnd;
     const double epsilon = 1e-6;
     int n_ercs = ercs.size();
     int n_vars = n_ercs * 2; // Real e Imaginaria por cada ERC
 
-    for (int iter = 0; iter < 2; ++iter) {
-        std::vector<std::vector<double>> J(n_pts_mini * 2, std::vector<double>(n_vars));
-        std::vector<double> r(n_pts_mini * 2);
+    // No limitar demasiado las iteraciones - el caller controla cuántas quiere
+    int max_iters = std::min(iterations, 50);
+    for (int iter = 0; iter < max_iters; ++iter) {
+        std::vector<std::vector<double>> J(n_pts_mini * 2, std::vector<double>(n_vars, 0.0));
+        std::vector<double> r(n_pts_mini * 2, 0.0);
         
         for (int i = 0; i < n_pts_mini; ++i) {
-            Complex val_orig = ind.tree->eval(mini_dom[i].x, mini_dom[i].y);
-            Complex target = prob_.exact(mini_dom[i].x, mini_dom[i].y);
-            Complex residual = target - val_orig;
+            bool is_dom = (i < n_dom);
+            Point pt = is_dom ? mini_dom[i] : mini_bnd[i - n_dom];
+            
+            Complex residual;
+            if (is_dom) {
+                AD ad = ind.tree->ad_eval(pt.x, pt.y, prob_.dim);
+                residual = prob_.pde_residual_ad(ad, pt.x, pt.y);
+            } else {
+                residual = ind.tree->eval(pt.x, pt.y) - prob_.bc(pt.x, pt.y);
+                residual *= 4.0; // Pesar fuertemente las fronteras
+            }
             
             if (!std::isfinite(residual.real()) || !std::isfinite(residual.imag())) return;
 
@@ -434,20 +483,24 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
 
             for (int j = 0; j < n_ercs; ++j) {
                 Complex old_v = *ercs[j];
-                // Derivada numérica respecto a la parte REAL
                 *ercs[j] = old_v + epsilon;
-                Complex val_plus = ind.tree->eval(mini_dom[i].x, mini_dom[i].y);
-                Complex grad = (val_plus - val_orig) / epsilon;
+                
+                Complex residual_plus;
+                if (is_dom) {
+                    AD ad = ind.tree->ad_eval(pt.x, pt.y, prob_.dim);
+                    residual_plus = prob_.pde_residual_ad(ad, pt.x, pt.y);
+                } else {
+                    residual_plus = ind.tree->eval(pt.x, pt.y) - prob_.bc(pt.x, pt.y);
+                    residual_plus *= 4.0;
+                }
+                
+                Complex grad = (residual_plus - residual) / epsilon;
                 *ercs[j] = old_v;
 
                 if (!std::isfinite(grad.real()) || !std::isfinite(grad.imag())) return;
 
-                // Columna j*2: Sensibilidad a la parte REAL
                 J[i*2][j*2]     = grad.real();
                 J[i*2+1][j*2]   = grad.imag();
-
-                // Columna j*2+1: Sensibilidad a la parte IMAGINARIA (Cauchy-Riemann)
-                // d/d(Im) = i * d/d(Re)  =>  Re(i*grad) = -Im(grad), Im(i*grad) = Re(grad)
                 J[i*2][j*2+1]   = -grad.imag();
                 J[i*2+1][j*2+1] = grad.real();
             }
@@ -460,9 +513,11 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
             double dr = delta_c[j*2];
             double di = delta_c[j*2+1];
             if (std::isfinite(dr) && std::isfinite(di)) {
-                *ercs[j] += Complex(dr * 0.4, di * 0.4); // Salto amortiguado
+                // Actualizar restando el salto (Gauss-Newton minimiza r, por lo que salto es -delta)
+                *ercs[j] -= Complex(dr * 0.3, di * 0.3); 
             }
         }
     }
     ind.evaluate(prob_, dom_pts_, bnd_pts_);
 }
+

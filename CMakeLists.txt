@@ -11,6 +11,9 @@ endif()
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG   "-g -fsanitize=address,undefined")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+
+find_package(OpenMP)
 
 # ─── Includes ─────────────────────────────────────────────────────────────────
 include_directories(${PROJECT_SOURCE_DIR}/include)
@@ -27,8 +30,7 @@ set(SOURCES
 # ─── Ejecutable principal ─────────────────────────────────────────────────────
 add_executable(pi_nsga2 ${SOURCES})
 
-# Linkar librerías matemáticas y filesystem
-target_link_libraries(pi_nsga2 m stdc++fs)
+target_link_libraries(pi_nsga2 m stdc++fs -fopenmp)
 
 # ─── Información de compilación ───────────────────────────────────────────────
 message(STATUS "Build type : ${CMAKE_BUILD_TYPE}")

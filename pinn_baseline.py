@@ -13,17 +13,36 @@ GPU: GTX 1050 Ti (sm_61) no compatible con PyTorch 2.x → usamos CPU multi-hilo
      de CUDA_VISIBLE_DEVICES y DeepXDE usará la GPU automáticamente.
 """
 
-import os, sys, time, argparse, csv, warnings
+import os, sys, time, argparse, csv, warnings, subprocess
 import numpy as np
 warnings.filterwarnings("ignore")
 
+# ── CUDA dynamic configuration ────────────────────────────────────────────────
+use_cuda = False
+try:
+    # Probamos en un subproceso si CUDA realmente puede ejecutar tensores sin fallar (evita crashes por sm_61 en PyTorch 2.x)
+    res = subprocess.run(
+        [sys.executable, "-c", "import torch; torch.randn(1, device='cuda')"],
+        capture_output=True, text=True, timeout=5
+    )
+    if res.returncode == 0:
+        use_cuda = True
+        print("[INFO] CUDA is functional. Running PINN on GPU.")
+    else:
+        print("[WARNING] CUDA is available but failed verification in subprocess (e.g. GPU compute capability mismatch).")
+        print("[WARNING] Falling back to CPU.")
+except Exception as e:
+    print(f"[WARNING] Exception during CUDA subprocess check: {e}. Falling back to CPU.")
+
+if not use_cuda:
+    os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 # ── Backend ───────────────────────────────────────────────────────────────────
 os.environ.setdefault("DDE_BACKEND", "pytorch")
-# Forzar CPU porque GTX 1050 Ti (sm_61) no es compatible con PyTorch 2.x
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 import torch
-# Usar todos los cores disponibles
+
+# Usar todos los cores disponibles si se corre en CPU
 N_THREADS = os.cpu_count() or 4
 torch.set_num_threads(N_THREADS)
 torch.set_num_interop_threads(max(1, N_THREADS // 2))
@@ -58,7 +77,9 @@ def build_problem(pde_name, dim):
     def exact_schrodinger_1d(x):   return np.exp(1j*_pi*x)  # onda plana
     def exact_schrodinger_2d(x,y): return np.exp(1j*_pi*(x+y))
     # Numéricos: función de referencia basada en la física del estado base
-    def ref_airy_1d(x):          return 0.3550*np.exp(-0.3*x**2)   # aprox Ai(x) en [0,1]
+    import scipy.special as sp
+    def ref_airy_1d(x):          return sp.airy(x)[0]
+    def ref_airy_2d(x,y):        return np.where(x < 0.01, 0.3550, 0.1353)
     def ref_ho_1d(x):            return np.exp(-0.5*x**2)           # estado base ψ₀
     def ref_ho_2d(x,y):          return np.exp(-0.5*(x**2+y**2))
     def ref_nonlin_poisson(x,y): return 1.0/(1+x**2+y**2)          # solución analítica
@@ -98,8 +119,11 @@ def build_problem(pde_name, dim):
                 return lap + k2 * u
 
             elif pde_name == "Airy":
-                # u'' = x*u
-                return lap - x[:,0:1]*u
+                # u'' = var*u
+                if dim == 1:
+                    return lap - x[:,0:1]*u
+                else:
+                    return lap - (x[:,0:1] + x[:,1:2])*u
 
             elif pde_name == "HarmonicOscillator":
                 # -u'' + x²u = u  →  u'' = (x²-1)u
@@ -125,8 +149,10 @@ def build_problem(pde_name, dim):
                 return lap - torch.exp(u)
 
             elif pde_name == "Sine-Gordon":
-                # ∇²u = sin(u)
-                return lap - torch.sin(u)
+                # ∇²u - sin(u) = f
+                u_exact = torch.sin(_pi * x[:, 0:1]) * torch.sin(_pi * x[:, 1:2])
+                f = -2.0 * _pi**2 * u_exact - torch.sin(u_exact)
+                return lap - torch.sin(u) - f
 
             return lap
         return pde
@@ -142,6 +168,7 @@ def build_problem(pde_name, dim):
         ("Schrodinger",1):(lambda x: np.real(exact_schrodinger_1d(x)), None),
         ("Schrodinger",2):(None, lambda x,y: np.real(exact_schrodinger_2d(x,y))),
         ("Airy",       1): (ref_airy_1d,        None),
+        ("Airy",       2): (None,               ref_airy_2d),
         ("HarmonicOscillator",1): (ref_ho_1d,  None),
         ("HarmonicOscillator",2): (None,        ref_ho_2d),
         ("NonlinearPoisson",2):   (None,        ref_nonlin_poisson),
@@ -181,7 +208,27 @@ def build_problem(pde_name, dim):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-def solve_and_eval(pde_name, dim, run_dir, epochs_override=None):
+def load_exact_grid(pde_name, dim, run_dir):
+    label = f"{pde_name}_{dim}D"
+    for d in [run_dir, RESULTS_DIR]:
+        path = os.path.join(d, f"grid_{label}_PI-NSGA-II.csv")
+        if os.path.exists(path):
+            try:
+                import pandas as pd
+                df = pd.read_csv(path)
+                if dim == 1:
+                    pts = df[["x"]].values
+                else:
+                    pts = df[["x", "y"]].values
+                u_exact = df["u_exact"].values
+                return pts, u_exact
+            except Exception as e:
+                print(f"[WARNING] Error reading {path}: {e}")
+    return None, None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+def solve_and_eval(pde_name, dim, run_dir, epochs_override=None, is_test=False):
     print(f"\n{'='*60}")
     print(f"  PINN: {pde_name} {dim}D  [{N_THREADS} CPU threads]")
     print(f"{'='*60}")
@@ -192,6 +239,9 @@ def solve_and_eval(pde_name, dim, run_dir, epochs_override=None):
     if epochs_override:
         epochs_adam = epochs_override
 
+    if is_test:
+        epochs_adam = 5
+
     data = dde.data.PDE(geom, pde_fn, bcs,
                         num_domain=n_dom, num_boundary=n_bnd, num_test=n_test)
     net = dde.nn.FNN(layers, "tanh", "Glorot normal")
@@ -201,29 +251,42 @@ def solve_and_eval(pde_name, dim, run_dir, epochs_override=None):
 
     # Fase 1: Adam
     model.compile("adam", lr=1e-3, loss_weights=[1, 100])
-    losshistory, _ = model.train(iterations=epochs_adam, display_every=epochs_adam//5)
+    losshistory, _ = model.train(iterations=epochs_adam, display_every=max(1, epochs_adam//5))
 
     # Fase 2: L-BFGS para refinamiento fino
-    dde.optimizers.config.set_LBFGS_options(maxiter=3000)
-    model.compile("L-BFGS")
-    losshistory, _ = model.train()
+    if not is_test:
+        dde.optimizers.config.set_LBFGS_options(maxiter=3000)
+        model.compile("L-BFGS")
+        losshistory, _ = model.train()
 
     rt = time.time() - t0
     print(f"  Tiempo total: {rt:.1f}s")
 
     # ── Evaluación ────────────────────────────────────────────────────────────
-    if dim == 1:
-        pts = np.linspace(0, 1, 100).reshape(-1, 1)
+    # Intentamos cargar la rejilla exacta del solver PI-NSGA-II para comparación 1:1
+    pts_exact, u_exact_grid = load_exact_grid(pde_name, dim, run_dir)
+
+    if pts_exact is not None:
+        pts = pts_exact
         u_approx = model.predict(pts).ravel()
-        u_exact  = exact_fn(pts[:, 0]).ravel()
+        u_exact = u_exact_grid
+    else:
+        # Fallback si no existe la rejilla en disco
+        if dim == 1:
+            pts = np.linspace(0, 1, 101).reshape(-1, 1)
+            u_approx = model.predict(pts).ravel()
+            u_exact  = exact_fn(pts[:, 0]).ravel()
+        else:
+            xs = np.linspace(0, 1, 51)
+            xx, yy = np.meshgrid(xs, xs)
+            pts = np.column_stack([xx.ravel(), yy.ravel()])
+            u_approx = model.predict(pts).ravel()
+            u_exact  = exact_fn(pts[:,0], pts[:,1]).ravel()
+
+    if dim == 1:
         bnd_pts  = np.array([[0.0],[1.0]])
     else:
-        xs = np.linspace(0, 1, 50)
-        xx, yy = np.meshgrid(xs, xs)
-        pts = np.column_stack([xx.ravel(), yy.ravel()])
-        u_approx = model.predict(pts).ravel()
-        u_exact  = exact_fn(pts[:,0], pts[:,1]).ravel()
-        t_bnd = np.linspace(0, 1, 50)
+        t_bnd = np.linspace(0, 1, 51)
         bnd_pts = np.concatenate([
             np.column_stack([t_bnd, np.zeros_like(t_bnd)]),
             np.column_stack([t_bnd, np.ones_like(t_bnd)]),
@@ -276,6 +339,7 @@ def main():
     parser.add_argument("--runs",   type=int, default=1)
     parser.add_argument("--only",   type=str, default=None,
                         help="Correr solo una ecuación, ej: --only Airy_1D")
+    parser.add_argument("--test",   action="store_true", help="Fast test mode")
     args = parser.parse_args()
 
     # Todos los problemas en el mismo orden que PI-NSGA-II
@@ -284,7 +348,7 @@ def main():
         ("Poisson",            1), ("Poisson",            2),
         ("Helmholtz",          1), ("Helmholtz",          2),
         ("Schrodinger",        1), ("Schrodinger",        2),
-        ("Airy",               1),
+        ("Airy",               1), ("Airy",               2),
         ("HarmonicOscillator", 1), ("HarmonicOscillator", 2),
         ("NonlinearPoisson",   2),
         ("Liouville",          2),
@@ -303,7 +367,7 @@ def main():
 
         for pde_name, dim in problems:
             try:
-                res = solve_and_eval(pde_name, dim, run_dir, args.epochs)
+                res = solve_and_eval(pde_name, dim, run_dir, args.epochs, is_test=args.test)
                 res["run"] = run_idx
                 all_results.append(res)
             except Exception as e:

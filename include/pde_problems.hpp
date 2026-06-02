@@ -50,5 +50,5 @@ PDEProblem make_schrodinger(int dim = 2);
 PDEProblem make_nonlinear_poisson();
 PDEProblem make_liouville();
 PDEProblem make_sine_gordon();
-PDEProblem make_airy();
+PDEProblem make_airy(int dim);
 PDEProblem make_harmonic_oscillator(int dim);
