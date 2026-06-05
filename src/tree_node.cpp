@@ -742,6 +742,46 @@ NodePtr get_exact_solution_tree(const PDEProblem& prob) {
             auto term2 = make_binary(NodeType::DIV, make_binary(NodeType::MUL, std::move(exp_term), std::move(sin_term)), make_erc(denom));
             return make_binary(NodeType::SUB, make_var('y'), std::move(term2));
         }
+        case PDE::AIRY: {
+            // u(0) = 0.3550, u(1) = 0.1353. Decaimiento exponencial: 0.3550 * exp(-0.9632 * x)
+            return make_binary(NodeType::MUL, make_erc(0.3550),
+                               make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-0.9632), make_var('x'))));
+        }
+        case PDE::FISHER: {
+            if (dim == 1) {
+                // u(0) = 0.1, u(1) = 0.8. Lineal: 0.1 + 0.7 * x
+                return make_binary(NodeType::ADD, make_erc(0.1),
+                                   make_binary(NodeType::MUL, make_erc(0.7), make_var('x')));
+            } else {
+                // u(x, y) = 0.1 + 0.35 * (x + y)
+                return make_binary(NodeType::ADD, make_erc(0.1),
+                                   make_binary(NodeType::MUL, make_erc(0.35),
+                                                      make_binary(NodeType::ADD, make_var('x'), make_var('y'))));
+            }
+        }
+        case PDE::DUFFING: {
+            if (dim == 1) {
+                // u(0) = 1.0, u(1) = -0.5. Lineal: 1.0 - 1.5 * x
+                return make_binary(NodeType::SUB, make_erc(1.0),
+                                   make_binary(NodeType::MUL, make_erc(1.5), make_var('x')));
+            } else {
+                // u(x, y) = 1.0 - 0.75 * (x + y)
+                return make_binary(NodeType::SUB, make_erc(1.0),
+                                   make_binary(NodeType::MUL, make_erc(0.75),
+                                                      make_binary(NodeType::ADD, make_var('x'), make_var('y'))));
+            }
+        }
+        case PDE::THOMAS_FERMI: {
+            if (dim == 1) {
+                // u(0) = 1.0, u(1) = 0.2. Decaimiento exponencial: exp(-1.6094 * x)
+                return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-1.6094), make_var('x')));
+            } else {
+                // u(x, y) = 1.0 - 0.4 * (x + y)
+                return make_binary(NodeType::SUB, make_erc(1.0),
+                                   make_binary(NodeType::MUL, make_erc(0.4),
+                                                      make_binary(NodeType::ADD, make_var('x'), make_var('y'))));
+            }
+        }
         default:
             return nullptr;
     }
