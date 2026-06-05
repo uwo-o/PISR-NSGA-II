@@ -24,10 +24,10 @@ plt.rcParams.update({
     "figure.dpi": 200
 })
 
-PDES_TO_PLOT = ["Laplace_2D", "Helmholtz_2D", "Schrodinger_2D", "Liouville_2D", "Sine-Gordon_2D"]
+PDES_TO_PLOT = ["Laplace_2D", "Helmholtz_2D", "Schrodinger_2D", "Fisher_2D", "Duffing_2D", "ThomasFermi_2D", "Liouville_2D", "Sine-Gordon_2D"]
 
 def plot_convergence():
-    fig, axes = plt.subplots(1, len(PDES_TO_PLOT), figsize=(18, 4), sharey=False)
+    fig, axes = plt.subplots(1, len(PDES_TO_PLOT), figsize=(24, 4), sharey=False)
     for idx, pde_name in enumerate(PDES_TO_PLOT):
         ax = axes[idx]
         # Cargar PI-NSGA-II
@@ -52,7 +52,7 @@ def plot_convergence():
     plt.close(fig)
 
 def plot_parsimony():
-    fig, axes = plt.subplots(1, len(PDES_TO_PLOT), figsize=(18, 4), sharey=False)
+    fig, axes = plt.subplots(1, len(PDES_TO_PLOT), figsize=(24, 4), sharey=False)
     for idx, pde_name in enumerate(PDES_TO_PLOT):
         ax = axes[idx]
         
@@ -84,7 +84,7 @@ def plot_parsimony():
     plt.close(fig)
 
 def plot_pareto_fronts():
-    fig, axes = plt.subplots(1, len(PDES_TO_PLOT), figsize=(18, 4), sharey=False)
+    fig, axes = plt.subplots(1, len(PDES_TO_PLOT), figsize=(24, 4), sharey=False)
     for idx, pde_name in enumerate(PDES_TO_PLOT):
         ax = axes[idx]
         

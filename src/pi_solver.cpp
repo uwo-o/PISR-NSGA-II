@@ -20,15 +20,58 @@ void PIIndividual::evaluate(const PDEProblem& prob,
     tree = remove_nested_polynomials(std::move(tree));
     
     double pde_mse = 0.0;
-    for (auto& p : dom) {
-        AD ad = tree->ad_eval(p.x, p.y, prob.dim);
-        Complex res = prob.pde_residual_ad(ad, p.x, p.y);
-        if (!std::isfinite(res.real()) || !std::isfinite(res.imag())) {
-            mse_domain = 1e18; mse_boundary = 1e18; return;
+    if (prob.type == PDE::NAVIER_STOKES) {
+        double h = 0.01; // Step for finite differences
+        double nu = prob.k2; // nu = 1.0 / Re = 0.05
+        
+        auto eval_laplacian = [&](const NodePtr& t, double x, double y) {
+            double v   = t->eval(x,   y).real();
+            double vxp = t->eval(x+h, y).real();
+            double vxm = t->eval(x-h, y).real();
+            double vyp = t->eval(x, y+h).real();
+            double vym = t->eval(x, y-h).real();
+            return (vxp + vxm + vyp + vym - 4.0 * v) / (h * h);
+        };
+        
+        for (auto& p : dom) {
+            double val_xp = tree->eval(p.x+h, p.y).real();
+            double val_xm = tree->eval(p.x-h, p.y).real();
+            double val_yp = tree->eval(p.x, p.y+h).real();
+            double val_ym = tree->eval(p.x, p.y-h).real();
+            
+            double psi_x = (val_xp - val_xm) / (2.0 * h);
+            double psi_y = (val_yp - val_ym) / (2.0 * h);
+            
+            double L_val = (val_xp + val_xm + val_yp + val_ym - 4.0 * tree->eval(p.x, p.y).real()) / (h * h);
+            double L_xp  = eval_laplacian(tree, p.x+h, p.y);
+            double L_xm  = eval_laplacian(tree, p.x-h, p.y);
+            double L_yp  = eval_laplacian(tree, p.x, p.y+h);
+            double L_ym  = eval_laplacian(tree, p.x, p.y-h);
+            
+            double L_x = (L_xp - L_xm) / (2.0 * h);
+            double L_y = (L_yp - L_ym) / (2.0 * h);
+            
+            double biharmonic = (L_xp + L_xm + L_yp + L_ym - 4.0 * L_val) / (h * h);
+            double convective = psi_y * L_x - psi_x * L_y;
+            
+            double res = convective - nu * biharmonic;
+            if (!std::isfinite(res)) {
+                mse_domain = 1e18; mse_boundary = 1e18; return;
+            }
+            pde_mse += res * res;
         }
-        pde_mse += std::norm(res); 
+        if (!dom.empty()) pde_mse /= dom.size();
+    } else {
+        for (auto& p : dom) {
+            AD ad = tree->ad_eval(p.x, p.y, prob.dim);
+            Complex res = prob.pde_residual_ad(ad, p.x, p.y);
+            if (!std::isfinite(res.real()) || !std::isfinite(res.imag())) {
+                mse_domain = 1e18; mse_boundary = 1e18; return;
+            }
+            pde_mse += std::norm(res); 
+        }
+        if (!dom.empty()) pde_mse /= dom.size();
     }
-    if (!dom.empty()) pde_mse /= dom.size();
 
     double raw_bc_mse = 0.0;
     for (auto& p : bnd) {
@@ -445,17 +488,24 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
     ind.tree->collect_ercs(ercs);
     if (ercs.empty()) return;
 
-    int n_dom = 20; 
-    int n_bnd = 20;
+    int n_dom = std::min(20, (int)dom_pts_.size()); 
+    int n_bnd = std::min(20, (int)bnd_pts_.size());
     std::vector<Point> mini_dom;
     std::vector<Point> mini_bnd;
     std::sample(dom_pts_.begin(), dom_pts_.end(), std::back_inserter(mini_dom), n_dom, gen_);
     std::sample(bnd_pts_.begin(), bnd_pts_.end(), std::back_inserter(mini_bnd), n_bnd, gen_);
     
-    int n_pts_mini = n_dom + n_bnd;
+    int n_pts_mini = (int)(mini_dom.size() + mini_bnd.size());
     const double epsilon = 1e-6;
     int n_ercs = ercs.size();
     int n_vars = n_ercs * 2; // Real e Imaginaria por cada ERC
+
+    // Guardar valores iniciales para poder revertir si diverge o empeora
+    std::vector<Complex> original_values(n_ercs);
+    for (int j = 0; j < n_ercs; ++j) {
+        original_values[j] = *ercs[j];
+    }
+    double original_err = ind.mse_domain + ind.mse_boundary;
 
     // No limitar demasiado las iteraciones - el caller controla cuántas quiere
     int max_iters = std::min(iterations, 50);
@@ -463,9 +513,10 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
         std::vector<std::vector<double>> J(n_pts_mini * 2, std::vector<double>(n_vars, 0.0));
         std::vector<double> r(n_pts_mini * 2, 0.0);
         
+        bool has_nan = false;
         for (int i = 0; i < n_pts_mini; ++i) {
-            bool is_dom = (i < n_dom);
-            Point pt = is_dom ? mini_dom[i] : mini_bnd[i - n_dom];
+            bool is_dom = (i < (int)mini_dom.size());
+            Point pt = is_dom ? mini_dom[i] : mini_bnd[i - mini_dom.size()];
             
             Complex residual;
             if (is_dom) {
@@ -476,7 +527,10 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
                 residual *= 4.0; // Pesar fuertemente las fronteras
             }
             
-            if (!std::isfinite(residual.real()) || !std::isfinite(residual.imag())) return;
+            if (!std::isfinite(residual.real()) || !std::isfinite(residual.imag())) {
+                has_nan = true;
+                break;
+            }
 
             r[i*2] = residual.real();
             r[i*2+1] = residual.imag();
@@ -497,13 +551,24 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
                 Complex grad = (residual_plus - residual) / epsilon;
                 *ercs[j] = old_v;
 
-                if (!std::isfinite(grad.real()) || !std::isfinite(grad.imag())) return;
+                if (!std::isfinite(grad.real()) || !std::isfinite(grad.imag())) {
+                    has_nan = true;
+                    break;
+                }
 
                 J[i*2][j*2]     = grad.real();
                 J[i*2+1][j*2]   = grad.imag();
                 J[i*2][j*2+1]   = -grad.imag();
                 J[i*2+1][j*2+1] = grad.real();
             }
+            if (has_nan) break;
+        }
+
+        if (has_nan) {
+            // Revertir a los valores iniciales y terminar
+            for (int j = 0; j < n_ercs; ++j) *ercs[j] = original_values[j];
+            ind.evaluate(prob_, dom_pts_, bnd_pts_);
+            return;
         }
 
         std::vector<double> delta_c;
@@ -518,6 +583,12 @@ void PISolver::hill_climb_constants(PIIndividual& ind, int iterations) {
             }
         }
     }
+
     ind.evaluate(prob_, dom_pts_, bnd_pts_);
+    double new_err = ind.mse_domain + ind.mse_boundary;
+    if (!std::isfinite(new_err) || new_err > original_err) {
+        for (int j = 0; j < n_ercs; ++j) *ercs[j] = original_values[j];
+        ind.evaluate(prob_, dom_pts_, bnd_pts_);
+    }
 }
 

@@ -15,7 +15,9 @@ const Complex I_COMPLEX(0.0, 1.0);
 enum class PDE { 
     LAPLACE, POISSON, HELMHOLTZ, SCHRODINGER, 
     NONLINEAR_POISSON, LIOUVILLE, SINE_GORDON,
-    AIRY, HARMONIC_OSCILLATOR, GROSS_PITAEVSKII
+    AIRY, HARMONIC_OSCILLATOR, GROSS_PITAEVSKII,
+    NAVIER_STOKES,
+    FISHER, DUFFING, THOMAS_FERMI
 };
 
 inline std::string pde_name(PDE t) {
@@ -30,6 +32,10 @@ inline std::string pde_name(PDE t) {
         case PDE::AIRY:              return "Airy";
         case PDE::HARMONIC_OSCILLATOR: return "HarmonicOscillator";
         case PDE::GROSS_PITAEVSKII:  return "Gross-Pitaevskii";
+        case PDE::NAVIER_STOKES:     return "Navier-Stokes";
+        case PDE::FISHER:            return "Fisher";
+        case PDE::DUFFING:           return "Duffing";
+        case PDE::THOMAS_FERMI:      return "ThomasFermi";
         default: return "Unknown";
     }
 }

@@ -93,6 +93,39 @@ std::vector<Complex> solve_rk4_1d(const PDEProblem& prob, int resolution) {
     return res_b.second;
 }
 
+static const double PI_VAL = std::acos(-1.0);
+
+Complex get_laplacian_value(const PDEProblem& prob, double x, double y, Complex u) {
+    switch (prob.type) {
+        case PDE::LAPLACE:
+            return 0.0;
+        case PDE::POISSON:
+            return prob.source(x, y);
+        case PDE::HELMHOLTZ:
+            return prob.source(x, y) - prob.k2 * u;
+        case PDE::SCHRODINGER:
+            return -2.0 * PI_VAL * PI_VAL * u;
+        case PDE::AIRY:
+            return (x + y) * u;
+        case PDE::HARMONIC_OSCILLATOR:
+            return (x * x + y * y - 2.0) * u;
+        case PDE::FISHER:
+            return -u * (1.0 - u);
+        case PDE::DUFFING:
+            return -u - u * u * u;
+        case PDE::THOMAS_FERMI:
+            return u * u / (x + y + 0.5);
+        case PDE::NONLINEAR_POISSON:
+            return prob.source(x, y) - u * u;
+        case PDE::LIOUVILLE:
+            return prob.source(x, y) - std::exp(u);
+        case PDE::SINE_GORDON:
+            return prob.source(x, y) + std::sin(u.real());
+        default:
+            return 0.0;
+    }
+}
+
 std::vector<Complex> solve_fd_2d(const PDEProblem& prob, int resolution) {
     int N = resolution;
     std::vector<Complex> grid(N * N, 0.0);
@@ -106,18 +139,17 @@ std::vector<Complex> solve_fd_2d(const PDEProblem& prob, int resolution) {
         grid[i * N + (N - 1)] = prob.bc(i * h, 1.0);   // y=1
     }
 
-    // Relajación Jacobi
-    for (int iter = 0; iter < 1000; ++iter) {
+    // Relajación Jacobi generalizada para PDEs lineales y no lineales
+    for (int iter = 0; iter < 2000; ++iter) {
         std::vector<Complex> next = grid;
         double max_diff = 0;
         for (int i = 1; i < N - 1; ++i) {
             for (int j = 1; j < N - 1; ++j) {
-                // ∇²u + k²u = f  => (u_i+1 + u_i-1 + u_j+1 + u_j-1 - 4u)/h² + k²u = f
                 Complex neighbors = grid[(i+1)*N + j] + grid[(i-1)*N + j] + 
                                    grid[i*N + (j+1)] + grid[i*N + (j-1)];
                 
-                // u = (neighbors - f*h²) / (4 - k²*h²)
-                Complex val = (neighbors - prob.source(i*h, j*h) * h * h) / (4.0 - prob.k2 * h * h);
+                Complex lap_val = get_laplacian_value(prob, i * h, j * h, grid[i*N+j]);
+                Complex val = (neighbors - lap_val * h * h) / 4.0;
                 next[i*N + j] = val;
                 max_diff = std::max(max_diff, std::abs(val - grid[i*N+j]));
             }

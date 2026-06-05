@@ -16,13 +16,21 @@
 template<typename Ind>
 std::vector<std::vector<int>> fast_non_dominated_sort(std::vector<Ind>& pop) {
     int n = (int)pop.size();
+    for (int i = 0; i < n; ++i) {
+        pop[i].rank = 9999;
+    }
     std::vector<int>              domination_count(n, 0);
     std::vector<std::vector<int>> dominated_by(n);
     std::vector<std::vector<int>> fronts(1);
 
     for (int i = 0; i < n; ++i) {
+        if (pop[i].mse_domain >= 1e10 || pop[i].mse_boundary >= 1e10) {
+            domination_count[i] = 999999;
+            continue;
+        }
         for (int j = 0; j < n; ++j) {
             if (i == j) continue;
+            if (pop[j].mse_domain >= 1e10 || pop[j].mse_boundary >= 1e10) continue;
             // 3 Objetivos para el frente de Pareto: Domain MSE, Boundary MSE y Tree Size (Complejidad)
             bool i_dom_j = (pop[i].mse_domain   <= pop[j].mse_domain   &&
                             pop[i].mse_boundary <= pop[j].mse_boundary &&

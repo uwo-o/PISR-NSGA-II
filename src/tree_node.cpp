@@ -99,13 +99,19 @@ AD UnaryNode::ad_eval(double x, double y, int dim) const {
     AD r;
     AD C = child->ad_eval(x, y, dim);
     if (type == NodeType::SIN) {
-        Complex s = std::sin(C.v), c = std::cos(C.v);
+        Complex clamped_v = C.v;
+        if (clamped_v.imag() > 30.0) clamped_v = Complex(clamped_v.real(), 30.0);
+        if (clamped_v.imag() < -30.0) clamped_v = Complex(clamped_v.real(), -30.0);
+        Complex s = std::sin(clamped_v), c = std::cos(clamped_v);
         r.v = s; r.dx = c * C.dx; r.dxx = c*C.dxx - s*C.dx*C.dx;
         if (dim == 2) {
             r.dy = c * C.dy; r.dyy = c*C.dyy - s*C.dy*C.dy;
         }
     } else if (type == NodeType::COS) {
-        Complex s = std::sin(C.v), c = std::cos(C.v);
+        Complex clamped_v = C.v;
+        if (clamped_v.imag() > 30.0) clamped_v = Complex(clamped_v.real(), 30.0);
+        if (clamped_v.imag() < -30.0) clamped_v = Complex(clamped_v.real(), -30.0);
+        Complex s = std::sin(clamped_v), c = std::cos(clamped_v);
         r.v = c; r.dx = -s * C.dx; r.dxx = -s*C.dxx - c*C.dx*C.dx;
         if (dim == 2) {
             r.dy = -s * C.dy; r.dyy = -s*C.dyy - c*C.dy*C.dy;
@@ -140,8 +146,14 @@ AD UnaryNode::ad_eval(double x, double y, int dim) const {
 }
 Complex UnaryNode::eval(double x, double y) const { 
     Complex v = child->eval(x, y);
-    if (type == NodeType::SIN) return std::sin(v);
-    if (type == NodeType::COS) return std::cos(v);
+    if (type == NodeType::SIN) {
+        double im = std::clamp(v.imag(), -30.0, 30.0);
+        return std::sin(Complex(v.real(), im));
+    }
+    if (type == NodeType::COS) {
+        double im = std::clamp(v.imag(), -30.0, 30.0);
+        return std::cos(Complex(v.real(), im));
+    }
     if (type == NodeType::EXP) {
         double re = std::clamp(v.real(), -30.0, 30.0);
         return std::exp(Complex(re, v.imag()));
@@ -272,29 +284,30 @@ Complex BinaryNode::eval(double x, double y) const {
     return 0.0;
 }
 void BinaryNode::print(std::ostream& os) const {
-    if (type == NodeType::LEGENDRE) os << "Legendre_";
-    else if (type == NodeType::HERMITE) os << "Hermite_";
-    else os << "(";
-
-    left->print(os);
-
-    if (type == NodeType::ADD) os << " + ";
-    else if (type == NodeType::SUB) os << " - ";
-    else if (type == NodeType::MUL) os << " * ";
-    else if (type == NodeType::DIV) os << " / ";
-    else if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) os << ", ";
-
-    right->print(os);
-    os << ")";
+    if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) {
+        int n = std::clamp((int)std::round(right->eval(0.0, 0.0).real()), 0, 3);
+        if (type == NodeType::LEGENDRE) os << "Legendre_" << n << "(";
+        else os << "Hermite_" << n << "(";
+        left->print(os);
+        os << ")";
+    } else {
+        os << "(";
+        left->print(os);
+        if (type == NodeType::ADD) os << " + ";
+        else if (type == NodeType::SUB) os << " - ";
+        else if (type == NodeType::MUL) os << " * ";
+        else if (type == NodeType::DIV) os << " / ";
+        right->print(os);
+        os << ")";
+    }
 }
 void BinaryNode::print_latex(std::ostream& os) const {
     if (type == NodeType::DIV) {
         os << "\\frac{"; left->print_latex(os); os << "}{"; right->print_latex(os); os << "}";
     } else if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) {
-        if (type == NodeType::LEGENDRE) os << "P_{";
-        else os << "H_{";
-        right->print_latex(os);
-        os << "}(";
+        int n = std::clamp((int)std::round(right->eval(0.0, 0.0).real()), 0, 3);
+        if (type == NodeType::LEGENDRE) os << "P_{" << n << "}(";
+        else os << "H_{" << n << "}(";
         left->print_latex(os);
         os << ")";
     } else {
@@ -720,6 +733,14 @@ NodePtr get_exact_solution_tree(const PDEProblem& prob) {
             }
             auto exp_arg = make_binary(NodeType::MUL, make_erc(-0.5), std::move(r2));
             return make_unary(NodeType::EXP, std::move(exp_arg));
+        }
+        case PDE::NAVIER_STOKES: {
+            double lambda = -0.96254378;
+            double denom = 40.0 * PI_VAL;
+            auto exp_term = make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(lambda), make_var('x')));
+            auto sin_term = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(2.0 * PI_VAL), make_var('y')));
+            auto term2 = make_binary(NodeType::DIV, make_binary(NodeType::MUL, std::move(exp_term), std::move(sin_term)), make_erc(denom));
+            return make_binary(NodeType::SUB, make_var('y'), std::move(term2));
         }
         default:
             return nullptr;

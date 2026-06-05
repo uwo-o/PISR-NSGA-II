@@ -30,11 +30,12 @@ RESULTS_DIR = os.path.join(BASE_DIR, "results")
 PDE_ORDER = [
     "Laplace", "Poisson", "Helmholtz", "Schrodinger",
     "Airy", "HarmonicOscillator",
-    "NonlinearPoisson", "Liouville", "Sine-Gordon",
+    "Fisher", "Duffing", "ThomasFermi",
+    "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes",
 ]
 
 # Ecuaciones cuya "u_exact" en el CSV proviene de RK4 (no hay fórmula cerrada)
-NUMERICAL_TRUTH = {"Airy", "HarmonicOscillator", "Liouville", "Sine-Gordon", "NonlinearPoisson"}
+NUMERICAL_TRUTH = {"Airy", "HarmonicOscillator", "Liouville", "Sine-Gordon", "NonlinearPoisson", "Fisher", "Duffing", "ThomasFermi"}
 
 # Etiqueta del eje / título para cada ecuación
 PDE_LABELS = {
@@ -44,9 +45,13 @@ PDE_LABELS = {
     "Schrodinger":        r"Schrödinger: $-u'' + V u = E u$",
     "Airy":               r"Airy: $u'' = x\,u$  [RK4 truth]",
     "HarmonicOscillator": r"Harmonic Oscillator: $u'' = (x^2-1)u$  [RK4 truth]",
+    "Fisher":             r"Fisher: $\nabla^2 u + u(1-u) = 0$  [RK4/FD truth]",
+    "Duffing":            r"Duffing: $\nabla^2 u + u + u^3 = 0$  [RK4/FD truth]",
+    "ThomasFermi":        r"Thomas-Fermi: $\nabla^2 u = u^2 / (x+y+0.5)$  [RK4/FD truth]",
     "NonlinearPoisson":   r"Nonlinear Poisson: $\nabla^2 u + u^2 = f$  [FD truth]",
     "Liouville":          r"Liouville: $\nabla^2 u = e^u$  [FD truth]",
     "Sine-Gordon":        r"Sine-Gordon: $\nabla^2 u = \sin(u)$  [FD truth]",
+    "Navier-Stokes":      r"Navier-Stokes: $\psi_y (\nabla^2 \psi)_x - \psi_x (\nabla^2 \psi)_y = \nu \nabla^4 \psi$",
 }
 
 CMAP_SOLUTION = "viridis"
@@ -197,7 +202,7 @@ def plot_equation(pde, dim):
 def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
-    skips_1d = {"NonlinearPoisson", "Liouville", "Sine-Gordon"}   # solo 2D
+    skips_1d = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes"}   # solo 2D
     skips_2d = set()
 
     for pde in PDE_ORDER:

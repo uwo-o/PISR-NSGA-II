@@ -52,3 +52,7 @@ PDEProblem make_liouville();
 PDEProblem make_sine_gordon();
 PDEProblem make_airy(int dim);
 PDEProblem make_harmonic_oscillator(int dim);
+PDEProblem make_navier_stokes();
+PDEProblem make_fisher(int dim);
+PDEProblem make_duffing(int dim);
+PDEProblem make_thomas_fermi(int dim);

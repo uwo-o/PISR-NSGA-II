@@ -208,7 +208,7 @@ void print_table(const std::string& lbl, const Stats& p) {
 }
 
 // ─── Una corrida completa (Solo PI-NSGA-II) ──────────────────────────────────
-std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose) {
+std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose, bool is_test) {
     unsigned seed_base = 1000u * (unsigned)(run_id + 1);
     std::vector<PDEProblem> problems;
     for (int d : {1, 2}) {
@@ -218,11 +218,15 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
         problems.push_back(make_schrodinger(d));
         problems.push_back(make_harmonic_oscillator(d));
         problems.push_back(make_airy(d));
+        problems.push_back(make_fisher(d));
+        problems.push_back(make_duffing(d));
+        problems.push_back(make_thomas_fermi(d));
     }
 
     problems.push_back(make_nonlinear_poisson());
     problems.push_back(make_liouville());
     problems.push_back(make_sine_gordon());
+    problems.push_back(make_navier_stokes());
 
     std::vector<Stats> all_stats;
 
@@ -282,7 +286,9 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
         {
             auto t0 = std::chrono::steady_clock::now();
             PISolver pi(prob, seed_base + 500u);
-            auto pi_pop = pi.run(Config::POP_SIZE, Config::MAX_GEN);
+            int pop = is_test ? 10 : Config::POP_SIZE;
+            int gen = is_test ? 5 : Config::MAX_GEN;
+            auto pi_pop = pi.run(pop, gen);
             double pi_rt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
             
             save_pareto_csv(pi_pop, out_dir + "/" + lbl + "_pi_gn_pareto.csv", "PI-NSGA-II", prob.name(), prob.dim);
@@ -348,7 +354,7 @@ int main(int argc, char* argv[]) {
         std::string out_dir = (n_runs == 1) ? "results" : "results/run_" + std::to_string(r);
         if (n_runs > 1) fs::create_directories(out_dir);
         
-        auto stats = run_once(r, out_dir, verbose);
+        auto stats = run_once(r, out_dir, verbose, is_test);
         all_runs.push_back(stats);
         save_summary(stats, out_dir + "/comparison_summary.csv");
 

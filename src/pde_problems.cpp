@@ -61,6 +61,12 @@ Complex PDEProblem::exact(double x, double y) const {
             case PDE::HARMONIC_OSCILLATOR:
             case PDE::GROSS_PITAEVSKII: 
                 return (x < 0.1) ? 1.0 : 0.0; // u(0)=1, u(1)=0
+            case PDE::FISHER:
+                return (x < 0.1) ? 0.1 : 0.8;
+            case PDE::DUFFING:
+                return (x < 0.1) ? 1.0 : -0.5;
+            case PDE::THOMAS_FERMI:
+                return (x < 0.1) ? 1.0 : 0.2;
             default: return 0.0;
         }
     } else {
@@ -81,6 +87,18 @@ Complex PDEProblem::exact(double x, double y) const {
                 return 1.0 / (1.0 + x*x + y*y);
             case PDE::SINE_GORDON:
                 return std::sin(PI*x) * std::sin(PI*y);
+            case PDE::FISHER:
+                return 0.1 + 0.35 * (x + y);
+            case PDE::DUFFING:
+                return 1.0 - 0.75 * (x + y);
+            case PDE::THOMAS_FERMI:
+                return 1.0 - 0.4 * (x + y);
+            case PDE::NAVIER_STOKES: {
+                double Re = 1.0 / k2;
+                double lambda = Re / 2.0 - std::sqrt(Re * Re / 4.0 + 4.0 * PI * PI);
+                double val = y - std::exp(lambda * x) * std::sin(2.0 * PI * y) / (2.0 * PI * Re);
+                return Complex(val, 0.0);
+            }
             default: return 0.0;
         }
     }
@@ -125,6 +143,9 @@ Complex PDEProblem::pde_second_derivative(double x, Complex u) const {
         case PDE::HARMONIC_OSCILLATOR:
             // Consistente con residuo: u'' = (x²-E)·u = (x²-1)·u  [E=1]
             return (x * x - 1.0) * u;
+        case PDE::FISHER: return -u * (1.0 - u);
+        case PDE::DUFFING: return -u - u * u * u;
+        case PDE::THOMAS_FERMI: return u * u / (x + 0.5);
         default: return 0.0;
     }
 }
@@ -164,6 +185,7 @@ Complex PDEProblem::source(double x, double y) const {
                 double u = std::sin(PI*x) * std::sin(PI*y);
                 return -2.0 * PI * PI * u - std::sin(u);
             }
+            case PDE::NAVIER_STOKES: return 0.0;
             default: return 0.0;
         }
     }
@@ -189,6 +211,30 @@ Complex PDEProblem::bc(double x, double y) const {
             return Complex(v, 0.0);
         }
     }
+    if (type == PDE::FISHER) {
+        if (dim == 1) {
+            if (x < 0.01) return Complex(0.1, 0.0);
+            return Complex(0.8, 0.0);
+        } else {
+            return Complex(0.1 + 0.35 * (x + y), 0.0);
+        }
+    }
+    if (type == PDE::DUFFING) {
+        if (dim == 1) {
+            if (x < 0.01) return Complex(1.0, 0.0);
+            return Complex(-0.5, 0.0);
+        } else {
+            return Complex(1.0 - 0.75 * (x + y), 0.0);
+        }
+    }
+    if (type == PDE::THOMAS_FERMI) {
+        if (dim == 1) {
+            if (x < 0.01) return Complex(1.0, 0.0);
+            return Complex(0.2, 0.0);
+        } else {
+            return Complex(1.0 - 0.4 * (x + y), 0.0);
+        }
+    }
     if (dim == 1) {
         switch (type) {
             case PDE::LAPLACE:   return x;
@@ -206,6 +252,7 @@ Complex PDEProblem::bc(double x, double y) const {
             case PDE::NONLINEAR_POISSON:
             case PDE::LIOUVILLE: return 1.0 / (1.0 + x*x + y*y);
             case PDE::SINE_GORDON: return std::sin(PI*x) * std::sin(PI*y);
+            case PDE::NAVIER_STOKES: return exact(x, y);
             default: return 0.0;
         }
     }
@@ -242,6 +289,10 @@ Complex PDEProblem::pde_residual_ad(const AD& ad, double x, double y) const {
             return -laplacian + (std::norm(u) * g - mu) * u;
         }
         case PDE::SINE_GORDON: return laplacian - std::sin(u.real()) - source(x, y);
+        case PDE::FISHER: return laplacian + u * (1.0 - u);
+        case PDE::DUFFING: return laplacian + u + u * u * u;
+        case PDE::THOMAS_FERMI: return laplacian - u * u / (x + y + 0.5);
+        case PDE::NAVIER_STOKES: return 0.0;
         default: return 0.0;
     }
 }
@@ -312,6 +363,39 @@ PDEProblem make_airy(int dim) {
 PDEProblem make_harmonic_oscillator(int dim) {
     PDEProblem p;
     p.type = PDE::HARMONIC_OSCILLATOR;
+    p.dim  = dim;
+    p.is_numerical = true;
+    return p;
+}
+
+PDEProblem make_navier_stokes() {
+    PDEProblem p;
+    p.type = PDE::NAVIER_STOKES;
+    p.dim  = 2;
+    p.k2   = 0.05; // nu = 1.0 / Re = 0.05 (Re = 20)
+    p.is_numerical = false;
+    return p;
+}
+
+PDEProblem make_fisher(int dim) {
+    PDEProblem p;
+    p.type = PDE::FISHER;
+    p.dim  = dim;
+    p.is_numerical = true;
+    return p;
+}
+
+PDEProblem make_duffing(int dim) {
+    PDEProblem p;
+    p.type = PDE::DUFFING;
+    p.dim  = dim;
+    p.is_numerical = true;
+    return p;
+}
+
+PDEProblem make_thomas_fermi(int dim) {
+    PDEProblem p;
+    p.type = PDE::THOMAS_FERMI;
     p.dim  = dim;
     p.is_numerical = true;
     return p;

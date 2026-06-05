@@ -55,6 +55,63 @@ RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results"
 os.makedirs(RESULTS_DIR, exist_ok=True)
 METHOD = "PINN"
 
+import torch.nn as nn
+
+class SOTAPINNNet(nn.Module):
+    def __init__(self, layers, activation="silu"):
+        super().__init__()
+        self.regularizer = None
+        self.in_dim = layers[0]
+        self.out_dim = layers[-1]
+        self.hidden_dim = layers[1]
+        self.num_layers = len(layers) - 2
+        
+        # Encoders
+        self.encoder_u = nn.Linear(self.in_dim, self.hidden_dim)
+        self.encoder_v = nn.Linear(self.in_dim, self.hidden_dim)
+        
+        # First hidden layer
+        self.first_layer = nn.Linear(self.in_dim, self.hidden_dim)
+        
+        # Hidden layers
+        self.hidden_layers = nn.ModuleList([
+            nn.Linear(self.hidden_dim, self.hidden_dim) for _ in range(self.num_layers - 1)
+        ])
+        
+        # Output layer
+        self.output_layer = nn.Linear(self.hidden_dim, self.out_dim)
+        
+        # Activation function
+        if activation == "silu":
+            self.act = nn.SiLU()
+        elif activation == "tanh":
+            self.act = nn.Tanh()
+        elif activation == "sin":
+            class Sin(nn.Module):
+                def forward(self, x): return torch.sin(x)
+            self.act = Sin()
+        else:
+            self.act = nn.SiLU()
+            
+        # Glorot initialization
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                nn.init.xavier_normal_(m.weight)
+                nn.init.zeros_(m.bias)
+
+    def forward(self, x):
+        # deepxde passes double/float64 tensors by default, ensure type matching
+        x = x.to(self.encoder_u.weight.dtype)
+        u = self.act(self.encoder_u(x))
+        v = self.act(self.encoder_v(x))
+        
+        h = self.act(self.first_layer(x))
+        for layer in self.hidden_layers:
+            h_next = self.act(layer(h))
+            h = (1.0 - h_next) * u + h_next * v
+            
+        return self.output_layer(h)
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Definición de cada problema: ecuación + BCs + solución de referencia
 # ─────────────────────────────────────────────────────────────────────────────
@@ -85,6 +142,16 @@ def build_problem(pde_name, dim):
     def ref_nonlin_poisson(x,y): return 1.0/(1+x**2+y**2)          # solución analítica
     def ref_liouville(x,y):      return 1.0/(1+x**2+y**2)          # solución analítica
     def ref_sine_gordon(x,y):    return np.sin(_pi*x)*np.sin(_pi*y) # aprox
+    def ref_navier_stokes(x,y):
+        Re = 20.0
+        lam = Re / 2.0 - np.sqrt(Re**2 / 4.0 + 4.0 * _pi**2)
+        return y - np.exp(lam * x) * np.sin(2.0 * _pi * y) / (2.0 * _pi * Re)
+    def ref_fisher_1d(x):       return np.where(x < 0.01, 0.1, 0.8)
+    def ref_fisher_2d(x,y):     return 0.1 + 0.35 * (x + y)
+    def ref_duffing_1d(x):      return np.where(x < 0.01, 1.0, -0.5)
+    def ref_duffing_2d(x,y):    return 1.0 - 0.75 * (x + y)
+    def ref_tf_1d(x):           return np.where(x < 0.01, 1.0, 0.2)
+    def ref_tf_2d(x,y):         return 1.0 - 0.4 * (x + y)
 
     # ── Definición del término de PDE (residuo) ───────────────────────────────
     def make_pde(pde_name, dim):
@@ -154,6 +221,37 @@ def build_problem(pde_name, dim):
                 f = -2.0 * _pi**2 * u_exact - torch.sin(u_exact)
                 return lap - torch.sin(u) - f
 
+            elif pde_name == "Fisher":
+                # ∇²u + u*(1-u) = 0
+                return lap + u * (1.0 - u)
+
+            elif pde_name == "Duffing":
+                # ∇²u + u + u³ = 0
+                return lap + u + u**3
+
+            elif pde_name == "ThomasFermi":
+                # ∇²u = u² / (x + y + 0.5)
+                if dim == 1:
+                    var = x[:, 0:1] + 0.5
+                else:
+                    var = x[:, 0:1] + x[:, 1:2] + 0.5
+                return lap - u**2 / var
+
+            elif pde_name == "Navier-Stokes":
+                psi_x = dde.grad.jacobian(u, x, i=0, j=0)
+                psi_y = dde.grad.jacobian(u, x, i=0, j=1)
+                psi_xx = dde.grad.hessian(u, x, i=0, j=0)
+                psi_yy = dde.grad.hessian(u, x, i=1, j=1)
+                L = psi_xx + psi_yy
+                L_x = dde.grad.jacobian(L, x, i=0, j=0)
+                L_y = dde.grad.jacobian(L, x, i=0, j=1)
+                L_xx = dde.grad.hessian(L, x, i=0, j=0)
+                L_yy = dde.grad.hessian(L, x, i=1, j=1)
+                biharmonic = L_xx + L_yy
+                nu = 0.05
+                convective = psi_y * L_x - psi_x * L_y
+                return convective - nu * biharmonic
+
             return lap
         return pde
 
@@ -174,6 +272,13 @@ def build_problem(pde_name, dim):
         ("NonlinearPoisson",2):   (None,        ref_nonlin_poisson),
         ("Liouville",  2): (None,               ref_liouville),
         ("Sine-Gordon",2): (None,               ref_sine_gordon),
+        ("Navier-Stokes",2): (None,             ref_navier_stokes),
+        ("Fisher",     1): (ref_fisher_1d,      None),
+        ("Fisher",     2): (None,               ref_fisher_2d),
+        ("Duffing",    1): (ref_duffing_1d,     None),
+        ("Duffing",    2): (None,               ref_duffing_2d),
+        ("ThomasFermi",1): (ref_tf_1d,          None),
+        ("ThomasFermi",2): (None,               ref_tf_2d),
     }
 
     fn1d, fn2d = exact_map.get((pde_name, dim), (None, None))
@@ -192,7 +297,7 @@ def build_problem(pde_name, dim):
                                      lambda _, on_bnd: on_bnd)]
 
     # ── Arquitectura de red: más profunda para ecuaciones no lineales ─────────
-    nonlinear = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Airy"}
+    nonlinear = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Airy", "Navier-Stokes", "Fisher", "Duffing", "ThomasFermi"}
     if pde_name in nonlinear:
         layers = [dim] + [128]*5 + [1]
         n_dom = 3000 if dim == 2 else 2000
@@ -244,19 +349,20 @@ def solve_and_eval(pde_name, dim, run_dir, epochs_override=None, is_test=False):
 
     data = dde.data.PDE(geom, pde_fn, bcs,
                         num_domain=n_dom, num_boundary=n_bnd, num_test=n_test)
-    net = dde.nn.FNN(layers, "tanh", "Glorot normal")
+    net = SOTAPINNNet(layers, activation="silu")
     model = dde.Model(data, net)
 
     t0 = time.time()
 
-    # Fase 1: Adam
-    model.compile("adam", lr=1e-3, loss_weights=[1, 100])
-    losshistory, _ = model.train(iterations=epochs_adam, display_every=max(1, epochs_adam//5))
+    # Fase 1: Adam con decaimiento de lr y resampler adaptativo (SOTA)
+    resampler = dde.callbacks.PDEPointResampler(period=100)
+    model.compile("adam", lr=1e-3, decay=("step", 2000, 0.5), loss_weights=[1, 100])
+    losshistory, _ = model.train(iterations=epochs_adam, display_every=max(1, epochs_adam//5), callbacks=[resampler])
 
-    # Fase 2: L-BFGS para refinamiento fino
+    # Fase 2: L-BFGS para refinamiento fino con pesos de pérdida sincronizados
     if not is_test:
         dde.optimizers.config.set_LBFGS_options(maxiter=3000)
-        model.compile("L-BFGS")
+        model.compile("L-BFGS", loss_weights=[1, 100])
         losshistory, _ = model.train()
 
     rt = time.time() - t0
@@ -350,9 +456,13 @@ def main():
         ("Schrodinger",        1), ("Schrodinger",        2),
         ("Airy",               1), ("Airy",               2),
         ("HarmonicOscillator", 1), ("HarmonicOscillator", 2),
+        ("Fisher",             1), ("Fisher",             2),
+        ("Duffing",            1), ("Duffing",            2),
+        ("ThomasFermi",        1), ("ThomasFermi",        2),
         ("NonlinearPoisson",   2),
         ("Liouville",          2),
         ("Sine-Gordon",        2),
+        ("Navier-Stokes",      2),
     ]
 
     if args.only:
