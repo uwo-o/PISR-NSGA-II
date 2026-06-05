@@ -1,6 +1,5 @@
 .cache/
 results/
-report/
 build/
 *.pdf
 *.png
