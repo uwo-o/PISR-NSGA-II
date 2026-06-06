@@ -2,8 +2,7 @@
 
 This repository contains the C++ and Python codebase, benchmark evaluation suite, and automated publication-quality reporting system comparing three paradigms for solving differential equations:
 1. **PI-NSGA-II**: Our proposed Physics-Informed Multi-Objective Symbolic Regression solver using exact Automatic Differentiation (AD).
-2. **Koza BNF**: A classical Grammatical Evolution baseline using Finite Differences (FD).
-3. **PINNs (Physics-Informed Neural Networks)**: A deep neural network baseline powered by DeepXDE, optimized for execution on consumer GPUs.
+2. **PINNs (Physics-Informed Neural Networks)**: A deep neural network baseline powered by DeepXDE, optimized for execution on consumer GPUs.
 
 ---
 
@@ -15,9 +14,6 @@ This repository contains the C++ and Python codebase, benchmark evaluation suite
   * Zero truncation error allows discovery of exact PDE residual gradients.
   * Rich operator library: `+`, `-`, `*`, `/`, `sin`, `cos`, `exp`, `log`, `sinh`, `cosh`, `tanh`, `sqrt`, `atan`.
   * Real-valued Ephemeral Random Constants (ERCs) with Gaussian mutation.
-* **Koza BNF (Baseline)**:
-  * Grammatical Evolution baseline mapping integer codon strings to symbolic syntax trees using a BNF grammar.
-  * Uses **Finite Differences (FD)** for numerical derivatives, introducing $O(h^2)$ truncation errors.
 * **PINNs (Baseline)**:
   * Deep neural networks built using the DeepXDE framework.
   * Memory-optimized execution using VRAM-conserving techniques (mixed-precision training, gradient accumulation, and reduced hidden layers) to prevent CUDA out-of-memory errors on limited VRAM hardware.
@@ -32,14 +28,6 @@ This repository contains the C++ and Python codebase, benchmark evaluation suite
 ### 3. Comprehensive Benchmarks (13 Equations)
 * **Elliptic PDEs**: Laplace ($\nabla^2 u = 0$), Poisson ($\nabla^2 u = f$), Helmholtz ($\nabla^2 u + k^2 u = f$), Nonlinear Poisson ($\nabla^2 u + u^2 = f$), Liouville ($\nabla^2 u = e^u$), Sine-Gordon ($\nabla^2 u = \sin(u)$), and Navier-Stokes ($\psi_y (\nabla^2 \psi)_x - \psi_x (\nabla^2 \psi)_y = \nu \nabla^4 \psi$).
 * **ODEs & Systems**: Schrödinger ($-u'' + V u = E u$), Airy ($u'' = x\,u$), Harmonic Oscillator ($u'' = (x^2-1)u$), Fisher ($\nabla^2 u + u(1-u) = 0$), Duffing ($\nabla^2 u + u + u^3 = 0$), and Thomas-Fermi ($\nabla^2 u = u^2 / (x+y+0.5)$).
-
-### 4. Publication-Ready PDF Graphics
-* All figures (solutions, convergence histories, parsimony pressure, and Pareto fronts) are output in lightweight, vector-based **PDF format**, fully compatible with LaTeX/Overleaf.
-* Typographic design optimized for double-column layouts (`minipage` size `0.48\textwidth`):
-  * **Main Title**: size `88` (featuring the exact equation LaTeX formulas).
-  * **Axis Labels**: size `55` with custom offsets (`labelpad=40/60`) to prevent overlaps.
-  * **Ticks**: size `48` utilizing simplified tick marks `[0, 0.5, 1]` to avoid origin crowding.
-  * **Colorbars**: Custom formatting showing explicit scientific notation (e.g. $1.5 \times 10^{-5}$) to prevent clipped exponents.
 
 ---
 
