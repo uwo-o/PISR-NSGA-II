@@ -1,0 +1,2 @@
+method,pde,dim,mse_domain,mse_boundary,rank
+PINN,Duffing,2,0.0000208489,0.0000000350,1

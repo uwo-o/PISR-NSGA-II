@@ -1,0 +1,2 @@
+method,pde,dim,mse_domain,mse_boundary,rank
+PINN,Airy,2,0.0000080071,0.0000884623,1

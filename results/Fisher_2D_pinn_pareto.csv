@@ -1,0 +1,2 @@
+method,pde,dim,mse_domain,mse_boundary,rank
+PINN,Fisher,2,0.0000391317,0.0000000311,1

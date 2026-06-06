@@ -1,0 +1,2 @@
+method,pde,dim,mse_domain,mse_boundary,rank
+PINN,Laplace,2,0.0000000024,0.0000000142,1

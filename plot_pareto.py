@@ -29,7 +29,7 @@ DIMS        = [1, 2]
 LOG_EPS     = 1e-12
 
 STYLE = {
-    "PI-NSGA-II":  dict(color="#2E86C1", marker="o", zorder=4, lw=1.8),
+    "PISR-NSGA-II":  dict(color="#2E86C1", marker="o", zorder=4, lw=1.8),
     "PINN":        dict(color="#27AE60", marker="^", zorder=5, lw=1.8),
 }
 
@@ -54,7 +54,7 @@ def load_all():
 
 def print_analysis_detailed(df):
     print("\n" + "="*80)
-    print(f"{'Equation':<20} {'Dim':<5} {'PI-NSGA-II (Mean ± Std)':<35}")
+    print(f"{'Equation':<20} {'Dim':<5} {'PISR-NSGA-II (Mean ± Std)':<35}")
     print("-" * 80)
 
     for pde in PDE_ORDER:

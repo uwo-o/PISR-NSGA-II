@@ -629,6 +629,12 @@ NodePtr BinaryNode::simplify() const {
         if (r_erc && std::abs(rv - 1.0) < 1e-9) return s_l;
         if (is_structurally_equal(s_l.get(), s_r.get())) return make_erc(1.0);
     }
+    if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) {
+        if (r_erc) {
+            int n = std::clamp((int)std::round(rv.real()), 0, 3);
+            if (n == 0) return make_erc(1.0);
+        }
+    }
 
     return std::make_unique<BinaryNode>(type, std::move(s_l), std::move(s_r));
 }
@@ -793,13 +799,21 @@ NodePtr remove_nested_polynomials(NodePtr node, bool inside_poly) {
     bool is_poly = (t == NodeType::LEGENDRE || t == NodeType::HERMITE);
     
     if (is_poly) {
+        auto* bn = dynamic_cast<BinaryNode*>(node.get());
+        if (!bn) return node;
+        
+        double val = 0.0;
+        if (bn->right) {
+            val = bn->right->eval(0.0, 0.0).real();
+        }
+        int n = std::clamp((int)std::round(val), 0, 3);
+        if (n == 0) {
+            return make_erc(1.0);
+        }
+        
         if (inside_poly) {
-            auto* bn = dynamic_cast<BinaryNode*>(node.get());
-            if (!bn) return node;
             return remove_nested_polynomials(std::move(bn->left), true);
         } else {
-            auto* bn = dynamic_cast<BinaryNode*>(node.get());
-            if (!bn) return node;
             bn->left = remove_nested_polynomials(std::move(bn->left), true);
             bn->right = remove_nested_polynomials(std::move(bn->right), false);
             return node;

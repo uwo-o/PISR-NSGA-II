@@ -1,9 +1,6 @@
 .cache/
-results/
 build/
 *.pdf
-*.png
-*.csv
 *.tex
 *.out
 *.log
