@@ -1,0 +1,2 @@
+method,pde,dim,mse_domain,mse_boundary,rank
+PINN,Navier-Stokes,2,0.2488096763,0.3283755270,1

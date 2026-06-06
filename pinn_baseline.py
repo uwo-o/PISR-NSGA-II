@@ -48,7 +48,12 @@ torch.set_num_threads(N_THREADS)
 torch.set_num_interop_threads(max(1, N_THREADS // 2))
 
 import deepxde as dde
-dde.config.set_default_float("float64")
+if use_cuda:
+    dde.config.set_default_float("float32")
+    print("[INFO] Using float32 precision for GPU training to optimize VRAM.")
+else:
+    dde.config.set_default_float("float64")
+    print("[INFO] Using float64 precision for CPU training.")
 
 _pi = np.pi
 RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
@@ -300,7 +305,10 @@ def build_problem(pde_name, dim):
     nonlinear = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Airy", "Navier-Stokes", "Fisher", "Duffing", "ThomasFermi"}
     if pde_name in nonlinear:
         layers = [dim] + [128]*5 + [1]
-        n_dom = 3000 if dim == 2 else 2000
+        if pde_name == "Navier-Stokes" and use_cuda:
+            n_dom = 1000  # Reduce memory usage on GPU for 4th-order derivatives
+        else:
+            n_dom = 3000 if dim == 2 else 2000
         epochs_adam = 10000
     else:
         layers = [dim] + [64]*4 + [1]
@@ -333,7 +341,7 @@ def load_exact_grid(pde_name, dim, run_dir):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-def solve_and_eval(pde_name, dim, run_dir, epochs_override=None, is_test=False):
+def _solve_and_eval_inner(pde_name, dim, run_dir, epochs_override=None, is_test=False):
     print(f"\n{'='*60}")
     print(f"  PINN: {pde_name} {dim}D  [{N_THREADS} CPU threads]")
     print(f"{'='*60}")
@@ -435,6 +443,35 @@ def solve_and_eval(pde_name, dim, run_dir, epochs_override=None, is_test=False):
 
     return {"pde": label, "dim": dim, "mse_dom": mse_dom,
             "mse_bnd": mse_bnd, "rt": rt}
+
+
+def solve_and_eval(pde_name, dim, run_dir, epochs_override=None, is_test=False):
+    try:
+        return _solve_and_eval_inner(pde_name, dim, run_dir, epochs_override, is_test)
+    except Exception as e:
+        err_msg = str(e)
+        if "out of memory" in err_msg.lower() and torch.cuda.is_available() and torch.get_default_device().type == "cuda":
+            print(f"\n[WARNING] CUDA Out Of Memory detected during {pde_name} {dim}D. Falling back to CPU for this problem.")
+            
+            # Clean up GPU memory
+            import gc
+            gc.collect()
+            torch.cuda.empty_cache()
+            
+            # Temporarily switch default device to CPU
+            orig_device = torch.get_default_device()
+            torch.set_default_device("cpu")
+            try:
+                res = _solve_and_eval_inner(pde_name, dim, run_dir, epochs_override, is_test)
+                # Restore original device after successful CPU run
+                torch.set_default_device(orig_device)
+                return res
+            except Exception as cpu_e:
+                # Restore original device even if CPU run fails
+                torch.set_default_device(orig_device)
+                raise cpu_e
+        else:
+            raise e
 
 
 # ─────────────────────────────────────────────────────────────────────────────

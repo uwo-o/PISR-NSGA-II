@@ -124,32 +124,111 @@ struct Stats {
     double hypervolume = 0.0;
 };
 
-// ─── Cálculo de hipervolumen 2D ──────────────────────────────────────────────
-template<typename Ind>
-double compute_hypervolume(const std::vector<Ind>& pop,
-                           double ref_dom = 1e4,
-                           double ref_bnd = 1e4)
+// ─── Hipervolumen 3D: mse_domain × mse_boundary × tree_size (normalizado) ─────
+// Algoritmo: slice-by-slice sweep sobre el tercer objetivo (tree_size).
+// Complejidad: O(n² log n), exacto para 3 objetivos.
+// Referencia: Emmerich et al. (2006), WFG algorithm.
+//
+// Objetivos (todos a minimizar):
+//   f1 = mse_domain     (ref: ref_dom)
+//   f2 = mse_boundary   (ref: ref_bnd)
+//   f3 = tree_size_norm (ref: 1.0, normalizado al máximo permitido)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Calcula HV 2D del conjunto de puntos 2D respecto al punto de referencia (rx, ry).
+// Los puntos deben estar en el espacio (minimización); solo se consideran los que
+// dominan al punto de referencia (xi < rx AND yi < ry).
+static double hv2d(std::vector<std::pair<double,double>> pts, double rx, double ry)
 {
-    std::vector<std::pair<double,double>> pts;
-    for (auto& ind : pop)
-        if (ind.rank == 1 && ind.mse_domain < ref_dom && ind.mse_boundary < ref_bnd)
-            pts.push_back({ind.mse_domain, ind.mse_boundary});
+    // Filtrar puntos que no dominan la referencia
+    pts.erase(std::remove_if(pts.begin(), pts.end(),
+        [rx, ry](const std::pair<double,double>& p){
+            return p.first >= rx || p.second >= ry;
+        }), pts.end());
 
     if (pts.empty()) return 0.0;
-    std::sort(pts.begin(), pts.end(), [](auto& a, auto& b){ return a.first < b.first; });
 
+    // Ordenar por primer objetivo (ascendente)
+    std::sort(pts.begin(), pts.end(),
+              [](const std::pair<double,double>& a, const std::pair<double,double>& b){
+                  return a.first < b.first;
+              });
+
+    // Sweepline: acumular área
     double hv = 0.0;
     double prev_x = pts[0].first;
     double cur_min_y = pts[0].second;
 
     for (size_t i = 1; i < pts.size(); ++i) {
         double x = pts[i].first;
-        hv += (x - prev_x) * (ref_bnd - cur_min_y);
+        if (cur_min_y < ry)                         // solo si contribuye
+            hv += (x - prev_x) * (ry - cur_min_y);
         cur_min_y = std::min(cur_min_y, pts[i].second);
         prev_x = x;
     }
-    hv += (ref_dom - prev_x) * (ref_bnd - cur_min_y);
-    return hv / (ref_dom * ref_bnd);
+    if (cur_min_y < ry)
+        hv += (rx - prev_x) * (ry - cur_min_y);
+
+    return hv;
+}
+
+template<typename Ind>
+double compute_hypervolume(const std::vector<Ind>& pop,
+                           double ref_dom  = 1e4,
+                           double ref_bnd  = 1e4,
+                           double ref_size = 1.0)   // tree_size normalizado
+{
+    // ── Recopilar puntos del frente de Pareto (rank == 1) ──────────────────
+    struct Pt3 { double f1, f2, f3; };
+    std::vector<Pt3> pts;
+
+    // Determinar max tree_size para normalización
+    double max_ts = 1.0;
+    for (auto& ind : pop)
+        if (ind.rank == 1)
+            max_ts = std::max(max_ts, (double)ind.tree_size);
+
+    for (auto& ind : pop) {
+        if (ind.rank != 1) continue;
+        double f1 = ind.mse_domain;
+        double f2 = ind.mse_boundary;
+        double f3 = (double)ind.tree_size / max_ts;   // normalizar a [0,1]
+
+        // Filtrar puntos fuera de la caja de referencia
+        if (f1 >= ref_dom || f2 >= ref_bnd || f3 >= ref_size) continue;
+        pts.push_back({f1, f2, f3});
+    }
+
+    if (pts.empty()) return 0.0;
+
+    // ── Slice-by-slice sobre f3 (ascendente = menor tree_size primero) ─────
+    // Ordenar por f3 ascendente
+    std::sort(pts.begin(), pts.end(),
+              [](const Pt3& a, const Pt3& b){ return a.f3 < b.f3; });
+
+    double hv3 = 0.0;
+    double prev_f3 = pts[0].f3;
+
+    // Para cada "slice" entre f3[i-1] y f3[i], calcular el HV 2D del
+    // conjunto acumulado de puntos proyectados sobre (f1, f2).
+    std::vector<std::pair<double,double>> slice_pts;
+
+    for (size_t i = 0; i < pts.size(); ++i) {
+        slice_pts.push_back({pts[i].f1, pts[i].f2});
+
+        // Grosor del slice en la dimensión f3
+        double next_f3 = (i + 1 < pts.size()) ? pts[i + 1].f3 : ref_size;
+        double thickness = next_f3 - prev_f3;
+
+        if (thickness > 0.0) {
+            double area = hv2d(slice_pts, ref_dom, ref_bnd);
+            hv3 += area * thickness;
+        }
+        prev_f3 = next_f3;
+    }
+
+    // Normalizar por el volumen total de la caja de referencia
+    return hv3 / (ref_dom * ref_bnd * ref_size);
 }
 
 template<typename Ind>
