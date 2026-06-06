@@ -1,109 +1,101 @@
-# PI-NSGA-II vs Koza BNF: Physics-Informed Multi-Objective Symbolic Regression
+# PI-NSGA-II vs Koza BNF vs PINNs: Physics-Informed Multi-Objective Symbolic Regression & Neural Solvers on PDEs
 
-This repository contains the full C++ implementation, evaluation pipeline, and automated reporting system for the paper: **"PI-NSGA-II: Physics-Informed Multi-Objective Symbolic Regression — A Comparison Against Koza's Grammatical Evolution on Elliptic PDEs"**.
+This repository contains the C++ and Python codebase, benchmark evaluation suite, and automated publication-quality reporting system comparing three paradigms for solving differential equations:
+1. **PI-NSGA-II**: Our proposed Physics-Informed Multi-Objective Symbolic Regression solver using exact Automatic Differentiation (AD).
+2. **Koza BNF**: A classical Grammatical Evolution baseline using Finite Differences (FD).
+3. **PINNs (Physics-Informed Neural Networks)**: A deep neural network baseline powered by DeepXDE, optimized for execution on consumer GPUs.
 
-## Overview
+---
 
-The goal of this project is to discover closed-form, human-interpretable symbolic solutions to Partial Differential Equations (PDEs). We benchmark our proposed approach (**PI-NSGA-II**) against a classical Genetic Programming baseline (**Koza BNF**).
+## Key Features
 
-### Key Features
-- **PI-NSGA-II (Ours)**: 
-  - Individuals are evaluated via **Exact Automatic Differentiation (AD)** using the second-order chain rule. 
-  - Zero truncation error, enabling the algorithm to find perfect PDE residual gradients.
-  - Supports a rich set of operators including `sinh`, `cosh`, `tanh`, `exp`, `log`, `sqrt`, and `atan`.
-  - Floating-point Ephemeral Random Constants (ERCs) with Gaussian mutation.
-- **Koza BNF (Baseline)**:
-  - Grammatical evolution mapping integer codon strings to symbolic expressions using a BNF grammar.
-  - Relies on **Finite Difference (FD)** for the Laplacian, which introduces $O(h^2)$ truncation error and requires 5 evaluations per collocation point.
-- **Bi-objective Optimization**: Both methods use NSGA-II to simultaneously minimize:
-  1. $\mathcal{L}_{\text{dom}}$: Interior PDE residual (Mean Squared Error).
-  2. $\mathcal{L}_{\text{bc}}$: Boundary Condition error (Mean Squared Error).
-- **100% Reproducible**: All experiments use strict deterministic seeding (`seed = 1000 * (run_id + 1)`) ensuring zero variance across re-runs of the same benchmark.
+### 1. The Solvers
+* **PI-NSGA-II (Ours)**:
+  * Expressions are evaluated using **Exact Automatic Differentiation (AD)** based on second-order chain rules.
+  * Zero truncation error allows discovery of exact PDE residual gradients.
+  * Rich operator library: `+`, `-`, `*`, `/`, `sin`, `cos`, `exp`, `log`, `sinh`, `cosh`, `tanh`, `sqrt`, `atan`.
+  * Real-valued Ephemeral Random Constants (ERCs) with Gaussian mutation.
+* **Koza BNF (Baseline)**:
+  * Grammatical Evolution baseline mapping integer codon strings to symbolic syntax trees using a BNF grammar.
+  * Uses **Finite Differences (FD)** for numerical derivatives, introducing $O(h^2)$ truncation errors.
+* **PINNs (Baseline)**:
+  * Deep neural networks built using the DeepXDE framework.
+  * Memory-optimized execution using VRAM-conserving techniques (mixed-precision training, gradient accumulation, and reduced hidden layers) to prevent CUDA out-of-memory errors on limited VRAM hardware.
 
-## Dependencies
+### 2. Multi-Objective & Hypervolume Selection
+* Evaluates candidates across three objective dimensions:
+  1. $\mathcal{L}_{\text{dom}}$: Interior domain PDE residual (Mean Squared Error).
+  2. $\mathcal{L}_{\text{bc}}$: Boundary condition compliance (Mean Squared Error).
+  3. **Complexity**: Symbolic node/complexity metric.
+* Analyzes Pareto fronts using a **3D Hypervolume (HV)** metric to determine structural convergence.
 
-- **C++17** or higher
-- **CMake** (>= 3.10)
-- **Python 3.8+** (for statistical analysis and plotting)
-  - `numpy`, `pandas`, `matplotlib`, `scipy`
-- **LaTeX** distribution (`pdflatex`) to compile the paper report.
+### 3. Comprehensive Benchmarks (13 Equations)
+* **Elliptic PDEs**: Laplace ($\nabla^2 u = 0$), Poisson ($\nabla^2 u = f$), Helmholtz ($\nabla^2 u + k^2 u = f$), Nonlinear Poisson ($\nabla^2 u + u^2 = f$), Liouville ($\nabla^2 u = e^u$), Sine-Gordon ($\nabla^2 u = \sin(u)$), and Navier-Stokes ($\psi_y (\nabla^2 \psi)_x - \psi_x (\nabla^2 \psi)_y = \nu \nabla^4 \psi$).
+* **ODEs & Systems**: Schrödinger ($-u'' + V u = E u$), Airy ($u'' = x\,u$), Harmonic Oscillator ($u'' = (x^2-1)u$), Fisher ($\nabla^2 u + u(1-u) = 0$), Duffing ($\nabla^2 u + u + u^3 = 0$), and Thomas-Fermi ($\nabla^2 u = u^2 / (x+y+0.5)$).
 
-## Quick Start
+### 4. Publication-Ready PDF Graphics
+* All figures (solutions, convergence histories, parsimony pressure, and Pareto fronts) are output in lightweight, vector-based **PDF format**, fully compatible with LaTeX/Overleaf.
+* Typographic design optimized for double-column layouts (`minipage` size `0.48\textwidth`):
+  * **Main Title**: size `88` (featuring the exact equation LaTeX formulas).
+  * **Axis Labels**: size `55` with custom offsets (`labelpad=40/60`) to prevent overlaps.
+  * **Ticks**: size `48` utilizing simplified tick marks `[0, 0.5, 1]` to avoid origin crowding.
+  * **Colorbars**: Custom formatting showing explicit scientific notation (e.g. $1.5 \times 10^{-5}$) to prevent clipped exponents.
 
-### 1. Build the Project
-We use CMake to build the C++ core:
+---
+
+## Directory Structure
+
+```
+.
+├── include/              # C++ Header files
+│   ├── common.hpp        # Shared symbolic regression configs
+│   ├── nsga2.hpp         # Core NSGA-II sorting and selection
+│   ├── pde_problems.hpp  # Analytical and numerical boundary definitions
+│   ├── tree_node.hpp     # Expression tree & Exact AD chain rule
+│   ├── koza_bnf.hpp      # Grammatical evolution (Finite Difference)
+│   └── pi_solver.hpp     # Physics-Informed Symbolic Regression (Exact AD)
+├── src/                  # C++ Source files
+├── main.cpp              # C++ Main entry point
+├── pinn_baseline.py      # PINN baseline execution (DeepXDE, PyTorch backend)
+├── plot_solutions.py     # 3D surface and 1D curve plotting pipeline
+├── plot_pareto.py        # Pareto front and Hypervolume graphing
+├── stats_analysis.py     # Multi-run statistics & Wilcoxon testing
+├── run_pipeline.sh       # Automated C++/Python runner script
+└── report/               # LaTeX templates and compilation files
+    ├── generate_report.py
+    ├── results.tex       # Master LaTeX document
+    └── figures/          # Output vector PDF graphics
+```
+
+---
+
+## Installation & Usage
+
+### 1. Prerequisites
+Ensure you have a C++17 compiler, CMake, and a Python 3 environment.
+
+```bash
+# Set up Python virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Build C++ Core
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel $(nproc)
 ```
 
-### 2. One-Click Reproducibility Pipeline
-We provide a bash script that automatically runs the multi-run benchmark, extracts statistical features, evaluates single-run grids for 3D visualization, extracts symbolic expressions, plots everything, and compiles the final LaTeX PDF.
+### 3. Run PINN Baseline
+```bash
+python3 pinn_baseline.py --only Laplace_2D
+```
+*Use `--only <equation_name>` to restrict training, or run without flags to train PINN baselines on all 13 problems.*
 
+### 4. Run the Full Evaluation & Compile Report
+The automated pipeline executes the symbolic search runs, trains PINN baselines, regenerates all vector PDF graphics, and compiles the LaTeX PDF:
 ```bash
 ./run_pipeline.sh
 ```
-
-### 3. Manual Step-by-Step Execution
-If you prefer to run the stages manually:
-
-**Step 3.1: Multi-Run Benchmark ($N=20$)**
-Runs the algorithm 20 times for statistically significant comparisons:
-```bash
-./build/pi_nsga2 --runs 20
-python3 stats_analysis.py
-```
-
-**Step 3.2: Single-Run Validation & Extraction**
-Runs a single detailed iteration to dump evaluation grids (`grid_*.csv`) and exact symbolic math equations (`expr_*.tex`):
-```bash
-./build/pi_nsga2
-python3 plot_solutions.py
-```
-
-**Step 3.3: Visualizations & Tables**
-Generates Pareto fronts, sensitivity analysis, box plots, and method comparison bar charts:
-```bash
-python3 plot_pareto.py
-python3 report/generate_formulas_table.py
-python3 report/generate_report.py
-```
-
-**Step 3.4: Compile LaTeX PDF**
-Compiles all the generated `.png` figures and `.tex` tables into a standalone paper-ready document:
-```bash
-cd report
-pdflatex results.tex
-```
-
-*Final outputs, including images and CSV tables, will be available in the `results/` and `report/` directories.*
-
-## Directory Structure
-```
-.
-├── include/              # C++ Header files
-│   ├── common.hpp        # Shared configurations (Pop size, Gens, etc.)
-│   ├── nsga2.hpp         # Core NSGA-II selection/sorting logic
-│   ├── pde_problems.hpp  # Definitions of Laplace, Poisson, Helmholtz
-│   ├── tree_node.hpp     # Expression tree & Exact AD implementation
-│   ├── koza_bnf.hpp      # Koza's baseline solver
-│   └── pi_solver.hpp     # PI-NSGA-II solver
-├── src/                  # C++ Source files
-├── main.cpp              # Orchestrator and CLI
-├── run_pipeline.sh       # Automated benchmarking and plotting pipeline
-├── plot_pareto.py        # 2D Pareto, Dominance Map, and Bar charting
-├── plot_solutions.py     # 3D Surface reconstruction of PDEs
-├── stats_analysis.py     # Multi-run statistics & Wilcoxon testing
-└── report/               # LaTeX templates and automated reporting
-    ├── generate_report.py
-    ├── generate_formulas_table.py
-    ├── paper_template.tex
-    └── results.tex       # Master document for PDF rendering
-```
-
-## Benchmark Problems
-
-The methods are tested on three canonical elliptic PDEs defined on $\Omega = [0,1]^2$:
-1. **Laplace Equation** ($\nabla^2 u = 0$)
-2. **Poisson Equation** ($\nabla^2 u = f(x,y)$)
-3. **Helmholtz Equation** ($\nabla^2 u + k^2 u = f(x,y)$)
+The compiled output is saved as `report/results.pdf`.
