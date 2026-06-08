@@ -304,10 +304,12 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
 
     problems.push_back(make_nonlinear_poisson());
     problems.push_back(make_liouville());
-    problems.push_back(make_sine_gordon());
+    problems.push_back(make_thomas_fermi(2));
     problems.push_back(make_navier_stokes());
+    problems.push_back(make_navier_stokes_unsteady());
 
     std::vector<Stats> all_stats;
+
 
     for (auto& prob : problems) {
         std::string lbl = prob.name() + (prob.dim == 1 ? "_1D" : "_2D");

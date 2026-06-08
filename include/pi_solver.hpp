@@ -11,7 +11,8 @@ struct PIIndividual : public Individual {
 
     void evaluate(const PDEProblem& prob, 
                   const std::vector<Point>& dom, 
-                  const std::vector<Point>& bnd);
+                  const std::vector<Point>& bnd,
+                  int current_gen = 100);
                   
     // Evaluación robusta en rejilla fija para el Hall of Fame
     double get_validation_mse(const PDEProblem& prob, 
@@ -44,7 +45,8 @@ private:
     PIIndividual best_ever_;
     bool has_best_ever_ = false;
     int stagnation_counter_ = 0;
-    int cataclysm_count_ = 0; // Para limitar a una sola inyección
+    int cataclysm_count_ = 0; 
+    int current_gen_ = 0;
     double last_best_mse_ = 1e18;
 
     PIIndividual random_individual();

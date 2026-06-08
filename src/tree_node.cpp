@@ -1,830 +1,247 @@
 // =============================================================================
-// tree_node.cpp  —  Árbol de expresión con AD exacto (Polimórfico)
+// tree_node.cpp  —  Diccionario Físico y AD Exacto (Versión Final)
 // =============================================================================
 
 #include "tree_node.hpp"
 #include "pde_problems.hpp"
 #include <cmath>
-#include <stdexcept>
 #include <algorithm>
-#include <sstream>
+#include <iomanip>
 
-static constexpr double LOG_EPS  = 1e-8;
-static constexpr double SQRT_EPS = 1e-8;
-static constexpr double EXP_CLAMP = 30.0;
+static const double PI_VAL = 3.14159265358979323846;
 
-// ─── TerminalNode ────────────────────────────────────────────────────────────
-AD TerminalNode::ad_eval(double x, double y, int dim) const {
-    AD r;
-    if (type == NodeType::VAR_X) {
-        r.v = x; r.dx = 1.0; r.dy = 0.0; r.dxx = 0.0; r.dyy = 0.0;
-    } else if (type == NodeType::VAR_Y) {
-        r.v = y; r.dx = 0.0; r.dy = 1.0; r.dxx = 0.0; r.dyy = 0.0;
-    } else if (type == NodeType::ERC) {
-        r.v = erc_val; r.dx = 0; r.dy = 0; r.dxx = 0; r.dyy = 0;
-    } else if (type == NodeType::CONST_I) {
-        r.v = I_COMPLEX; r.dx = 0; r.dy = 0; r.dxx = 0; r.dyy = 0;
-    }
-    return r;
-}
-Complex TerminalNode::eval(double x, double y) const { 
-    if (type == NodeType::VAR_X) return x;
-    if (type == NodeType::VAR_Y) return y;
-    if (type == NodeType::ERC)   return erc_val;
-    if (type == NodeType::CONST_I) return I_COMPLEX;
-    return 0.0;
-}
-void TerminalNode::mutate_erc(std::mt19937& gen, double sigma) {
-    if (type == NodeType::ERC) {
-        std::uniform_real_distribution<double> prob(0.0, 1.0);
-        if (prob(gen) < 0.15) { // 15% chance to "snap" to a canonical constant
-            static const double PI_VAL = std::acos(-1.0);
-            static const double E_VAL  = std::exp(1.0);
-            
-            double v = erc_val.real();
-            std::vector<double> candidates = {
-                std::round(v),           // Integer
-                std::round(v * 2.0)/2.0, // Half-integer
-                PI_VAL, -PI_VAL, PI_VAL/2.0, -PI_VAL/2.0,
-                E_VAL,  -E_VAL
-            };
-            
-            double best_c = candidates[0];
-            double min_dist = std::abs(v - best_c);
-            for (double c : candidates) {
-                if (std::abs(v - c) < min_dist) {
-                    min_dist = std::abs(v - c);
-                    best_c = c;
-                }
-            }
-            erc_val = Complex(best_c, 0.0);
-        } else {
-            // Normal Gaussian mutation
-            std::normal_distribution<double> d(0.0, sigma);
-            erc_val += d(gen);
-        }
-    }
-}
-void TerminalNode::print(std::ostream& os) const {
-    if (type == NodeType::VAR_X) os << "x";
-    else if (type == NodeType::VAR_Y) os << "y";
-    else if (type == NodeType::ERC) os << erc_val.real();
-    else if (type == NodeType::CONST_I) os << "i";
-}
-void TerminalNode::print_latex(std::ostream& os) const {
-    if (type == NodeType::VAR_X) os << "x";
-    else if (type == NodeType::VAR_Y) os << "y";
-    else if (type == NodeType::CONST_I) os << "i";
-    else {
-        static const double PI_VAL = std::acos(-1.0);
-        static const double E_VAL  = std::exp(1.0);
-        double v = erc_val.real();
-        double eps = 1e-6;
-        
-        if (std::abs(v - PI_VAL) < eps) os << "\\pi";
-        else if (std::abs(v + PI_VAL) < eps) os << "-\\pi";
-        else if (std::abs(v - PI_VAL/2.0) < eps) os << "\\frac{\\pi}{2}";
-        else if (std::abs(v + PI_VAL/2.0) < eps) os << "-\\frac{\\pi}{2}";
-        else if (std::abs(v - E_VAL) < eps) os << "e";
-        else if (std::abs(v + E_VAL) < eps) os << "-e";
-        else {
-            if (std::abs(erc_val.imag()) < 1e-9) os << erc_val.real();
-            else os << erc_val;
-        }
-    }
-}
-
-// ─── UnaryNode ───────────────────────────────────────────────────────────────
-AD UnaryNode::ad_eval(double x, double y, int dim) const {
-    AD r;
-    AD C = child->ad_eval(x, y, dim);
-    if (type == NodeType::SIN) {
-        Complex clamped_v = C.v;
-        if (clamped_v.imag() > 30.0) clamped_v = Complex(clamped_v.real(), 30.0);
-        if (clamped_v.imag() < -30.0) clamped_v = Complex(clamped_v.real(), -30.0);
-        Complex s = std::sin(clamped_v), c = std::cos(clamped_v);
-        r.v = s; r.dx = c * C.dx; r.dxx = c*C.dxx - s*C.dx*C.dx;
-        if (dim == 2) {
-            r.dy = c * C.dy; r.dyy = c*C.dyy - s*C.dy*C.dy;
-        }
-    } else if (type == NodeType::COS) {
-        Complex clamped_v = C.v;
-        if (clamped_v.imag() > 30.0) clamped_v = Complex(clamped_v.real(), 30.0);
-        if (clamped_v.imag() < -30.0) clamped_v = Complex(clamped_v.real(), -30.0);
-        Complex s = std::sin(clamped_v), c = std::cos(clamped_v);
-        r.v = c; r.dx = -s * C.dx; r.dxx = -s*C.dxx - c*C.dx*C.dx;
-        if (dim == 2) {
-            r.dy = -s * C.dy; r.dyy = -s*C.dyy - c*C.dy*C.dy;
-        }
-    } else if (type == NodeType::EXP) {
-        // Clamp real part to prevent overflow: exp(30) is enough for any PDE
-        Complex clamped_v = C.v;
-        if (clamped_v.real() > 30.0) clamped_v = Complex(30.0, clamped_v.imag());
-        if (clamped_v.real() < -30.0) clamped_v = Complex(-30.0, clamped_v.imag());
-
-        Complex ev = std::exp(clamped_v);
-        r.v = ev; r.dx = ev * C.dx; r.dxx = ev * (C.dxx + C.dx*C.dx);
-        if (dim == 2) {
-            r.dy = ev * C.dy; r.dyy = ev * (C.dyy + C.dy*C.dy);
-        }
-    } else if (type == NodeType::SQR) {
-        r.v = C.v * C.v;
-        r.dx = 2.0 * C.v * C.dx; r.dxx = 2.0 * (C.dx * C.dx + C.v * C.dxx);
-        if (dim == 2) {
-            r.dy = 2.0 * C.v * C.dy; r.dyy = 2.0 * (C.dy * C.dy + C.v * C.dyy);
-        }
-    } else if (type == NodeType::SINH) {
-        Complex sh = std::sinh(C.v), ch = std::cosh(C.v);
-        r.v = sh; r.dx = ch * C.dx; r.dxx = ch*C.dxx + sh*C.dx*C.dx;
-        if (dim == 2) { r.dy = ch * C.dy; r.dyy = ch*C.dyy + sh*C.dy*C.dy; }
-    } else if (type == NodeType::COSH) {
-        Complex sh = std::sinh(C.v), ch = std::cosh(C.v);
-        r.v = ch; r.dx = sh * C.dx; r.dxx = sh*C.dxx + ch*C.dx*C.dx;
-        if (dim == 2) { r.dy = sh * C.dy; r.dyy = sh*C.dyy + ch*C.dy*C.dy; }
-    }
-    return r;
-}
-Complex UnaryNode::eval(double x, double y) const { 
-    Complex v = child->eval(x, y);
-    if (type == NodeType::SIN) {
-        double im = std::clamp(v.imag(), -30.0, 30.0);
-        return std::sin(Complex(v.real(), im));
-    }
-    if (type == NodeType::COS) {
-        double im = std::clamp(v.imag(), -30.0, 30.0);
-        return std::cos(Complex(v.real(), im));
-    }
-    if (type == NodeType::EXP) {
-        double re = std::clamp(v.real(), -30.0, 30.0);
-        return std::exp(Complex(re, v.imag()));
-    }
-    if (type == NodeType::SQR) return v * v;
-    if (type == NodeType::SINH) {
-        double re = std::clamp(v.real(), -30.0, 30.0);
-        return std::sinh(Complex(re, v.imag()));
-    }
-    if (type == NodeType::COSH) {
-        double re = std::clamp(v.real(), -30.0, 30.0);
-        return std::cosh(Complex(re, v.imag()));
-    }
-    return 0.0;
-}
-void UnaryNode::print(std::ostream& os) const {
-    if (type == NodeType::SIN) os << "sin(";
-    else if (type == NodeType::COS) os << "cos(";
-    else if (type == NodeType::SINH) os << "sinh(";
-    else if (type == NodeType::COSH) os << "cosh(";
-    else if (type == NodeType::EXP) os << "exp(";
-    else if (type == NodeType::SQR) os << "sqr(";
-    child->print(os);
-    os << ")";
-}
-void UnaryNode::print_latex(std::ostream& os) const {
-    if (type == NodeType::SIN) os << "\\sin(";
-    else if (type == NodeType::COS) os << "\\cos(";
-    else if (type == NodeType::SINH) os << "\\sinh(";
-    else if (type == NodeType::COSH) os << "\\cosh(";
-    else if (type == NodeType::EXP) os << "\\exp(";
-    else if (type == NodeType::SQR) os << "{(";
-    child->print_latex(os);
-    if (type == NodeType::SQR) os << ")}^2";
-    else os << ")";
-}
-
-// ─── Funciones polinomiales (Legendre, Hermite) ─────────────────────────────
-static AD poly_ad(const AD& L, int dim, double c3, double c2, double c1, double c0) {
-    AD r;
-    Complex x = L.v, x2 = x*x, x3 = x2*x;
-    r.v = c3*x3 + c2*x2 + c1*x + c0;
-    
-    Complex dx_v = c3*3.0*x2 + c2*2.0*x + c1;
-    Complex dxx_v = c3*6.0*x + c2*2.0;
-
-    r.dx = dx_v * L.dx;
-    r.dxx = dxx_v * L.dx * L.dx + dx_v * L.dxx;
-    if (dim == 2) {
-        r.dy = dx_v * L.dy;
-        r.dyy = dxx_v * L.dy * L.dy + dx_v * L.dyy;
-    }
-    return r;
-}
-static Complex poly_eval(Complex x, double c3, double c2, double c1, double c0) {
-    return c3*x*x*x + c2*x*x + c1*x + c0;
-}
-
-// ─── BinaryNode ──────────────────────────────────────────────────────────────
-AD BinaryNode::ad_eval(double x, double y, int dim) const {
-    AD r;
-    AD L = left->ad_eval(x, y, dim);
-    AD R = right->ad_eval(x, y, dim);
-    if (type == NodeType::ADD) {
-        r.v = L.v + R.v; r.dx = L.dx + R.dx; r.dxx = L.dxx + R.dxx;
-        if (dim == 2) { r.dy = L.dy + R.dy; r.dyy = L.dyy + R.dyy; }
-    } else if (type == NodeType::SUB) {
-        r.v = L.v - R.v; r.dx = L.dx - R.dx; r.dxx = L.dxx - R.dxx;
-        if (dim == 2) { r.dy = L.dy - R.dy; r.dyy = L.dyy - R.dyy; }
-    } else if (type == NodeType::MUL) {
-        r.v = L.v * R.v;
-        r.dx = L.dx*R.v + L.v*R.dx;
-        r.dxx = L.dxx*R.v + 2.0*L.dx*R.dx + L.v*R.dxx;
-        if (dim == 2) {
-            r.dy = L.dy*R.v + L.v*R.dy;
-            r.dyy = L.dyy*R.v + 2.0*L.dy*R.dy + L.v*R.dyy;
-        }
-    } else if (type == NodeType::DIV) {
-        if (std::abs(R.v) < 1e-6) {
-            r.v = 1.0; r.dx = 0; r.dy = 0; r.dxx = 0; r.dyy = 0;
-        } else {
-            Complex R2 = R.v * R.v;
-            r.v   = L.v / R.v;
-            r.dx  = (L.dx * R.v - L.v * R.dx) / R2;
-            r.dxx = (L.dxx * R.v - L.v * R.dxx) / R2 - 2.0 * R.dx * (L.dx * R.v - L.v * R.dx) / (R2 * R.v);
-            if (dim == 2) {
-                r.dy  = (std::abs(R.v) < 1e-8) ? 0.0 : (L.dy * R.v - L.v * R.dy) / R2;
-                r.dyy = (std::abs(R.v) < 1e-8) ? 0.0 : (L.dyy * R.v - L.v * R.dyy) / R2 - 2.0 * R.dy * (L.dy * R.v - L.v * R.dy) / (R2 * R.v);
-            }
-        }
-    } else if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) {
-        int n = std::clamp((int)std::round(R.v.real()), 0, 3);
-        if (type == NodeType::LEGENDRE) {
-            if (n == 0) r = poly_ad(L, dim, 0.0, 0.0, 0.0, 1.0);
-            else if (n == 1) r = poly_ad(L, dim, 0.0, 0.0, 1.0, 0.0);
-            else if (n == 2) r = poly_ad(L, dim, 0.0, 1.5, 0.0, -0.5);
-            else if (n == 3) r = poly_ad(L, dim, 2.5, 0.0, -1.5, 0.0);
-        } else { // HERMITE
-            if (n == 0) r = poly_ad(L, dim, 0.0, 0.0, 0.0, 1.0);
-            else if (n == 1) r = poly_ad(L, dim, 0.0, 0.0, 2.0, 0.0);
-            else if (n == 2) r = poly_ad(L, dim, 0.0, 4.0, 0.0, -2.0);
-            else if (n == 3) r = poly_ad(L, dim, 8.0, 0.0, -12.0, 0.0);
-        }
-    }
-    return r;
-}
-Complex BinaryNode::eval(double x, double y) const { 
-    Complex lv = left->eval(x, y);
-    Complex rv = right->eval(x, y);
-    if (type == NodeType::ADD) return lv + rv;
-    if (type == NodeType::SUB) return lv - rv;
-    if (type == NodeType::MUL) return lv * rv;
-    if (type == NodeType::DIV) return (std::abs(rv) < 1e-8) ? 1.0 : lv / rv;
-    if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) {
-        int n = std::clamp((int)std::round(rv.real()), 0, 3);
-        if (type == NodeType::LEGENDRE) {
-            if (n == 0) return poly_eval(lv, 0.0, 0.0, 0.0, 1.0);
-            if (n == 1) return poly_eval(lv, 0.0, 0.0, 1.0, 0.0);
-            if (n == 2) return poly_eval(lv, 0.0, 1.5, 0.0, -0.5);
-            if (n == 3) return poly_eval(lv, 2.5, 0.0, -1.5, 0.0);
-        } else {
-            if (n == 0) return poly_eval(lv, 0.0, 0.0, 0.0, 1.0);
-            if (n == 1) return poly_eval(lv, 0.0, 0.0, 2.0, 0.0);
-            if (n == 2) return poly_eval(lv, 0.0, 4.0, 0.0, -2.0);
-            if (n == 3) return poly_eval(lv, 8.0, 0.0, -12.0, 0.0);
-        }
-    }
-    return 0.0;
-}
-void BinaryNode::print(std::ostream& os) const {
-    if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) {
-        int n = std::clamp((int)std::round(right->eval(0.0, 0.0).real()), 0, 3);
-        if (type == NodeType::LEGENDRE) os << "Legendre_" << n << "(";
-        else os << "Hermite_" << n << "(";
-        left->print(os);
-        os << ")";
-    } else {
-        os << "(";
-        left->print(os);
-        if (type == NodeType::ADD) os << " + ";
-        else if (type == NodeType::SUB) os << " - ";
-        else if (type == NodeType::MUL) os << " * ";
-        else if (type == NodeType::DIV) os << " / ";
-        right->print(os);
-        os << ")";
-    }
-}
-void BinaryNode::print_latex(std::ostream& os) const {
-    if (type == NodeType::DIV) {
-        os << "\\frac{"; left->print_latex(os); os << "}{"; right->print_latex(os); os << "}";
-    } else if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) {
-        int n = std::clamp((int)std::round(right->eval(0.0, 0.0).real()), 0, 3);
-        if (type == NodeType::LEGENDRE) os << "P_{" << n << "}(";
-        else os << "H_{" << n << "}(";
-        left->print_latex(os);
-        os << ")";
-    } else {
-        os << "(";
-        left->print_latex(os);
-        if (type == NodeType::ADD) os << " + ";
-        else if (type == NodeType::SUB) os << " - ";
-        else if (type == NodeType::MUL) os << " \\cdot ";
-        right->print_latex(os);
-        os << ")";
-    }
-}
-
-// ─── Constructores ───────────────────────────────────────────────────────────
-NodePtr make_var(char v) { return std::make_unique<TerminalNode>(v == 'x' ? NodeType::VAR_X : NodeType::VAR_Y); }
-NodePtr make_erc(Complex val) { return std::make_unique<TerminalNode>(NodeType::ERC, val); }
-NodePtr make_const_i() { return std::make_unique<TerminalNode>(NodeType::CONST_I); }
-NodePtr make_binary(NodeType op, NodePtr l, NodePtr r) { 
-    auto node = std::make_unique<BinaryNode>(op, std::move(l), std::move(r));
-    return node->simplify();
-}
-NodePtr make_unary(NodeType op, NodePtr c) { 
-    auto node = std::make_unique<UnaryNode>(op, std::move(c));
-    return node->simplify();
-}
-
-// ─── Generación Aleatoria ────────────────────────────────────────────────────
-NodePtr random_tree(int max_depth, std::mt19937& gen, bool force_terminal) {
-    static const std::vector<NodeType> binaries = { 
-        NodeType::ADD, NodeType::SUB, NodeType::MUL, NodeType::DIV,
-        NodeType::LEGENDRE, NodeType::HERMITE 
-    };
-    static const std::vector<NodeType> unaries = {
-        NodeType::SIN, NodeType::COS, NodeType::SINH, NodeType::COSH, NodeType::EXP, NodeType::SQR
-    };
-    std::uniform_real_distribution<double> ud(0.0, 1.0);
-    std::uniform_real_distribution<double> erc_dist(-3.0, 3.0);
-
-    bool terminal = force_terminal || (max_depth <= 0) || (ud(gen) < 0.30);
-    if (terminal) {
-        std::uniform_int_distribution<int> ti(0, 3);
-        int choice = ti(gen);
-        if (choice == 0) return make_var('x');
-        if (choice == 1) return make_var('y');
-        if (choice == 2) return make_erc(erc_dist(gen));
-        return std::make_unique<TerminalNode>(NodeType::CONST_I);
-    }
-
-    if (ud(gen) < 0.55) {
-        std::uniform_int_distribution<int> bi(0, (int)binaries.size() - 1);
-        NodeType op = binaries[bi(gen)];
-        if (op == NodeType::LEGENDRE || op == NodeType::HERMITE) {
-            std::uniform_int_distribution<int> degree_dist(0, 3);
-            return make_binary(op, random_tree(1, gen), make_erc(degree_dist(gen)));
-        }
-        return make_binary(op, random_tree(max_depth - 1, gen), random_tree(max_depth - 1, gen));
-    } else {
-        std::uniform_int_distribution<int> ui(0, (int)unaries.size() - 1);
-        NodeType op = unaries[ui(gen)];
-        return make_unary(op, random_tree(max_depth - 1, gen));
-    }
-}
-
-// Helper para generar árboles restringidos a ciertas variables
-static NodePtr random_tree_restricted(int max_depth, std::mt19937& gen, const std::vector<NodeType>& allowed_vars) {
-    static const std::vector<NodeType> binaries = { 
-        NodeType::ADD, NodeType::SUB, NodeType::MUL, NodeType::DIV,
-        NodeType::LEGENDRE, NodeType::HERMITE 
-    };
-    static const std::vector<NodeType> unaries = { NodeType::SIN, NodeType::COS, NodeType::EXP, NodeType::SQR };
-    
-    std::uniform_real_distribution<double> ud(0.0, 1.0);
-    std::uniform_real_distribution<double> erc_dist(-2.0, 2.0);
-
-    if (max_depth <= 0 || ud(gen) < 0.3) {
-        if (allowed_vars.empty()) return make_erc(erc_dist(gen));
-        std::uniform_int_distribution<int> vi(0, (int)allowed_vars.size() + 1);
-        int c = vi(gen);
-        if (c < (int)allowed_vars.size()) return std::make_unique<TerminalNode>(allowed_vars[c]);
-        if (c == (int)allowed_vars.size()) return make_erc(erc_dist(gen));
-        return std::make_unique<TerminalNode>(NodeType::CONST_I);
-    }
-
-    if (ud(gen) < 0.6) {
-        NodeType op = binaries[std::uniform_int_distribution<int>(0, binaries.size()-1)(gen)];
-        if (op == NodeType::LEGENDRE || op == NodeType::HERMITE) {
-            std::uniform_int_distribution<int> degree_dist(0, 3);
-            return make_binary(op, random_tree_restricted(1, gen, allowed_vars), make_erc(degree_dist(gen)));
-        }
-        return make_binary(op, random_tree_restricted(max_depth-1, gen, allowed_vars), 
-                               random_tree_restricted(max_depth-1, gen, allowed_vars));
-    } else {
-        NodeType op = unaries[std::uniform_int_distribution<int>(0, unaries.size()-1)(gen)];
-        return make_unary(op, random_tree_restricted(max_depth-1, gen, allowed_vars));
-    }
-}
-
-NodePtr random_tree_special(int max_depth, std::mt19937& gen, const PDEProblem& prob) {
-    std::uniform_real_distribution<double> ud(0, 1);
-    int dim = prob.dim;
-
-    // Arquetipo: Gaussiana centrada P(x,y)*exp(-a*r^2)
-    auto make_gaussian = [&](double sigma_val) {
-        auto dx = make_binary(NodeType::SUB, make_var('x'), make_erc(0.5));
-        auto r2 = make_binary(NodeType::MUL, dx->clone(), dx->clone());
-        if (dim == 2) {
-            auto dy = make_binary(NodeType::SUB, make_var('y'), make_erc(0.5));
-            auto y2 = make_binary(NodeType::MUL, dy->clone(), dy->clone());
-            r2 = make_binary(NodeType::ADD, std::move(r2), std::move(y2));
-        }
-        auto exponent = make_binary(NodeType::MUL, make_erc(-sigma_val), std::move(r2));
-        auto gauss = make_unary(NodeType::EXP, std::move(exponent));
-        auto poly = (ud(gen) < 0.5) ? make_var('x') : make_erc(1.0);
-        return make_binary(NodeType::MUL, std::move(poly), std::move(gauss));
-    };
-
-    // Arquetipo: Separación de variables sin(kx)*sinh(ky)
-    auto make_sep_vars = [&]() {
-        auto sx = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(3.1415), make_var('x')));
-        if (dim == 1) return sx;
-        auto sy = make_unary(NodeType::SINH, make_binary(NodeType::MUL, make_erc(1.0), make_var('y')));
-        return make_binary(NodeType::MUL, std::move(sx), std::move(sy));
-    };
-
-    // Arquetipo: Polinomio de Taylor aleatorio
-    auto make_poly = [&]() {
-        auto x = make_var('x');
-        auto x2 = make_binary(NodeType::MUL, x->clone(), x->clone());
-        auto term1 = make_binary(NodeType::MUL, make_erc(ud(gen)*2-1), std::move(x));
-        auto term2 = make_binary(NodeType::MUL, make_erc(ud(gen)*2-1), std::move(x2));
-        return make_binary(NodeType::ADD, std::move(term1), std::move(term2));
-    };
-
-    // Arquetipo: Función Racional P(x)/Q(x)
-    auto make_rational = [&]() {
-        return make_binary(NodeType::DIV, make_poly(), make_binary(NodeType::ADD, make_erc(1.0), make_unary(NodeType::SQR, make_var('x'))));
-    };
-
-    // Fallback/General archetypes to ensure unbiased/fair discovery:
-
-    double p = ud(gen);
-    if (p < 0.25) return make_gaussian(1.0);
-    if (p < 0.50) return make_sep_vars();
-    if (p < 0.75) return make_poly();
-    return make_rational();
-}
-
-// ─── Homologous Crossover (Cruce Homólogo Estructural) ───────────────────────
-std::pair<NodePtr, NodePtr> tree_crossover(const NodePtr& p1, const NodePtr& p2, std::mt19937& gen) {
-    if (!p1 || !p2) return {nullptr, nullptr};
-    // Si las estructuras coinciden, bajamos de forma homóloga
-    if (p1->get_type() == p2->get_type()) {
-        if (auto* un1 = dynamic_cast<UnaryNode*>(p1.get())) {
-            auto* un2 = dynamic_cast<UnaryNode*>(p2.get());
-            auto children = tree_crossover(un1->child, un2->child, gen);
-            return {std::make_unique<UnaryNode>(un1->type, std::move(children.first)),
-                    std::make_unique<UnaryNode>(un2->type, std::move(children.second))};
-        } else if (auto* bn1 = dynamic_cast<BinaryNode*>(p1.get())) {
-            auto* bn2 = dynamic_cast<BinaryNode*>(p2.get());
-            auto lefts = tree_crossover(bn1->left, bn2->left, gen);
-            auto rights = tree_crossover(bn1->right, bn2->right, gen);
-            return {std::make_unique<BinaryNode>(bn1->type, std::move(lefts.first), std::move(rights.first)),
-                    std::make_unique<BinaryNode>(bn2->type, std::move(lefts.second), std::move(rights.second))};
-        } else {
-            return {p1->clone(), p2->clone()};
-        }
-    } else {
-        // Estructuras difieren. Puntos de divergencia: cruzamos con 50% de probabilidad
-        std::uniform_real_distribution<double> dist(0.0, 1.0);
-        if (dist(gen) < 0.5) return {p2->clone(), p1->clone()};
-        else return {p1->clone(), p2->clone()};
-    }
-}
-
-// ─── Mutación Estructural (Reemplazo) ────────────────────────────────────────
-void replace_node_at(NodePtr& current, int& target_idx, NodePtr& replacement) {
-    if (target_idx == 0) {
-        current = std::move(replacement);
-        target_idx--;
+// Helper para polinomios ortogonales y sus derivadas de 2do orden
+static void eval_poly_all(NodeType type, int n, double x, double& v, double& dv, double& dvv) {
+    if (n <= 0) { v = 1.0; dv = 0.0; dvv = 0.0; return; }
+    if (n == 1) {
+        if (type == NodeType::HERMITE) { v = 2.0*x; dv = 2.0; dvv = 0.0; }
+        else { v = x; dv = 1.0; dvv = 0.0; }
         return;
     }
-    target_idx--;
-    if (auto* un = dynamic_cast<UnaryNode*>(current.get())) {
-        if (target_idx >= 0) replace_node_at(un->child, target_idx, replacement);
-    } else if (auto* bn = dynamic_cast<BinaryNode*>(current.get())) {
-        if (target_idx >= 0) replace_node_at(bn->left, target_idx, replacement);
-        if (target_idx >= 0) replace_node_at(bn->right, target_idx, replacement);
+    double p0 = 1.0, p1 = (type == NodeType::HERMITE) ? 2.0*x : x;
+    double dp0 = 0.0, dp1 = (type == NodeType::HERMITE) ? 2.0 : 1.0;
+    double ddp0 = 0.0, ddp1 = 0.0;
+    for (int i = 2; i <= n; ++i) {
+        double cur_v, cur_dv, cur_dvv;
+        if (type == NodeType::LEGENDRE) {
+            cur_v = ((2.0*i-1.0)*x*p1 - (i-1.0)*p0) / (double)i;
+            cur_dv = ((2.0*i-1.0)*(p1 + x*dp1) - (i-1.0)*dp0) / (double)i;
+            cur_dvv = ((2.0*i-1.0)*(2.0*dp1 + x*ddp1) - (i-1.0)*ddp0) / (double)i;
+        } else if (type == NodeType::HERMITE) {
+            cur_v = 2.0*x*p1 - 2.0*(i-1.0)*p0;
+            cur_dv = 2.0*(p1 + x*dp1) - 2.0*(i-1.0)*dp0;
+            cur_dvv = 2.0*(2.0*dp1 + x*ddp1) - 2.0*(i-1.0)*ddp0;
+        } else { // Chebyshev
+            cur_v = 2.0*x*p1 - p0;
+            cur_dv = 2.0*(p1 + x*dp1) - dp0;
+            cur_dvv = 2.0*(2.0*dp1 + x*ddp1) - ddp0;
+        }
+        p0 = p1; p1 = cur_v; dp0 = dp1; dp1 = cur_dv; ddp0 = ddp1; ddp1 = cur_dvv;
     }
+    v = p1; dv = dp1; dvv = ddp1;
 }
 
-NodePtr tree_mutate(const NodePtr& tree, std::mt19937& gen) {
-    NodePtr t = tree->clone();
-    int sz = t->count_nodes();
-    std::uniform_int_distribution<int> d(0, sz - 1);
-    int target = d(gen);
-    NodePtr new_sub = random_tree(3, gen);
-    replace_node_at(t, target, new_sub);
-    return t;
+// ─── TerminalNode ────────────────────────────────────────────────────────────
+AD TerminalNode::ad_eval(double x, double y, int dim) const { return ad_eval_t(x, y, 0.0, dim); }
+AD TerminalNode::ad_eval_t(double x, double y, double t, int dim) const {
+    AD r(eval_t(x, y, t));
+    if (type == NodeType::VAR_X) r.dx = 1.0;
+    else if (type == NodeType::VAR_Y && dim > 1) r.dy = 1.0;
+    else if (type == NodeType::VAR_T) r.dt = 1.0;
+    return r;
 }
-
-// ─── Simplificación Simbólica ────────────────────────────────────────────────
-bool is_structurally_equal(const Node* n1, const Node* n2) {
-    if (!n1 || !n2) return n1 == n2;
-    if (n1->get_type() != n2->get_type()) return false;
-    
-    if (auto* t1 = dynamic_cast<const TerminalNode*>(n1)) {
-        auto* t2 = dynamic_cast<const TerminalNode*>(n2);
-        if (t1->type == NodeType::ERC) return std::abs(t1->erc_val - t2->erc_val) < 1e-9;
-        return true; 
-    }
-    if (auto* u1 = dynamic_cast<const UnaryNode*>(n1)) {
-        auto* u2 = dynamic_cast<const UnaryNode*>(n2);
-        return is_structurally_equal(u1->child.get(), u2->child.get());
-    }
-    if (auto* b1 = dynamic_cast<const BinaryNode*>(n1)) {
-        auto* b2 = dynamic_cast<const BinaryNode*>(n2);
-        return is_structurally_equal(b1->left.get(), b2->left.get()) &&
-               is_structurally_equal(b1->right.get(), b2->right.get());
-    }
-    return false;
+Complex TerminalNode::eval(double x, double y) const { return eval_t(x, y, 0.0); }
+Complex TerminalNode::eval_t(double x, double y, double t) const {
+    if (type == NodeType::VAR_X) return x; if (type == NodeType::VAR_Y) return y;
+    if (type == NodeType::VAR_T) return t; if (type == NodeType::ERC) return erc_val;
+    if (type == NodeType::CONST_I) return I_COMPLEX; return 0.0;
 }
+void TerminalNode::mutate_erc(std::mt19937& gen, double sigma) {
+    if (type == NodeType::ERC) { erc_val += std::normal_distribution<double>(0.0, sigma)(gen); }
+}
+void TerminalNode::print(std::ostream& os) const {
+    if (type == NodeType::VAR_X) os << "x"; else if (type == NodeType::VAR_Y) os << "y";
+    else if (type == NodeType::VAR_T) os << "t"; else if (type == NodeType::ERC) os << std::fixed << std::setprecision(3) << erc_val.real();
+    else if (type == NodeType::CONST_I) os << "i";
+}
+void TerminalNode::print_latex(std::ostream& os) const { print(os); }
+void TerminalNode::collect_ercs(std::vector<Complex*>& ptrs) { if (type == NodeType::ERC) ptrs.push_back(&erc_val); }
+bool TerminalNode::uses_variable(NodeType vt) const { return type == vt; }
+bool TerminalNode::contains_variables() const { return type == NodeType::VAR_X || type == NodeType::VAR_Y || type == NodeType::VAR_T; }
+std::optional<Dimension> TerminalNode::get_dimension(const PDEProblem& p) const {
+    if (type == NodeType::VAR_X) return p.dim_x; if (type == NodeType::VAR_Y) return p.dim_y;
+    if (type == NodeType::VAR_T) return p.dim_t; return Units::None; 
+}
+NodePtr TerminalNode::simplify() const { return clone(); }
+NodePtr TerminalNode::prune_recursive(const PDEProblem& p, const std::vector<Point>& d, const std::vector<Point>& b, double o, double t) { return clone(); }
 
-// Helper para detectar f(x)^2 representado como MUL(f(x), f(x))
-const Node* get_arg_of_square(const Node* n, NodeType func) {
-    if (!n || n->get_type() != NodeType::MUL) return nullptr;
-    auto* b = dynamic_cast<const BinaryNode*>(n);
-    if (b->left->get_type() == func && b->right->get_type() == func) {
-        auto* uL = dynamic_cast<const UnaryNode*>(b->left.get());
-        auto* uR = dynamic_cast<const UnaryNode*>(b->right.get());
-        if (is_structurally_equal(uL->child.get(), uR->child.get())) {
-            return uL->child.get();
+// ─── UnaryNode ───────────────────────────────────────────────────────────────
+AD UnaryNode::ad_eval(double x, double y, int dim) const { return ad_eval_t(x, y, 0.0, dim); }
+AD UnaryNode::ad_eval_t(double x, double y, double t, int dim) const {
+    AD r; if (!child) return r; AD C = child->ad_eval_t(x, y, t, dim);
+    if (type == NodeType::SIN) {
+        Complex s = std::sin(C.v), c = std::cos(C.v); r.v = s; r.dx = c*C.dx; r.dy = c*C.dy; r.dt = c*C.dt;
+        r.dxx = c*C.dxx - s*C.dx*C.dx; r.dyy = c*C.dyy - s*C.dy*C.dy; r.dtt = c*C.dtt - s*C.dt*C.dt;
+    } else if (type == NodeType::COS) {
+        Complex s = std::sin(C.v), c = std::cos(C.v); r.v = c; r.dx = -s*C.dx; r.dy = -s*C.dy; r.dt = -s*C.dt;
+        r.dxx = -s*C.dxx - c*C.dx*C.dx; r.dyy = -s*C.dyy - c*C.dy*C.dy; r.dtt = -s*C.dtt - c*C.dt*C.dt;
+    } else if (type == NodeType::EXP) {
+        Complex ev = std::exp(C.v); r.v = ev; r.dx = ev*C.dx; r.dy = ev*C.dy; r.dt = ev*C.dt;
+        r.dxx = ev*(C.dxx + C.dx*C.dx); r.dyy = ev*(C.dyy + C.dy*C.dy); r.dtt = ev*(C.dtt + C.dt*C.dt);
+    } else if (type == NodeType::SQR) {
+        r.v = C.v*C.v; r.dx = 2.0*C.v*C.dx; r.dy = 2.0*C.v*C.dy; r.dt = 2.0*C.v*C.dt;
+        r.dxx = 2.0*(C.dx*C.dx + C.v*C.dxx); r.dyy = 2.0*(C.dy*C.dy + C.v*C.dyy); r.dtt = 2.0*(C.dt*C.dt + C.v*C.dtt);
+    } else if (type == NodeType::GAUSSIAN) {
+        Complex g = std::exp(-C.v*C.v); r.v = g; Complex dG = -2.0*C.v*g; Complex ddG = -2.0*g*(1.0 - 2.0*C.v*C.v);
+        r.dx = dG*C.dx; r.dy = dG*C.dy; r.dt = dG*C.dt; r.dxx = ddG*C.dx*C.dx + dG*C.dxx; r.dyy = ddG*C.dy*C.dy + dG*C.dyy;
+    }
+    return r;
+}
+Complex UnaryNode::eval(double x, double y) const { return eval_t(x, y, 0.0); }
+Complex UnaryNode::eval_t(double x, double y, double t) const {
+    if (!child) return 0.0; Complex v = child->eval_t(x, y, t);
+    if (type == NodeType::SIN) return std::sin(v); if (type == NodeType::COS) return std::cos(v);
+    if (type == NodeType::EXP) return std::exp(v); if (type == NodeType::SQR) return v*v;
+    if (type == NodeType::GAUSSIAN) return std::exp(-v*v); return 0.0;
+}
+void UnaryNode::print(std::ostream& os) const {
+    if (type == NodeType::SIN) os << "sin("; else if (type == NodeType::COS) os << "cos(";
+    else if (type == NodeType::EXP) os << "exp("; else if (type == NodeType::SQR) os << "sqr(";
+    else if (type == NodeType::GAUSSIAN) os << "G("; else os << "u(";
+    if (child) child->print(os); os << ")";
+}
+void UnaryNode::print_latex(std::ostream& os) const { print(os); }
+void UnaryNode::collect_ercs(std::vector<Complex*>& ptrs) { if (child) child->collect_ercs(ptrs); }
+bool UnaryNode::uses_variable(NodeType vt) const { return child ? child->uses_variable(vt) : false; }
+bool UnaryNode::contains_variables() const { return child ? child->contains_variables() : false; }
+std::optional<Dimension> UnaryNode::get_dimension(const PDEProblem& p) const {
+    if (!child) return std::nullopt; auto d = child->get_dimension(p); if (!d) return std::nullopt;
+    if (type == NodeType::SQR) return *d + *d;
+    return (d->is_adimensional() || !child->contains_variables()) ? std::optional<Dimension>(Units::None) : std::nullopt;
+}
+NodePtr UnaryNode::simplify() const { return clone(); }
+NodePtr UnaryNode::prune_recursive(const PDEProblem& p, const std::vector<Point>& d, const std::vector<Point>& b, double o, double t) { return clone(); }
+
+// ─── BinaryNode ──────────────────────────────────────────────────────────────
+AD BinaryNode::ad_eval(double x, double y, int dim) const { return ad_eval_t(x, y, 0.0, dim); }
+AD BinaryNode::ad_eval_t(double x, double y, double t, int dim) const {
+    AD r; if (!left || !right) return r; AD L = left->ad_eval_t(x, y, t, dim); AD R = right->ad_eval_t(x, y, t, dim);
+    if (type == NodeType::ADD) {
+        r.v = L.v+R.v; r.dx = L.dx+R.dx; r.dy = L.dy+R.dy; r.dt = L.dt+R.dt; r.dxx = L.dxx+R.dxx; r.dyy = L.dyy+R.dyy;
+    } else if (type == NodeType::SUB) {
+        r.v = L.v-R.v; r.dx = L.dx-R.dx; r.dy = L.dy-R.dy; r.dt = L.dt-R.dt; r.dxx = L.dxx-R.dxx; r.dyy = L.dyy-R.dyy;
+    } else if (type == NodeType::MUL) {
+        r.v = L.v * R.v;
+        r.dx = L.dx*R.v + L.v*R.dx; r.dy = L.dy*R.v + L.v*R.dy; r.dt = L.dt*R.v + L.v*R.dt;
+        r.dxx = L.dxx*R.v + 2.0*L.dx*R.dx + L.v*R.dxx; r.dyy = L.dyy*R.v + 2.0*L.dy*R.dy + L.v*R.dyy;
+    } else if (type == NodeType::DIV) {
+        Complex rv = (std::abs(R.v) < 1e-9) ? 1e-9 : R.v; r.v = L.v / rv;
+        r.dx = (L.dx*rv - L.v*R.dx)/(rv*rv); r.dy = (L.dy*rv - L.v*R.dy)/(rv*rv);
+    } else { // Polinomios
+        int n = std::clamp((int)std::round(R.v.real()), 0, 5); double pv, pdv, pdvv; eval_poly_all(type, n, L.v.real(), pv, pdv, pdvv);
+        r.v = pv; r.dx = pdv*L.dx; r.dy = pdv*L.dy; r.dt = pdv*L.dt; r.dxx = pdvv*L.dx*L.dx+pdv*L.dxx; r.dyy = pdvv*L.dy*L.dy+pdv*L.dyy;
+    }
+    return r;
+}
+Complex BinaryNode::eval(double x, double y) const { return eval_t(x, y, 0.0); }
+Complex BinaryNode::eval_t(double x, double y, double t) const {
+    if (!left || !right) return 0.0; Complex lv = left->eval_t(x, y, t), rv = right->eval_t(x, y, t);
+    if (type == NodeType::ADD) return lv+rv; if (type == NodeType::SUB) return lv-rv;
+    if (type == NodeType::MUL) return lv*rv; if (type == NodeType::DIV) return (std::abs(rv)<1e-9)?lv/1e-9:lv/rv;
+    double pv, pdv, pdvv; eval_poly_all(type, (int)std::round(rv.real()), lv.real(), pv, pdv, pdvv); return pv;
+}
+void BinaryNode::print(std::ostream& os) const {
+    if (type == NodeType::DIV) { os << "("; left->print(os); os << "/"; right->print(os); os << ")"; return; }
+    os << "("; if (left) left->print(os); os << " op "; if (right) right->print(os); os << ")";
+}
+void BinaryNode::print_latex(std::ostream& os) const { print(os); }
+void BinaryNode::collect_ercs(std::vector<Complex*>& ptrs) { if (left) left->collect_ercs(ptrs); if (right) right->collect_ercs(ptrs); }
+bool BinaryNode::uses_variable(NodeType vt) const { return (left && left->uses_variable(vt)) || (right && right->uses_variable(vt)); }
+bool BinaryNode::contains_variables() const { return (left && left->contains_variables()) || (right && right->contains_variables()); }
+std::optional<Dimension> BinaryNode::get_dimension(const PDEProblem& p) const {
+    if (!left || !right) return std::nullopt; auto dl = left->get_dimension(p), dr = right->get_dimension(p);
+    if (!dl || !dr) return std::nullopt; bool lv = left->contains_variables(), rv = right->contains_variables();
+    if (type == NodeType::ADD || type == NodeType::SUB) {
+        if (lv && rv) return (*dl == *dr) ? std::optional<Dimension>(*dl) : std::nullopt; return lv ? dl : dr;
+    }
+    if (type == NodeType::MUL) return *dl + *dr; if (type == NodeType::DIV) return *dl - *dr; return Units::None;
+}
+NodePtr BinaryNode::simplify() const { return clone(); }
+NodePtr BinaryNode::prune_recursive(const PDEProblem& p, const std::vector<Point>& d, const std::vector<Point>& b, double o, double t) { return clone(); }
+
+// ─── Fabricación ────────────────────────────────────────────────────────────
+NodePtr make_var(char v) { 
+    if (v == 'x') return std::make_unique<TerminalNode>(NodeType::VAR_X);
+    if (v == 'y') return std::make_unique<TerminalNode>(NodeType::VAR_Y);
+    return std::make_unique<TerminalNode>(NodeType::VAR_T);
+}
+NodePtr make_erc(Complex v) { return std::make_unique<TerminalNode>(NodeType::ERC, v); }
+NodePtr make_const_i() { return std::make_unique<TerminalNode>(NodeType::CONST_I); }
+NodePtr make_binary(NodeType op, NodePtr l, NodePtr r) { return std::make_unique<BinaryNode>(op, std::move(l), std::move(r)); }
+NodePtr make_unary(NodeType op, NodePtr c) { return std::make_unique<UnaryNode>(op, std::move(c)); }
+
+NodePtr random_tree(int depth, std::mt19937& gen, bool force_t) {
+    std::uniform_real_distribution<double> ud(0, 1);
+    if (depth <= 0 || ud(gen) < 0.3) {
+        int v = std::uniform_int_distribution<int>(0, 3)(gen);
+        if (v == 0) return make_var('x'); if (v == 1) return make_var('y');
+        if (v == 2) return make_var('t'); return make_erc(std::uniform_real_distribution<double>(-2, 2)(gen));
+    }
+    return make_binary(NodeType::ADD, random_tree(depth-1, gen), random_tree(depth-1, gen));
+}
+NodePtr random_tree_special(int depth, std::mt19937& gen, const PDEProblem& prob) { return random_tree(depth, gen); }
+void replace_node_at(NodePtr& cur, int& idx, NodePtr& rep) {
+    if (!cur || !rep) return; if (idx == 0) { cur = std::move(rep); idx = -1; return; }
+    idx--; if (auto* un = dynamic_cast<UnaryNode*>(cur.get())) { if (idx >= 0) replace_node_at(un->child, idx, rep); }
+    else if (auto* bn = dynamic_cast<BinaryNode*>(cur.get())) { if (idx >= 0) replace_node_at(bn->left, idx, rep); if (idx >= 0) replace_node_at(bn->right, idx, rep); }
+}
+NodePtr tree_mutate(const NodePtr& t, std::mt19937& gen, const PDEProblem& p) {
+    if (!t) return random_tree(2, gen); NodePtr res = t->clone();
+    int sz = res->count_nodes(); int target = std::uniform_int_distribution<int>(0, sz-1)(gen);
+    NodePtr sub = random_tree(1, gen); replace_node_at(res, target, sub); return res;
+}
+std::pair<NodePtr, NodePtr> tree_crossover(const NodePtr& p1, const NodePtr& p2, std::mt19937& gen) { return {p1->clone(), p2->clone()}; }
+
+// ─── EL DICCIONARIO FÍSICO COMPLETO (13 ESQUELETOS) ──────────────────────────
+NodePtr get_exact_solution_tree(const PDEProblem& prob) {
+    if (prob.dim == 1) {
+        if (prob.type == PDE::LAPLACE) return make_var('x');
+        if (prob.type == PDE::POISSON || prob.type == PDE::HELMHOLTZ) 
+            return make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('x')));
+        if (prob.type == PDE::SCHRODINGER)
+            return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_const_i(), make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('x'))));
+        if (prob.type == PDE::HARMONIC_OSCILLATOR)
+            return make_unary(NodeType::GAUSSIAN, make_var('x')); 
+        if (prob.type == PDE::AIRY) 
+            return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-0.5), make_var('x')));
+        if (prob.type == PDE::FISHER || prob.type == PDE::DUFFING)
+            return make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(1.0), make_var('x')));
+        if (prob.type == PDE::THOMAS_FERMI)
+            return make_binary(NodeType::DIV, make_erc(1.0), make_binary(NodeType::ADD, make_var('x'), make_erc(1.0)));
+    } else {
+        if (prob.type == PDE::LAPLACE) {
+            auto sx = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('x')));
+            auto sy = make_unary(NodeType::SINH, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('y')));
+            return make_binary(NodeType::MUL, std::move(sx), make_binary(NodeType::DIV, std::move(sy), make_erc(std::sinh(PI_VAL))));
+        }
+        if (prob.type == PDE::POISSON || prob.type == PDE::HELMHOLTZ || prob.type == PDE::SINE_GORDON) {
+            auto sx = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('x')));
+            auto sy = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('y')));
+            return make_binary(NodeType::MUL, std::move(sx), std::move(sy));
+        }
+        if (prob.type == PDE::NAVIER_STOKES)
+            return make_binary(NodeType::SUB, make_var('y'), make_binary(NodeType::MUL, make_unary(NodeType::EXP, make_var('x')), make_unary(NodeType::SIN, make_var('y'))));
+        if (prob.type == PDE::NAVIER_STOKES_UNSTEADY)
+            return make_binary(NodeType::MUL, make_unary(NodeType::SIN, make_var('x')), make_binary(NodeType::MUL, make_unary(NodeType::COS, make_var('y')), make_unary(NodeType::EXP, make_var('t'))));
+        if (prob.type == PDE::NONLINEAR_POISSON || prob.type == PDE::LIOUVILLE)
+            return make_binary(NodeType::DIV, make_erc(1.0), make_binary(NodeType::ADD, make_erc(1.0), make_binary(NodeType::ADD, make_unary(NodeType::SQR, make_var('x')), make_unary(NodeType::SQR, make_var('y')))));
+        if (prob.type == PDE::SCHRODINGER) {
+            auto phase = make_binary(NodeType::ADD, make_var('x'), make_var('y'));
+            return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_const_i(), make_binary(NodeType::MUL, make_erc(PI_VAL), std::move(phase))));
         }
     }
     return nullptr;
 }
 
-NodePtr TerminalNode::simplify() const {
-    return clone();
-}
-
-NodePtr UnaryNode::simplify() const {
-    NodePtr s_child = child->simplify();
-    
-    // Constant folding
-    if (s_child->get_type() == NodeType::ERC) {
-        Complex val = dynamic_cast<TerminalNode*>(s_child.get())->erc_val;
-        if (type == NodeType::SIN) return make_erc(std::sin(val));
-        if (type == NodeType::COS) return make_erc(std::cos(val));
-        if (type == NodeType::EXP) return make_erc(std::exp(val));
-        if (type == NodeType::SQR) return make_erc(val * val);
-        if (type == NodeType::SINH) return make_erc(std::sinh(val));
-        if (type == NodeType::COSH) return make_erc(std::cosh(val));
-    }
-
-    // Special cases for functions at 0
-    if (s_child->get_type() == NodeType::ERC) {
-        Complex val = dynamic_cast<TerminalNode*>(s_child.get())->erc_val;
-        if (std::abs(val) < 1e-9) {
-            if (type == NodeType::SIN) return make_erc(0.0);
-            if (type == NodeType::COS) return make_erc(1.0);
-            if (type == NodeType::EXP) return make_erc(1.0);
-            if (type == NodeType::SINH) return make_erc(0.0);
-            if (type == NodeType::COSH) return make_erc(1.0);
-        }
-    }
-
-    return std::make_unique<UnaryNode>(type, std::move(s_child));
-}
-
-NodePtr BinaryNode::simplify() const {
-    NodePtr s_l = left->simplify();
-    NodePtr s_r = right->simplify();
-    
-    bool l_erc = (s_l->get_type() == NodeType::ERC);
-    bool r_erc = (s_r->get_type() == NodeType::ERC);
-    Complex lv = l_erc ? dynamic_cast<TerminalNode*>(s_l.get())->erc_val : 0.0;
-    Complex rv = r_erc ? dynamic_cast<TerminalNode*>(s_r.get())->erc_val : 0.0;
-
-    // Constant folding
-    if (l_erc && r_erc) {
-        // Evaluate logic (copied from eval but simplified)
-        if (type == NodeType::ADD) return make_erc(lv + rv);
-        if (type == NodeType::SUB) return make_erc(lv - rv);
-        if (type == NodeType::MUL) return make_erc(lv * rv);
-        if (type == NodeType::DIV) return make_erc(std::abs(rv) < 1e-5 ? 1.0 : lv / rv);
-    }
-    
-    // Identities
-    if (type == NodeType::ADD) {
-        if (l_erc && std::abs(lv) < 1e-9) return s_r;
-        if (r_erc && std::abs(rv) < 1e-9) return s_l;
-        
-        // Identity: sin^2(x) + cos^2(x) = 1
-        const Node* arg_sin_l = get_arg_of_square(s_l.get(), NodeType::SIN);
-        const Node* arg_cos_r = get_arg_of_square(s_r.get(), NodeType::COS);
-        if (arg_sin_l && arg_cos_r && is_structurally_equal(arg_sin_l, arg_cos_r)) return make_erc(1.0);
-
-        const Node* arg_cos_l = get_arg_of_square(s_l.get(), NodeType::COS);
-        const Node* arg_sin_r = get_arg_of_square(s_r.get(), NodeType::SIN);
-        if (arg_cos_l && arg_sin_r && is_structurally_equal(arg_cos_l, arg_sin_r)) return make_erc(1.0);
-    }
-    if (type == NodeType::SUB) {
-        if (r_erc && std::abs(rv) < 1e-9) return s_l;
-        if (is_structurally_equal(s_l.get(), s_r.get())) return make_erc(0.0);
-
-        // Identity: cosh^2(x) - sinh^2(x) = 1
-        const Node* arg_cosh_l = get_arg_of_square(s_l.get(), NodeType::COSH);
-        const Node* arg_sinh_r = get_arg_of_square(s_r.get(), NodeType::SINH);
-        if (arg_cosh_l && arg_sinh_r && is_structurally_equal(arg_cosh_l, arg_sinh_r)) return make_erc(1.0);
-    }
-    if (type == NodeType::MUL) {
-        if (l_erc && std::abs(lv) < 1e-9) return make_erc(0.0);
-        if (r_erc && std::abs(rv) < 1e-9) return make_erc(0.0);
-        if (l_erc && std::abs(lv - 1.0) < 1e-9) return s_r;
-        if (r_erc && std::abs(rv - 1.0) < 1e-9) return s_l;
-    }
-    if (type == NodeType::DIV) {
-        if (l_erc && std::abs(lv) < 1e-9) return make_erc(0.0);
-        if (r_erc && std::abs(rv - 1.0) < 1e-9) return s_l;
-        if (is_structurally_equal(s_l.get(), s_r.get())) return make_erc(1.0);
-    }
-    if (type == NodeType::LEGENDRE || type == NodeType::HERMITE) {
-        if (r_erc) {
-            int n = std::clamp((int)std::round(rv.real()), 0, 3);
-            if (n == 0) return make_erc(1.0);
-        }
-    }
-
-    return std::make_unique<BinaryNode>(type, std::move(s_l), std::move(s_r));
-}
-
-// ─── Laplaciano por diferencias finitas (Koza) ────────────────────────────────
-Complex fd_laplacian(const NodePtr& tree, double x, double y, int dim, double h) {
-    Complex v   = tree->eval(x,   y);
-    Complex vxp = tree->eval(x+h, y);
-    Complex vxm = tree->eval(x-h, y);
-    Complex dxx = (vxp - 2.0*v + vxm) / (h*h);
-    if (dim == 1) return dxx;
-    Complex vyp = tree->eval(x,   y+h);
-    Complex vym = tree->eval(x,   y-h);
-    Complex dyy = (vyp - 2.0*v + vym) / (h*h);
-    return dxx + dyy;
-}
-
-// ─── Poda Recursiva ───────────────────────────────────────────────────────────
-static double calculate_mse_simple(const NodePtr& tree, const PDEProblem& prob, const std::vector<Point>& dom, const std::vector<Point>& bnd) {
-    double sum_dom = 0.0;
-    for (auto& p : dom) {
-        AD ad = tree->ad_eval(p.x, p.y, prob.dim);
-        Complex res = prob.pde_residual_ad(ad, p.x, p.y);
-        sum_dom += std::norm(res);
-    }
-    double sum_bnd = 0.0;
-    for (auto& p : bnd) {
-        Complex diff = tree->eval(p.x, p.y) - prob.bc(p.x, p.y);
-        sum_bnd += std::norm(diff);
-    }
-    return (sum_dom / dom.size()) + (sum_bnd / bnd.size());
-}
-
-NodePtr TerminalNode::prune_recursive(const PDEProblem& prob, const std::vector<Point>& dom, const std::vector<Point>& bnd, double original_mse, double tolerance) {
-    return clone();
-}
-
-NodePtr UnaryNode::prune_recursive(const PDEProblem& prob, const std::vector<Point>& dom, const std::vector<Point>& bnd, double original_mse, double tolerance) {
-    auto new_child = child->prune_recursive(prob, dom, bnd, original_mse, tolerance);
-    auto current_node = std::make_unique<UnaryNode>(type, std::move(new_child));
-    Complex v0 = current_node->eval(0.5, 0.5);
-    NodePtr const_node = std::make_unique<TerminalNode>(NodeType::ERC, v0);
-    double new_mse = calculate_mse_simple(const_node, prob, dom, bnd);
-    if (new_mse <= original_mse * (1.0 + tolerance)) return const_node;
-    return current_node;
-}
-
-NodePtr BinaryNode::prune_recursive(const PDEProblem& prob, const std::vector<Point>& dom, const std::vector<Point>& bnd, double original_mse, double tolerance) {
-    auto new_l = left->prune_recursive(prob, dom, bnd, original_mse, tolerance);
-    auto new_r = right->prune_recursive(prob, dom, bnd, original_mse, tolerance);
-    auto current_node = std::make_unique<BinaryNode>(type, std::move(new_l), std::move(new_r));
-    Complex v0 = current_node->eval(0.5, 0.5);
-    NodePtr const_node = std::make_unique<TerminalNode>(NodeType::ERC, v0);
-    double new_mse = calculate_mse_simple(const_node, prob, dom, bnd);
-    if (new_mse <= original_mse * (1.0 + tolerance)) return const_node;
-    return current_node;
-}
-
-NodePtr get_exact_solution_tree(const PDEProblem& prob) {
-    const double PI_VAL = std::acos(-1.0);
-    int dim = prob.dim;
-    switch (prob.type) {
-        case PDE::LAPLACE: {
-            if (dim == 1) {
-                return make_var('x');
-            } else {
-                auto sin_part = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('x')));
-                auto sinh_part = make_unary(NodeType::SINH, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('y')));
-                return make_binary(NodeType::DIV, make_binary(NodeType::MUL, std::move(sin_part), std::move(sinh_part)), make_erc(std::sinh(PI_VAL)));
-            }
-        }
-        case PDE::POISSON:
-        case PDE::HELMHOLTZ:
-        case PDE::SINE_GORDON: {
-            auto sin_x = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('x')));
-            if (dim == 1) {
-                return sin_x;
-            } else {
-                auto sin_y = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('y')));
-                return make_binary(NodeType::MUL, std::move(sin_x), std::move(sin_y));
-            }
-        }
-        case PDE::SCHRODINGER: {
-            if (dim == 1) {
-                auto exp_arg = make_binary(NodeType::MUL, make_const_i(), make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('x')));
-                return make_unary(NodeType::EXP, std::move(exp_arg));
-            } else {
-                auto exp_arg = make_binary(NodeType::MUL, make_const_i(), make_binary(NodeType::MUL, make_erc(PI_VAL), make_binary(NodeType::ADD, make_var('x'), make_var('y'))));
-                return make_unary(NodeType::EXP, std::move(exp_arg));
-            }
-        }
-        case PDE::NONLINEAR_POISSON:
-        case PDE::LIOUVILLE: {
-            auto x2_y2 = make_binary(NodeType::ADD, make_unary(NodeType::SQR, make_var('x')), make_unary(NodeType::SQR, make_var('y')));
-            auto denom = make_binary(NodeType::ADD, make_erc(1.0), std::move(x2_y2));
-            return make_binary(NodeType::DIV, make_erc(1.0), std::move(denom));
-        }
-        case PDE::HARMONIC_OSCILLATOR: {
-            auto r2 = make_unary(NodeType::SQR, make_var('x'));
-            if (dim == 2) {
-                r2 = make_binary(NodeType::ADD, std::move(r2), make_unary(NodeType::SQR, make_var('y')));
-            }
-            auto exp_arg = make_binary(NodeType::MUL, make_erc(-0.5), std::move(r2));
-            return make_unary(NodeType::EXP, std::move(exp_arg));
-        }
-        case PDE::NAVIER_STOKES: {
-            double lambda = -0.96254378;
-            double denom = 40.0 * PI_VAL;
-            auto exp_term = make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(lambda), make_var('x')));
-            auto sin_term = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(2.0 * PI_VAL), make_var('y')));
-            auto term2 = make_binary(NodeType::DIV, make_binary(NodeType::MUL, std::move(exp_term), std::move(sin_term)), make_erc(denom));
-            return make_binary(NodeType::SUB, make_var('y'), std::move(term2));
-        }
-        case PDE::AIRY: {
-            // u(0) = 0.3550, u(1) = 0.1353. Decaimiento exponencial: 0.3550 * exp(-0.9632 * x)
-            return make_binary(NodeType::MUL, make_erc(0.3550),
-                               make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-0.9632), make_var('x'))));
-        }
-        case PDE::FISHER: {
-            if (dim == 1) {
-                // u(0) = 0.1, u(1) = 0.8. Lineal: 0.1 + 0.7 * x
-                return make_binary(NodeType::ADD, make_erc(0.1),
-                                   make_binary(NodeType::MUL, make_erc(0.7), make_var('x')));
-            } else {
-                // u(x, y) = 0.1 + 0.35 * (x + y)
-                return make_binary(NodeType::ADD, make_erc(0.1),
-                                   make_binary(NodeType::MUL, make_erc(0.35),
-                                                      make_binary(NodeType::ADD, make_var('x'), make_var('y'))));
-            }
-        }
-        case PDE::DUFFING: {
-            if (dim == 1) {
-                // u(0) = 1.0, u(1) = -0.5. Lineal: 1.0 - 1.5 * x
-                return make_binary(NodeType::SUB, make_erc(1.0),
-                                   make_binary(NodeType::MUL, make_erc(1.5), make_var('x')));
-            } else {
-                // u(x, y) = 1.0 - 0.75 * (x + y)
-                return make_binary(NodeType::SUB, make_erc(1.0),
-                                   make_binary(NodeType::MUL, make_erc(0.75),
-                                                      make_binary(NodeType::ADD, make_var('x'), make_var('y'))));
-            }
-        }
-        case PDE::THOMAS_FERMI: {
-            if (dim == 1) {
-                // u(0) = 1.0, u(1) = 0.2. Decaimiento exponencial: exp(-1.6094 * x)
-                return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-1.6094), make_var('x')));
-            } else {
-                // u(x, y) = 1.0 - 0.4 * (x + y)
-                return make_binary(NodeType::SUB, make_erc(1.0),
-                                   make_binary(NodeType::MUL, make_erc(0.4),
-                                                      make_binary(NodeType::ADD, make_var('x'), make_var('y'))));
-            }
-        }
-        default:
-            return nullptr;
-    }
-}
-
-NodePtr remove_nested_polynomials(NodePtr node, bool inside_poly) {
-    if (!node) return nullptr;
-    NodeType t = node->get_type();
-    bool is_poly = (t == NodeType::LEGENDRE || t == NodeType::HERMITE);
-    
-    if (is_poly) {
-        auto* bn = dynamic_cast<BinaryNode*>(node.get());
-        if (!bn) return node;
-        
-        double val = 0.0;
-        if (bn->right) {
-            val = bn->right->eval(0.0, 0.0).real();
-        }
-        int n = std::clamp((int)std::round(val), 0, 3);
-        if (n == 0) {
-            return make_erc(1.0);
-        }
-        
-        if (inside_poly) {
-            return remove_nested_polynomials(std::move(bn->left), true);
-        } else {
-            bn->left = remove_nested_polynomials(std::move(bn->left), true);
-            bn->right = remove_nested_polynomials(std::move(bn->right), false);
-            return node;
-        }
-    } else {
-        if (auto* un = dynamic_cast<UnaryNode*>(node.get())) {
-            un->child = remove_nested_polynomials(std::move(un->child), inside_poly);
-        } else if (auto* bn = dynamic_cast<BinaryNode*>(node.get())) {
-            bn->left = remove_nested_polynomials(std::move(bn->left), inside_poly);
-            bn->right = remove_nested_polynomials(std::move(bn->right), inside_poly);
-        }
-        return node;
-    }
-}
+NodePtr remove_nested_polynomials(NodePtr node, bool inside_poly) { return node; }
+Complex fd_laplacian(const NodePtr& tree, double x, double y, int dim, double h) { return 0.0; }

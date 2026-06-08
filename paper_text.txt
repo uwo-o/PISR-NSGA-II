@@ -1,0 +1,3420 @@
+PISR-NSGA-II: A Physics-Informed Multi-Objective Approach for
+Symbolic Solutions to Differential Equations
+Campos H.∗, Montero E.∗∗
+Universidad Tecnica Federico Santa Maria, Avenida España 1680, Valparaíso, 2340000, Valparaíso, Chile
+
+Abstract
+While traditional numerical methods provide reliable discrete approximations for complex differential
+equations, they fail to yield closed-form mathematical expressions. Recent physics-informed machine
+learning approaches, such as PINNs, attempt to address this but frequently suffer from optimization
+instabilities due to weighted penalty functions and a lack of mathematical interpretability. This study
+introduces the Physics-Informed Symbolic Regression Non-dominated Sorting Genetic Algorithm II
+(PISR-NSGA-II)., a hybrid Physics-Informed Multi-Objective Symbolic Regression framework for
+discovering exact analytical solutions to partial differential equations (PDEs). Unlike traditional
+methods, PISR-NSGA-II formulates the search as a strictly tri-objective Pareto optimization problem, independently minimizing domain residuals, boundary condition errors, and expression complexity, thereby eliminating the need for manual penalty weights. Utilizing an object-oriented tree
+representation, the algorithm enables exact Automated Symbolic Differentiation (AD), bypassing the
+computational overhead of finite differences. Evaluated across a comprehensive benchmark suite of
+13 linear and non-linear PDEs, the framework exhibited a bifurcated performance profile. For systems with exact closed-form solutions, PISR-NSGA-II achieved machine-precision accuracy (10−30 to
+10−33 ) and successfully reconstructed complex formulations, including the 2D Navier-Stokes stream
+function. However, for PDEs lacking simple analytical forms that rely on numerical approximations,
+the algorithm struggles to compress complex numerical fields into parsimonious symbolic trees, resulting in higher residual errors (10−1 to 10−3 ). Despite this limitation in numerical field approximation,
+the proposed framework demonstrates significant advantages over deep learning baselines in both
+computational efficiency and mathematical interpretability for exactly solvable systems.
+Keywords: Meta-heuristics, Differential equations, Genetic Programming, Numerical methods,
+Optimization, Multi-Objective
+1. Introduction
+Many complex phenomena in physics and engineering are governed by differential equations Tsoulos and Lagaris (2006). While traditional numerical algorithms, such as the Runge-Kutta method
+Runge (1895); Kutta (1901), provide reliable discrete approximations Mateescu (2006), they do
+not yield closed-form mathematical expressions. For many complex Partial Differential Equations
+(PDEs), exact closed-form analytical solutions are unavailable Fish and Belytschko (2007); Morton
+and Mayers (2012). To address these limitations, meta-heuristic algorithms and symbolic optimiza∗
+∗∗
+
+Corresponding author
+Professor
+Email addresses: hugo.campos@usm.cl (Campos H.), elizabeth.montero@usm.cl (Montero E.)
+
+tion tools like Genetic Programming (GP) Koza (1992) have emerged as promising alternatives to
+discover closed-form analytical equations that describe the underlying physical phenomena.
+In recent years, the integration of prior physical knowledge into optimization models has gained
+significant traction, extending the principles of Physics-Informed Neural Networks (PINNs) Raissi
+et al. (2019a) into evolutionary computation Ouyang et al. (2026). However, traditional physicsinformed evolutionary approaches typically aggregate domain residuals and boundary condition
+errors into a single scalar fitness function using a weighted penalty method Cohen et al. (2024);
+Raissi et al. (2019a). Choosing the optimal penalty weight is notoriously difficult, heavily biases the
+population-based search, and requires extensive manual hyperparameter tuning, which frequently
+compromises the stability and accuracy of the convergence.
+To overcome these limitations, this study introduces the Physics-Informed Non-dominated Sorting Genetic Algorithm II (PISR-NSGA-II) for the exact symbolic resolution of partial differential
+equations. Unlike traditional physics-informed models, PISR-NSGA-II evaluates domain residuals
+and boundary requirements as strictly independent objectives within a bi-objective Pareto framework, completely eliminating manual penalty weights. Furthermore, by utilizing an object-oriented,
+tree-based chromosome representation embedded with Ephemeral Random Constants (ERC) Koza
+(1992), our framework enables native, exact Automated Symbolic Differentiation (AD) Baydin et al.
+(2018). This design bypasses the computational overhead of finite differences or external heavy autodifferentiation libraries, allowing the simultaneous evolution of functional topology and numerical
+coefficients to discover robust, closed-form analytical solutions with mathematical precision.
+The remainder of this article is organized as follows: Section 2 reviews related work in evolutionary computation and physics-informed meta-heuristics. Section 3 formalizes the mathematical
+model and introduces the canonical PDEs utilized as computational benchmarks. Section 4 details
+the proposed PISR-NSGA-II framework, focusing on its tree-based representation and automated
+symbolic differentiation. Section 5 outlines the experimental methodology and statistical validation
+procedures, while Section 6 presents the numerical results and comparative analyses.
+2. Related Work
+The application of meta-heuristic search strategies to differential equations has evolved significantly, bridging the gap between flexible symbolic regression and physics-driven optimization. This
+section reviews existing approaches, categorizing them into pure evolutionary methods for differential
+equations and hybrid physics-informed meta-heuristics.
+2.1. Evolutionary Algorithms for Differential Equations
+Early paradigms heavily relied on grammar-based structures or specialized mathematical polynomials to construct candidate solutions. Tsoulos and Lagaris (2006) introduced Grammatical Evolution (GE) for solving differential equations, utilizing a codified Backus-Naur Form (BNF) where
+chromosomes are represented as integer arrays mapping to sequences of derivation rules. Although
+effective at discovering analytical expressions, this methodology is computationally intensive due to
+its reliance on finite difference methods for derivative evaluation.
+To refine parameter transitions and ensure smooth solutions, Albadarneh et al. (2021) adapted the
+Continuous Genetic Algorithm (CGA) originally developed by Abo-Hammour et al. (2010) for PDEs.
+In their approach, each chromosome is a real-valued vector representing discrete solution values over
+a spatial grid, optimizing nodal approximations via a finite difference scheme Richardson (1911).
+Similarly, Abo-bakr et al. (2022) proposed a technique based on Bernstein polynomials Bernstein
+
+2
+
+(1912); Lorentz (1986), using a hybrid Particle Swarm Optimization and Genetic Algorithm (PSOGA) scheme to minimize the sum of squared residuals in high-order non-linear ordinary and partial
+differential equations.
+More recently, Genetic Programming has been enhanced by incorporating the differential equation
+as a regularizer within the objective function. Utilizing a symbolic representation, Oh et al. (2023)
+and Cohen (1988) demonstrated that allowing the algorithm to explore a diverse functional space of
+trial functions significantly improves convergence toward stable analytical solutions from scarce or
+noisy data.
+2.2. Physics-Informed Meta-heuristics
+Integrating physical laws directly into meta-heuristics has emerged as a powerful mechanism to
+constrain search spaces and accelerate learning without relying on gradient-based optimization. Du
+et al. (2022) developed a data-driven Evolutionary Strategy (ES) incorporating a physics-informed
+Trainable Action Mask (TAM), which applies prior physical knowledge to filter improper control
+actions, improving exploration efficiency in high-dimensional spaces. Similarly, Zhang (2024) introduced the AI-enhanced multi-scale physics-informed optimization algorithm (AMPHIS) framework,
+utilizing a multi-scale particle representation coupled with a deep learning guide and a self-correction
+physical system that projects particles into feasible physical regions.
+To demonstrate the efficacy of physics-informed initializations, Papadopoulos et al. (2024) embedded geometric principles into meta-heuristic algorithms (MAs), comparing standard frameworks
+against their physics-informed counterparts. Their empirical results across multiple algorithmic
+engines—including the Gradient Descent Algorithm (GDA), traditional GA, Non-Dominated Sorting
+Genetic Algorithm II (NSGA-II) Deb et al. (2002), and Strength Pareto Evolutionary Algorithm 2
+(SPEA2) Amuso and Enslin (2007)—demonstrated that incorporating physical domain constraints
+consistently yields superior optimization performance.
+Expanding the structural design of physics-inspired operators, Liu et al. (2026) proposed the
+Cyclotron Accelerator Optimization Framework (CAOF), embedding magnetic-field deflection and
+electric-field acceleration operators into the Grey Wolf Optimizer (GWO) Mirjalili et al. (2014) to
+achieve a dynamic balance between global exploration and local exploitation. Furthermore, Ouyang
+et al. (2026) proposed Physics-informed Evolution (PIE), extending the principles of PINNs directly
+into evolutionary computation. By embedding physical information from governing equations into
+the fitness landscape, the multi-objective PIE formulation successfully reveals Pareto-optimal tradeoffs between task performance and physics-informed regularization costs, proving that gradient-free
+evolutionary search can be effectively governed by underlying physical laws.
+2.3. Physics-Informed Neural Networks (PINNs)
+In parallel with evolutionary methods, Deep Learning has revolutionized the field of scientific
+computing through the introduction of Physics-Informed Neural Networks (PINNs) (Raissi et al.,
+2019b). Instead of representing solutions symbolically, PINNs parameterize the unknown function
+u(x) using a deep neural network, embedding the governing differential equations directly into the
+loss function as regularizing terms evaluated at a set of collocation points. This framework has
+been widely extended to solve both forward and inverse problems across diverse physical domains,
+including fluid dynamics, heat transfer, and solid mechanics (Karniadakis et al., 2021).
+To standardize the implementation of these neural solvers, several open-source libraries have been
+developed, most notably DeepXDE (Lu et al., 2021), which provides a unified interface for solving
+partial differential equations on complex geometries using multiple deep learning backends. Despite
+their success in high-dimensional domains, PINNs suffer from well-documented limitations, such as
+training instabilities stemming from the non-convex optimization landscape of multi-objective loss
+3
+
+functions (e.g., balancing boundary and domain residuals), lack of mathematical interpretability,
+and significant computational overhead during training due to standard backpropagation-based gradient calculations (Cuomo et al., 2022). These limitations have motivated the search for alternative
+frameworks, such as the multi-objective symbolic regression approach proposed in this work.
+Recently, Oh et al. (2023) demonstrated that Genetic Programming-based Symbolic Regression
+(GPSR) can successfully recover exact analytical solutions to differential equations by incorporating
+physics-regularized fitness functions. However, their framework relies on translating syntax trees into
+external automatic differentiation libraries (such as PyTorch) to compute the necessary gradients.
+As the authors noted, this approach introduces a severe computational penalty, rendering the algorithmic evaluation significantly slower than conventional function evaluations. Furthermore, their
+methodology aggregates domain residuals and boundary conditions into a single scalar fitness metric,
+inherently reintroducing the optimization vulnerabilities associated with penalty weight tuning.
+To directly address these critical limitations, the proposed PISR-NSGA-II framework completely
+bypasses external deep learning libraries by embedding exact Automated Symbolic Differentiation
+(AD) natively within the object-oriented syntax tree nodes. Coupled with a strictly multi-objective
+Pareto formulation that evaluates domain and boundary residuals independently, this architectural
+design enables the highly efficient and robust discovery of complex, non-linear analytical solutions
+without sacrificing computational speed or boundary condition integrity.
+3. Differential equations mathematical model
+To establish a formal framework for our evolutionary approach, we first define the general mathematical structure of the problems under study. This section outlines the governing equations and
+introduces the suite of differential equations that serve as benchmarks for evaluating the proposed
+algorithm.
+Consider a general n-th order non-linear differential equation defined on a bounded domain Ω ⊂
+d
+R . The problem can be formulated in its implicit mathematical form as follows:
+
+F x, u(x), ∇u(x), ∇2 u(x), . . . , ∇n u(x) = 0,
+
+∀x ∈ Ω
+
+(1)
+
+where:
+• x = (x1 , x2 , . . . , xd ) represents the vector of independent spatial (or temporal) variables.
+• u(x) is the unknown analytical continuous function we aim to approximate.
+• ∇k u(x) denotes the k-th order differential operator applied to u with respect to the independent
+variables.
+• F is a continuous, potentially non-linear functional operator that maps the state of the system
+to a zero-residual equilibrium.
+To ensure a well-posed physical problem, the system is subjected to boundary conditions prescribed on the boundary of the domain, denoted as ∂Ω:
+B (x, u(x), ∇u(x)) = g(x),
+
+∀x ∈ ∂Ω
+
+(2)
+
+where B represents the boundary operator (which may encapsulate Dirichlet, Neumann, or Robin
+conditions, depending on the physical phenomena modeled) and g(x) is a known continuous function
+dictating the boundary state.
+4
+
+3.1. Canonical Benchmark Suite
+To evaluate the symbolic regression capabilities of the proposed PISR-NSGA-II framework, we
+establish a comprehensive benchmark suite of 13 differential equations. These equations span a wide
+spectrum of physical domains, dimensions (d ∈ {1, 2}), and mathematical complexities, including
+linear elliptic fields, quantum eigenvalue problems, non-linear reaction-diffusion kinetics, and highorder fluid dynamics.
+3.1.1. Linear Differential Equations
+Laplace’s Equation (d ∈ {1, 2}). Models steady-state heat conduction, irrotational fluid flow, and
+electrostatics in charge-free regions:
+∇2 u(x) = 0
+(3)
+For d = 2, the Dirichlet boundary conditions are satisfied by the harmonic exact solution:
+u(x, y) =
+
+sin(πx) sinh(πy)
+sinh(π)
+
+(4)
+
+Poisson’s Equation (d ∈ {1, 2}). Introduces an inhomogeneous source term f (x) to describe fields
+under external potentials (e.g., electrostatic charge density):
+∇2 u(x) = f (x)
+
+(5)
+
+where f (x) = −π 2 sin(πx) in 1D, and f (x, y) = −2π 2 sin(πx) sin(πy) in 2D.
+Helmholtz’s Equation (d ∈ {1, 2}). Governs time-harmonic wave propagation (acoustic, electromagnetic, or seismic waves) with a spatial wavenumber k:
+∇2 u(x) + k 2 u(x) = f (x)
+
+(6)
+
+where we set k 2 = 4, with source terms f (x) = (k 2 − π 2 ) sin(πx) in 1D, and f (x, y) = (k 2 −
+2π 2 ) sin(πx) sin(πy) in 2D.
+Time-Independent Schrödinger Equation (d ∈ {1, 2}). The fundamental equation of quantum mechanics describing wave functions of stationary states in a potential free-space V (x) = 0:
+∇2 u(x) + Eu(x) = 0
+
+(7)
+
+where the energy eigenvalues are set to E = π 2 in 1D, and E = 2π 2 in 2D, corresponding to wave
+propagation regimes.
+Quantum Harmonic Oscillator (d ∈ {1, 2}). A standard quantum mechanical system representing a
+particle confined in a quadratic potential well V (x) = ∥x∥2 :
+∇2 u(x) − ∥x∥2 u(x) + Eu(x) = 0
+
+(8)
+
+where E = 1 for d = 1, and E = 2 for d = 2. The ground-state solution exhibits a Gaussian profile:
+1
+
+2
+
+u(x) = e− 2 ∥x∥
+
+5
+
+(9)
+
+Airy’s Equation (d ∈ {1, 2}). A classic ordinary differential equation appearing in boundary value
+problems near turning points and in diffraction optics:
+!
+d
+X
+∇2 u(x) −
+xi u(x) = 0
+(10)
+i=1
+
+In 1D, this simplifies to the standard Airy ODE: uxx − xu = 0, subjected to boundary conditions
+matching the Airy function Ai(x) on [0, 1].
+3.1.2. Non-Linear Differential Equations
+Non-Linear Poisson’s Equation (d = 2). Introduces quadratic non-linearities to study electrostatics
+in polarizable media:
+∇2 u(x) + u2 (x) = f (x)
+(11)
+where the source term f (x, y) is analytically manufactured to yield the rational solution:
+u(x, y) =
+
+1
+1 + x2 + y 2
+
+(12)
+
+Liouville’s Equation (d = 2). Arises in statistical mechanics, differential geometry, and Einstein’s
+theory of general relativity:
+∇2 u(x) + eu(x) = f (x)
+(13)
+−1
+
+with the source term f (x, y) calibrated for the exact solution u(x, y) = (1 + x2 + y 2 ) .
+Sine-Gordon Equation (d = 2). A non-linear wave equation that models dislocation dynamics in
+crystals, Josephson junctions, and soliton propagation:
+∇2 u(x) − sin(u(x)) = f (x)
+
+(14)
+
+with f (x, y) = −2π 2 sin(πx) sin(πy) − sin(sin(πx) sin(πy)).
+Fisher’s Equation (d ∈ {1, 2}). A non-linear reaction-diffusion equation used to model population
+dynamics, gene propagation, and flame fronts:
+∇2 u(x) + u(x) (1 − u(x)) = 0
+
+(15)
+
+evaluated numerically against a reference grid using boundary values u(0) = 0.1 and u(1) = 0.8 in
+1D.
+Duffing’s Equation (d ∈ {1, 2}). Models non-linear damping and stiffness in mechanical oscillations:
+∇2 u(x) + u(x) + u3 (x) = 0
+
+(16)
+
+subjected to Dirichlet boundary states u(0) = 1.0 and u(1) = −0.5 in 1D.
+Thomas-Fermi Equation (d ∈ {1, 2}). A non-linear equation that models the electrostatic potential
+of electrons in an atom:
+u2 (x)
+
+=0
+(17)
+∇2 u(x) − P
+d
+x
++
+0.5
+i=1 i
+2
+
+u
+where d = 1 reduces to uxx − x+0.5
+= 0, matched to boundary states u(0) = 1.0 and u(1) = 0.2.
+
+6
+
+3.1.3. Fluid Dynamics Systems
+2D Steady Navier-Stokes Equation (d = 2). Governs the flow of an incompressible viscous fluid. We
+solve the 2D Kovasznay flow benchmark in its stream-function formulation:
+ψy
+
+∂(∇2 ψ)
+∂(∇2 ψ)
+− ψx
+− ν∇4 ψ = 0
+∂x
+∂y
+
+(18)
+
+where ψ(x) is the fluid stream function, ν = 0.05 is the kinematic viscosity (Re = 20), and ∇4 is the
+biharmonic operator. The exact solution is given by:
+ψ(x, y) = y −
+
+eλx sin(2πy)
+2πRe
+
+(19)
+
+with the spatial decay rate defined as:
+Re
+−
+λ=
+2
+
+r
+
+7
+
+Re2
++ 4π 2
+4
+
+(20)
+
+4. Proposed Physics-Informed Evolutionary Algorithm
+To discover the closed-form analytical solutions of complex differential equations, we propose a
+hybrid multi-objective evolutionary framework based on Symbolic Regression. Building upon the
+recent formalization of Physics-Informed Genetic Programming (PIGP) (Cohen et al., 2024), our
+architecture utilizes a tree-based representation to dynamically explore functional spaces.
+Unlike conventional genetic programming, our approach introduces three major algorithmic enhancements:
+1. Tri-Objective Optimization: We formulate the search as a three-objective optimization
+problem, explicitly separating the domain residual, the boundary condition error, and the tree
+complexity (parsimony pressure) to naturally control bloat.
+2. Hybrid Local Search: We integrate a second-order Gauss-Newton (GN) local optimizer
+directly into the evolutionary loop. This solver uses QR decomposition of the Jacobian matrix
+to fine-tune continuous Ephemeral Random Constants (ERCs) at the leaf level, complementing
+global genetic search with rapid local convergence.
+3. Boundary-Conforming Seeds: We inject physically motivated boundary-conforming trees
+(ansatzes) into the initial population, jump-starting the evolutionary search with high-fitness
+individuals that exactly or approximately satisfy boundary states.
+4.1. Tree-Based Chromosome Representation and Polynomial Collapse
+Following the standard Genetic Programming paradigm established by Koza (1992), our approach abandons fixed-length numerical arrays in favor of a dynamic, object-oriented syntax tree
+representation. This allows the algorithm to evolve equations of varying length and complexity.
+Each gene in the population is implemented as a node structure in memory, classified into two
+categories:
+• Terminal Nodes (Leaves): Located at the bottom of the tree, these nodes provide the fundamental inputs for the equation. They represent either independent spatial/temporal variables
+(e.g., x, y, t) or Ephemeral Random Constants (ERCs) representing continuous parameters.
+• Internal Nodes (Operators): These nodes encapsulate mathematical functions (e.g., +, −,
+×, sin, exp) and specialized orthogonal function nodes, namely Legendre (Pn (x)) and Hermite
+(Hn (x)) polynomials.
+For Legendre and Hermite polynomial operators, we implement a binary structure where the left
+child represents the input argument x and the right child represents the constant degree constraint
+n ∈ {0, 1, 2, 3}.
+To provide a clearer understanding of this computational architecture, Figure 1 illustrates the
+internal memory structure of a candidate tree-based chromosome. In this specific example, the
+tree encodes the mathematical expression û(x, y) = 4.5 sin(x) + y 2 , demonstrating the hierarchical
+relationship between operators, spatial variables, and ERCs.
+4.2. Recursive Evaluation and Automated Symbolic Differentiation
+To evaluate a candidate solution û(x) at a specific spatial coordinate, the algorithm performs a
+recursive post-order traversal of the expression tree. The evaluation proceeds from the bottom up,
+replacing terminal variables with the numerical coordinates of the collocation point and applying the
+operator nodes sequentially.
+Crucially, this tree structure allows for exact, automated symbolic differentiation (AD) without
+the computational overhead of finite differences or external automatic differentiation libraries. By
+8
+
++
+Internal Node (Operator)
+
+×
+
+×
+Terminal Variable
+
+4.5
+
+sin
+
+y
+
+y
+
+Terminal Constant (ERC)
+
+x
+Figure 1: Object-oriented tree-based chromosome representation encoding the trial analytical solution û(x, y) =
+4.5 sin(x)+y 2 . Internal nodes represent mathematical operators (blue), while terminal leaf nodes consist of independent
+spatial variables (green) and ERC (orange). This hierarchical computational graph guarantees syntactical validity and
+enables exact Automated Symbolic Differentiation (AD) via recursive post-order traversal.
+
+adopting an object-oriented paradigm, each node class in the tree is programmed with its own
+analytical calculus derivative rule (e.g., returning 1 for the target differentiation variable, 0 for
+constants, and applying the chain rule recursively for operators). This ensures that physical residuals
+are calculated with analytical precision, regardless of the equation’s non-linear complexity.
+4.3. Tri-Objective Fitness Evaluation
+Instead of combining conflicting goals (domain accuracy, boundary accuracy, and simplicity) into
+a single scalar fitness function via arbitrary penalty weights (Raissi et al., 2019a), we formulate the
+symbolic regression task as a strictly tri-objective optimization problem. We evaluate each candidate
+solution û(x) on three independent metrics:
+f1 (û) = LΩ =
+
+1 X
+(F(xi , û, ∇û, . . . ))2
+|XΩ | x ∈X
+i
+
+f2 (û) = L∂Ω =
+
+Ω
+
+1
+|X∂Ω | x ∈X
+
+X
+
+j
+
+(21)
+
+(B(xj , û, . . . ) − g(xj ))2
+
+(22)
+
+∂Ω
+
+f3 (û) = C(û) = NodeCount(û)
+
+(23)
+
+where XΩ and X∂Ω represent collocation grids inside the domain and along its boundaries, respectively, and C(û) measures tree complexity to enforce parsimony. We employ the multi-objective
+Non-dominated Sorting Genetic Algorithm II (NSGA-II) engine (Deb et al., 2002) to compute Pareto
+dominance and select parents based on non-dominated ranks and crowding distances.
+4.4. Hybridization: Local Gauss-Newton Parameter Fine-Tuning
+To bridge the gap between structural search and continuous parameter tuning, we hybridize the
+evolutionary engine with a local second-order Gauss-Newton (GN) solver. For individuals within
+the Rank-1 Pareto front (and promising offspring), we isolate the vector of M Ephemeral Random
+Constants, c = (c1 , . . . , cM )T .
+The solver minimizes the non-linear least-squares residual over a mini-batch of collocation points.
+At each GN iteration k, the update is computed as:
+−1 T
+c(k+1) = c(k) − J T J + µI
+J R
+(24)
+9
+
+where R ∈ RN is the vector of domain and boundary residuals, J ∈ RN ×M is the Jacobian matrix
+i
+containing the derivatives of the residuals with respect to each constant (Jij = ∂R
+), and µ is a
+∂cj
+Levenberg-Marquardt damping factor. We compute the Jacobian columns J·j exactly using the
+symbolic derivatives generated by our automated differentiation tree, and solve the system efficiently
+using QR decomposition. This hybrid operator allows the genetic algorithm to focus on discovering
+functional topologies while the local optimizer handles the numerical coefficients.
+4.5. Boundary-Conforming Physics-Informed Initializations
+To accelerate search in highly constrained physical domains, we seed the initial population with
+boundary-conforming functional ansatzes. Instead of starting from entirely random trees that violate
+boundary conditions, we inject approximate or exact physical seeds at generation 0:
+• Fisher/Duffing/Thomas-Fermi 2D: Linear boundary profiles of the form u(x, y) = c0 +
+c1 (x + y), matching the exact boundary values prescribed at the rectangular boundaries.
+• Airy 1D/2D: Exponential decay profiles u(x, y) = c0 e−c1 x matching the characteristic decay
+of the Airy function Ai(x) on [0, 1].
+• Thomas-Fermi 1D: Non-linear exponential ansatzes u(x) = e−c1 x satisfying u(0) = 1 and
+u(1) = 0.2.
+These seed structures provide high-fitness templates that guide the crossover and mutation operators
+toward boundary-consistent search space regions.
+Algorithm 1 Hybrid Physics-Informed NSGA-II Cycle
+Require: Population P of candidate trees, Collocation points XΩ and X∂Ω
+Ensure: Pareto-optimal front of symbolic solutions
+1: Initialize population P including boundary-conforming seed trees (Ansatzes)
+2: while stopping criteria not met do
+3:
+for each tree û ∈ P do
+4:
+Perform recursive AD post-order traversal on û
+5:
+Evaluate domain residual: f1 ← Ldom
+6:
+Evaluate boundary residual: f2 ← Lbc
+7:
+Evaluate tree complexity: f3 ← NodeCount(û)
+8:
+end for
+9:
+Perform Non-dominated Sorting on P based on (f1 , f2 , f3 )
+10:
+Identify Rank-1 individuals (Pareto front)
+11:
+for each Rank-1 individual ûpareto do
+12:
+Run local Gauss-Newton solver on constants c to minimize LΩ + L∂Ω
+13:
+Update tree constants with optimized values
+14:
+end for
+15:
+Select parents using binary tournament selection
+16:
+Generate offspring via Subtree Crossover, Structural Mutation, and Constant Mutation
+17:
+P ← Combined parents and offspring
+18: end while
+19: return Rank-1 Pareto-optimal solutions
+
+10
+
+5. Experimental Methodology and Evaluation Metrics
+To rigorously evaluate the quality, physical consistency, and efficiency of the symbolic solutions
+discovered by the proposed PI-NSGA-II framework against the established baselines, we employ five
+primary performance metrics:
+• Domain Residual (MSE LΩ ): Quantifies the mean squared error of the discovered analytical
+expression û with respect to the governing differential operator F evaluated across the interior
+collocation points. This metric serves as the primary indicator of adherence to the underlying
+physical laws.
+• Boundary Error (MSE L∂Ω ): Measures the deviation of the candidate solution from the
+prescribed initial or boundary conditions B. Strict minimization of this metric is critical to
+ensure that the discovered PDE solution is unique, physically consistent, and mathematically
+well-posed.
+• Hypervolume (HV): Since the proposed framework employs a Pareto-based multi-objective
+optimization strategy, HV is utilized to measure the volume of the objective space (Domain vs.
+Boundary error) strictly dominated by the obtained Pareto front. It serves as a comprehensive
+indicator of algorithmic convergence and the quality of the trade-off solutions.
+• Expression Complexity (C(û)): Evaluates the structural size of the symbolic tree (total node
+count). Tracking complexity is essential to monitor parsimony pressure, prevent equation bloat,
+and ensure that the final mathematical formulations remain elegant and human-interpretable.
+• Computational Runtime: The total wall-clock time required to achieve convergence. This
+metric assesses the execution efficiency of the native Automated Symbolic Differentiation (AD)
+embedded in the object-oriented trees, especially when compared against the backpropagation
+overhead of PINNs.
+
+11
+
+6. Results
+6.1. Experimental Configuration
+The empirical evaluation was conducted across a heterogeneous computational suite to guarantee
+a rigorous benchmark of precision, scalability, and execution efficiency. Table 1 outlines the hardware
+and compiler specifications of the test bench.
+Table 1: Hardware and Software specifications used for the benchmarks.
+
+Component
+
+Specification
+
+Processor (CPU)
+Intel(R) Core(TM) i7-4790K @ 4.00GHz
+Memory (RAM)
+32 GB
+Grafics (GPU)
+Nvidia 1050Ti 4GB
+Operating System
+Linux (CachyOS Kernel 7.0)
+Compiler
+g++ (GCC) 15.2.1
+Language Standard
+ISO C++17
+Analysis Environment Python 3.14.4
+Table 2 details the hyperparameters of the proposed PISR-NSGA-II framework. The population
+size and generation limits were calibrated to balance exploration pressure and computation time.
+Table 2: Hyperparameter configurations for the benchmark suite. AD denotes Automatic Differentiation (symbolic),
+and ERC represent evolved numerical constants.
+
+Parameter
+Population size
+Generations
+Domain collocation Nd
+Boundary points Nb
+Alpha α
+Max tree depth
+Crossover prob.
+Mutation prob.
+ERC σ
+Derivative method
+Operator set
+Independent runs N
+
+PISR-NSGA-II
+250
+150
+600
+200
+0.50
+8
+0.80
+0.30
+0.20
+Exact AD
+{+, −, ×, /, sin, cos, sinh, cosh, exp, Legendre, Hermite, Bessel, Gamma}
+30
+
+6.2. Discussion and Comparative Analysis
+An analysis of the benchmark results highlights the performance advantages of the proposed
+framework:
+• Precision and Convergence Depth: As shown in Table 5, PISR-NSGA-II achieves near-zero
+machine-precision errors (10−30 to 10−33 ) across all linear and non-linear analytical equations
+(Laplace, Poisson, Helmholtz, Schrödinger, Nonlinear Poisson, Liouville, and Sine-Gordon).
+In contrast, the PINN baseline, despite training for 10, 000 Adam epochs, is fundamentally
+bounded by the optimization dynamics of neural networks, plateauing between 10−8 and 10−12 .
+12
+
+Table 3: PISR-NSGA-II Performance Metrics (Mean ± Std).
+
+PDE
+
+Dim
+
+Laplace
+
+1D
+
+Laplace
+
+Domain MSE
+
+BC MSE
+
+Total MSE
+
+Hypervolume
+0
+
+0.0000
+
+(0.00 ± 0.00) × 10
+
+−31
+
+(1.65 ± 0.00) × 10
+
+0.9089
+
+(3.06 ± 0.00) × 10−31
+
+(0.00 ± 0.00) × 100
+
+(3.06 ± 0.00) × 10−31
+
+0.7464
+
+(9.32 ± 0.00) × 10
+
+−31
+
+0
+
+(0.00 ± 0.00) × 10
+
+−31
+
+0.8827
+
+1D
+
+(4.91 ± 0.00) × 10
+
+−31
+
+0
+
+(0.00 ± 0.00) × 10
+
+−31
+
+(4.91 ± 0.00) × 10
+
+0.7472
+
+Helmholtz
+
+2D
+
+(1.37 ± 0.00) × 10−30
+
+(0.00 ± 0.00) × 100
+
+(1.37 ± 0.00) × 10−30
+
+0.8833
+
+Schrodinger
+
+1D
+
+(2.45 ± 0.00) × 10
+
+−31
+
+0
+
+−31
+
+0.8316
+
+Schrodinger
+
+2D
+
+(2.36 ± 0.00) × 10
+
+−30
+
+(6.51 ± 0.00) × 10
+
+−30
+
+(2.43 ± 0.00) × 10
+
+0.8732
+
+Airy
+
+1D
+
+(6.89 ± 0.00) × 10−3
+
+(9.82 ± 0.00) × 10−7
+
+(6.89 ± 0.00) × 10−3
+
+0.8571
+
+Airy
+
+2D
+
+−2
+
+−5
+
+−2
+
+0.8750
+
+(0.00 ± 0.00) × 10
+
+−33
+
+(1.83 ± 0.00) × 10
+
+0.8000
+
+0
+
+(0.00 ± 0.00) × 10
+
+2D
+
+(1.65 ± 0.00) × 10
+
+−31
+
+0
+
+Poisson
+
+1D
+
+Poisson
+
+2D
+
+Helmholtz
+
+(0.00 ± 0.00) × 10
+
+(2.01 ± 0.00) × 10
+
+0
+
+(0.00 ± 0.00) × 10
+
+−32
+
+(6.13 ± 0.00) × 10
+
+(0.00 ± 0.00) × 10
+
+(9.32 ± 0.00) × 10
+
+(2.45 ± 0.00) × 10
+
+(2.01 ± 0.00) × 10
+
+HarmonicOscillator 1D
+
+(1.83 ± 0.00) × 10
+
+HarmonicOscillator 2D
+
+(1.05 ± 0.00) × 10−32
+
+(1.54 ± 0.00) × 10−34
+
+(1.06 ± 0.00) × 10−32
+
+0.8749
+
+Fisher
+
+1D
+
+(4.39 ± 0.00) × 10−2
+
+(6.16 ± 0.00) × 10−33
+
+(4.39 ± 0.00) × 10−2
+
+0.8000
+
+Fisher
+
+2D
+
+−2
+
+−6
+
+−2
+
+0.9000
+
+Duffing
+
+1D
+
+(6.68 ± 0.00) × 10
+
+(0.00 ± 0.00) × 10
+
+−2
+
+(6.68 ± 0.00) × 10
+
+0.8997
+
+Duffing
+
+2D
+
+(2.71 ± 0.00) × 10−1
+
+(6.71 ± 0.00) × 10−4
+
+(2.72 ± 0.00) × 10−1
+
+0.8570
+
+ThomasFermi
+
+1D
+
+(2.04 ± 0.00) × 10
+
+−3
+
+−9
+
+−3
+
+0.8332
+
+ThomasFermi
+
+2D
+
+(1.35 ± 0.00) × 10
+
+−1
+
+(2.30 ± 0.00) × 10
+
+−1
+
+(1.35 ± 0.00) × 10
+
+0.8749
+
+NonlinearPoisson
+
+2D
+
+(4.69 ± 0.00) × 10−32
+
+(1.60 ± 0.00) × 10−33
+
+(4.85 ± 0.00) × 10−32
+
+0.8887
+
+Liouville
+
+2D
+
+−32
+
+−33
+
+−32
+
+0.8887
+
+Sine-Gordon
+
+2D
+
+(1.41 ± 0.00) × 10
+
+(0.00 ± 0.00) × 10
+
+−30
+
+(1.41 ± 0.00) × 10
+
+0.8826
+
+Navier-Stokes
+
+2D
+
+(6.23 ± 0.00) × 10−9
+
+(7.54 ± 0.00) × 10−23
+
+(6.23 ± 0.00) × 10−9
+
+0.9231
+
+−33
+
+(1.85 ± 0.00) × 10
+
+−2
+
+(5.29 ± 0.00) × 10
+
+−30
+
+0
+
+(3.38 ± 0.00) × 10
+
+0
+
+(1.85 ± 0.00) × 10
+
+−4
+
+(1.60 ± 0.00) × 10
+
+0
+
+(1.85 ± 0.00) × 10
+
+(2.04 ± 0.00) × 10
+
+(5.45 ± 0.00) × 10
+
+• Computational Efficiency: PISR-NSGA-II completes its structural search and parameter
+optimization in under a minute for most PDEs. For analytical cases, the boundary-conforming
+seeding strategy combined with the local Gauss-Newton optimizer enables immediate convergence at generation 0. Conversely, PINNs require backpropagation-based gradient descent over
+thousands of collocation points on deep neural architectures, resulting in long training runtimes
+(exceeding 1.5 hours per 2D equation on GPU).
+• Exact Symbolic Reconstruction: Table 4 demonstrates that PISR-NSGA-II successfully
+reconstructs the exact target mathematical formulations. For instance, in the 2D steady NavierStokes Kovasznay flow problem, PISR-NSGA-II accurately discovered the stream function profile
+exp(−1.8101x) sin(6.2832y)
+ψ(x, y) = y −
+125.6637
+which matches the analytical solution (where 2πRe ≈ 125.6637 and λ ≈ −1.8101).
+• Boundary Condition Satisfaction: Traditional physics-informed algorithms often compromise boundary integrity to minimize domain residuals. Under the tri-objective Pareto formulation of PISR-NSGA-II, the boundary condition residual (f2 ) is treated as an independent
+13
+
+dimension. This separation ensures that candidate solutions are driven to satisfy boundary
+constraints exactly, yielding boundary errors of 10−32 (e.g., in 1D Fisher) and preventing the
+boundary leakage issues common in neural network baselines.
+• Numerical Reference Comparison (RK4/FDM): For equations lacking closed-form analytical solutions (Airy, Fisher, Duffing, and Thomas-Fermi), the 1D/2D numerical solutions
+computed via Runge-Kutta 4th order and Finite Difference relaxation serve as the Ground
+Truth (represented as (0.00 ± 0.00) × 100 error in Table 5). Both PISR-NSGA-II and PINN
+solutions were evaluated against these discrete reference grids, with PISR-NSGA-II obtaining
+highly accurate symbolic approximations (e.g., 10−3 in 1D Airy) that capture the physical
+properties of the underlying fields.
+6.3. Visualization of Evolutionary Optimization and Solutions
+This section illustrates the optimization dynamics of the hybrid PI-NSGA-II framework along
+with the reconstructed 1D and 2D field solutions across the benchmark suite.
+
+Pareto Fronts: Domain vs. Boundary (Color = Complexity)
+
+10 7
+
+6
+
+10 9
+
+4
+
+10 11
+
+2
+10 10 10 7 10 4 10 1
+
+10 3
+10 7
+10 11
+10 10 10 7 10 4 10 1 102
+
+2
+100
+
+10 5
+
+6
+
+10 7
+
+4
+
+10 9
+10 11
+
+2
+10 10 10 7 10 4 10 1
+
+5
+4
+
+10 2
+
+3
+2
+
+10 3
+100
+
+Sine-Gordon 2D
+
+10 2
+
+10 3
+
+1
+
+Domain MSE ( )
+
+8
+
+10 3
+
+6
+
+8
+
+10 1
+10 3
+10 5
+10 7
+10 9
+10 11
+
+6
+4
+2
+10 10 10 7 10 4 10 1 102
+
+Domain MSE ( )
+
+Figure 2: Final non-dominated Pareto fronts for representative PDEs.
+
+14
+
+100
+
+Domain MSE ( )
+
+Complexity (Tree Nodes)
+
+Liouville 2D
+
+7
+
+Boundary MSE ( )
+
+10 5
+
+Boundary MSE ( )
+
+4
+
+Boundary MSE ( )
+
+Boundary MSE ( )
+
+10 4
+
+10 1
+
+ThomasFermi 2D
+
+8
+7
+6
+5
+4
+3
+2
+1
+
+Complexity (Tree Nodes)
+
+6
+
+Complexity (Tree Nodes)
+
+Boundary MSE ( )
+
+10 10 10 7 10 4 10 1 102
+
+8
+7
+6
+5
+4
+3
+2
+1
+
+Domain MSE ( )
+
+Complexity (Tree Nodes)
+
+10 3
+
+Complexity (Tree Nodes)
+
+8
+
+Domain MSE ( )
+
+Duffing 2D
+
+10
+
+10 2
+
+10 1
+
+2
+
+10 1
+10 3
+10 5
+10 7
+10 9
+10 11
+
+Domain MSE ( )
+
+Fisher 2D
+
+Domain MSE ( )
+
+4
+
+10 9
+
+Domain MSE ( )
+
+10 1
+
+6
+
+10 5
+
+Boundary MSE ( )
+
+8
+
+10 5
+
+Boundary MSE ( )
+
+Boundary MSE ( )
+
+10 3
+
+8
+
+Schrodinger 2D
+
+Complexity (Tree Nodes)
+
+10
+
+Helmholtz 2D
+
+10 1
+
+Complexity (Tree Nodes)
+
+10 1
+
+Complexity (Tree Nodes)
+
+Laplace 2D
+
+Parsimony Pressure: Accuracy vs. Expression Complexity
+
+Laplace 2D
+
+PISR-NSGA-II
+
+Total MSE
+
+2 × 100
+1.8 × 100
+1.6 × 100
+
+6 × 101
+4 × 101
+
+Schrodinger 2D
+
+PISR-NSGA-II
+
+4 × 101
+3 × 101
+
+3 × 101
+2
+
+4
+
+6
+
+8
+
+10
+
+2
+
+Complexity (Tree Nodes)
+
+4
+
+6
+
+Total MSE
+6
+
+8
+
+Complexity (Tree Nodes)
+
+100
+
+10
+
+2
+
+4
+
+6
+
+Complexity (Tree Nodes)
+
+Liouville 2D
+
+1.8 × 100
+
+2
+
+Sine-Gordon 2D
+
+102
+
+PISR-NSGA-II
+
+Total MSE
+
+Total MSE
+
+1.65 × 100
+1.6 × 100
+1.55 × 100
+
+2
+
+4
+
+6
+
+8
+
+Complexity (Tree Nodes)
+
+6
+
+8
+
+ThomasFermi 2D
+
+100
+
+PISR-NSGA-II
+2
+4
+
+PISR-NSGA-II
+
+6 × 101
+4 × 101
+3 × 101
+
+2
+
+4
+
+6
+
+8
+
+Complexity (Tree Nodes)
+
+Figure 3: Impact of parsimony pressure on average tree complexity.
+
+15
+
+6
+
+Complexity (Tree Nodes)
+
+1.75 × 100
+1.7 × 100
+
+4
+
+Complexity (Tree Nodes)
+
+PISR-NSGA-II
+
+10 1
+
+4
+
+2 × 101
+
+Duffing 2D
+
+PISR-NSGA-II
+
+2
+
+8
+
+Complexity (Tree Nodes)
+
+Fisher 2D
+
+100
+
+Total MSE
+
+6 × 101
+
+Total MSE
+
+1.4 × 100
+
+PISR-NSGA-II
+
+Total MSE
+
+2.2 × 100
+
+Total MSE
+
+Helmholtz 2D
+
+8
+
+0.5
+
+00
+
+0.5
+
+1
+
+x
+
+Error
+
+PISR-NSGA-II
+
+0.0
+
+0.5
+00
+
+0.5
+
+10 1
+
+1
+
+0
+
+0.5
+
+0.5
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+0
+
+0.5
+
+1
+
+x
+
+0.5
+
+0.5
+
+x 1 0 y
+
+Exact (top view)
+
+2.0 × 10 4
+
+1.0 × 10 1 0
+0
+
+1
+
+x
+
+0
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+0
+
+0
+
+1.0
+
+Error
+1
+
+0.5
+
+0.5
+
+0.5
+
+0.5
+
+1
+
+x
+
+0.0
+
+x 1 0 y
+
+1.0
+
+Error
+1
+
+0.5
+
+0.5
+
+0.5
+
+00
+
+0.0
+
+0.5
+
+1
+
+x
+
+0.5
+
+0.5
+
+1
+
+y
+
+y
+
+Exact (top view)
+
+0
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+PISR-NSGA-II
+
+00
+
+0.5
+
+0
+
+10 1
+
+1
+
+0
+
+0.5
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+0.5
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+0
+
+0.5
+
+1
+
+x
+
+0
+
+0.5
+
+0.5
+
+x 1 0 y
+
+1 0.5
+0 0.0
+1
+0.5
+1
+
+1
+
+1
+
+0.5
+
+0
+
+00
+
+0.5
+
+x
+
+0
+
+x 1 0 y
+
+Exact (top view)
+
+0.5
+00
+
+0.5
+0.5
+
+x
+
+1
+
+0.5
+
+0.5
+
+Error
+1
+
+1.0
+
+y
+
+y
+
+1
+
+0
+
+x 1 0 y
+
+00
+
+1.0
+0.75
+0.5
+0.50
+1
+
+0
+
+PISR-NSGA-II
+
+1
+2.0 × 10 2
+
+0.5
+
+x
+
+1
+
+1 0.5
+0 0.0
+1
+0.5
+1
+
+0.5
+
+1
+
+x
+
+0
+
+PISR-NSGA-II
+
+1
+
+0
+
+0.5
+
+0
+
+0.5
+
+1
+
+x
+
+1 0.5
+0 0.0
+1
+0.5
+1
+
+0.5
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+100
+
+0.5
+
+0
+
+00
+
+Airy: u00 = xu [RK4 truth]
+
+PINN
+
+0.5
+
+x 1 0 y
+
+00
+
+0
+
+Exact
+
+0.5
+
+1
+
+x
+
+0
+
+1.0
+0.75
+0.5
+0.50
+1
+
+0.5
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+x
+
+x 1 0 y
+
+0.3
+0.3
+0.2 0.2
+1
+
+0
+
+Exact (top view)
+
+2.0 × 10 2
+0.5
+
+0.5
+
+0.5
+
+1
+
+0
+
+00
+
+Harmonic Osc. 2D
+
+0.2
+0.5
+
+x
+
+1
+
+0.5
+
+0.5
+
+Error
+1
+0.3
+
+0.5
+
+PINN
+0.20
+
+1
+
+0.5
+00
+
+0
+
+2D
+
+PISR-NSGA-II
+
+y
+
+0.5
+
+0.5
+
+0.5
+
+0.5
+
+Error
+1
+1
+
+1
+
+2D
+
+y
+
+PISR-NSGA-II
+
+y
+
+0
+
+1.0 × 10 1 0
+0
+
+1
+
+x
+
+10 4
+
+Schrödinger 2D
+
+Harmonic Oscillator: u00 = (x2 1)u [RK4 truth]
+1.0
+0.75
+0.5
+0.50
+1
+
+0.5
+
+PINN
+
+PINN
+
+Helmholtz 2D
+
+Exact
+
+0
+
+Error
+
+PISR-NSGA-II
+
+Exact (top view)
+
+2.0 × 10 4
+
+1.0 × 10 1 0
+0
+
+1
+
+x
+
+1
+
+0.5
+
+x 1 0 y
+
+2D
+
+y
+
+x 1 0 y
+
+10 1
+
+0.5
+
+Schrödinger: u00 + Vu = Eu
+Exact
+
+PINN
+
+y
+
+0.5
+
+0.5
+
+2D
+
+PISR-NSGA-II
+
+y
+
+0
+
+0.5
+
+0
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+Poisson 2D
+
+Helmholtz: 2u + k 2u = f
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+PISR-NSGA-II
+
+00
+
+Laplace 2D
+
+Exact
+
+x 1 0 y
+
+1
+
+00
+
+0.5
+
+0.5
+
+PINN
+
+y
+
+y
+
+0.5
+
+x 1 0 y
+
+1
+
+1.0
+
+0.5
+
+0.5
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+PISR-NSGA-II
+
+y
+
+Exact (top view)
+
+1
+
+0
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+2D
+
+x 1 0 y
+
+0.3
+0.2
+0.15
+1
+
+PISR-NSGA-II
+2.0 × 10 1
+
+0.5
+00
+
+0
+
+y
+
+x 1 0 y
+
+Exact
+
+PINN
+
+y
+
+0.5
+
+0.5
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+y
+
+0
+
+PISR-NSGA-II
+
+y
+
+Exact
+
+Poisson: 2u = f
+
+2D
+
+y
+
+Laplace: 2u = 0
+
+0.5
+
+x
+
+1
+
+0
+
+1
+
+0.3
+0.3
+0.2
+0.2
+1
+
+0.5
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+5.0 × 10 2
+
+0.5
+00
+
+0.5
+
+x
+
+1
+
+0
+
+Airy 2D
+
+Figure 4: Reconstructed 2D symbolic solutions representing fields û(x, y) or stream function ψ̂(x, y) (for Navier-Stokes)
+discovered by PI-NSGA-II across the benchmark suite (Part 1).
+
+16
+
+y
+
+0.75
+0.50
+0.25
+
+0.5
+00
+
+0.5
+
+0
+
+PISR-NSGA-II
+
+1
+3.0 × 10 2
+2
+2.0 × 10 0.5
+10 2
+00
+1
+
+0.5
+00
+
+1
+
+x
+
+x 1 0 y
+
+Error
+1
+y
+
+Exact (top view)
+
+1
+
+0.5
+
+0.5
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+0.5
+
+x
+
+1
+0
+
+0.75
+0.50 0.50
+0.25
+0.25
+1
+
+0.5
+
+0
+
+x 1 0 y
+
+0.0
+
+1
+
+Exact (top view)
+
+0
+
+0
+0.5
+
+0.5
+0.5
+
+Error
+
+00
+
+1
+
+x
+
+0
+
+PISR-NSGA-II
+
+1
+3.0 × 10 2
+2
+2.0 × 10 0.5
+10 2
+00
+1
+
+0.5
+0.5
+
+x
+
+0.5
+
+1.0 0.75
+0.5 0.50
+1
+0.25
+0.5
+
+Error
+
+PINN
+
+0
+
+x 1 0 y
+
+Exact (top view)
+
+0.5
+
+1.0 0.75
+0.5
+0.50
+1
+
+PISR-NSGA-II
+
+0.5
+00
+
+1
+
+x
+
+x 1 0 y
+
+Error
+1
+
+0.5
+
+0.5
+
+0.5
+
+0.5
+
+0
+
+10 1
+
+1
+
+0
+
+0.5
+
+1.0 0.75
+0.5
+0.50
+1
+
+PISR-NSGA-II
+
+0.5
+00
+
+0.5
+
+x
+
+1
+
+0
+
+10 1
+
+1
+
+0
+
+0.5
+
+1.0 × 10 1 0
+0
+
+1.0 0.75
+0.5
+0.50
+1
+
+0.5
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+0
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+5.0 × 10 2
+0.5
+
+1
+
+x
+
+10 1
+0.5
+
+x
+
+PISR-NSGA-II
+
+0.5
+
+0.5
+
+x 1 0 y
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+Exact (top view)
+
+1
+
+y
+
+x 1 0 y
+
+1.0 0.75
+0.5
+0.50
+1
+
+0.5
+
+1.0 × 10 1 0
+0
+
+1
+
+x
+
+2D
+
+0
+
+Non-linear Poisson 2D
+
+y
+
+y
+
+y
+
+0.5
+
+0.5
+
+Error
+1
+
+1.0
+0.5
+
+1
+
+0
+
+0
+
+PINN
+
+Exact
+
+1.0 0.75
+0.5
+0.50
+1
+
+1
+
+x
+
+PINN
+
+0.5
+
+x
+
+0.5
+
+PISR-NSGA-II
+
+Exact (top view)
+
+0.5
+
+00
+
+1
+
+x
+
+Sine-Gordon: 2u = sin(u) [FD truth]
+
+1
+
+00
+
+5.0 × 10 3
+
+2D
+
+0.5
+
+x 1 0 y
+
+PINN
+
+Liouville: 2u = eu [FD truth]
+Exact
+
+0.5
+
+0.5
+
+0
+
+1.0
+
+0.5
+00
+
+1
+
+x
+
+x 1 0 y
+
+1
+10 2
+5.0 × 10 3
+
+0.5
+
+0.5
+
+0.5
+
+1.0 0.75
+0.5
+0.50
+1
+
+Thomas-Fermi 2D
+
+0
+
+Error
+
+PISR-NSGA-II
+
+0
+
+1.0
+
+Error
+1
+
+0.5
+
+0.5
+
+0.5
+
+0.5
+
+x
+
+1
+
+0.0
+
+00
+
+0.5
+
+0.5
+
+1
+
+00
+
+Liouville 2D
+
+0
+
+y
+
+00
+
+x 1 0
+
+1
+
+1.0
+
+0.5
+
+0.5
+
+0.75
+0.75
+0.50
+0.25 0.50
+1
+0.5
+0.25
+y
+
+y
+
+Exact (top view)
+
+1
+
+y
+
+0
+
+x 1 0 y
+
+Exact
+
+PINN
+
+y
+
+0.5
+
+1
+7.5 × 10 2
+5.0 × 10 2 0.5
+2.5 × 10 2
+
+0.5
+
+x 1 0 y
+
+0.0
+
+1
+
+0.5
+
+Nonlinear Poisson: 2u + u2 = f [FD truth]
+
+2D
+
+y
+
+PISR-NSGA-II
+
+y
+
+0
+
+0
+
+0.5
+
+Duffing 2D
+
+Thomas-Fermi: 2u = u2/(x + y + 0.5) [RK4/FD truth]
+1.0 0.75
+0.5 0.50
+1
+0.25
+0.5
+
+1
+0
+
+0.5
+0.5
+0.0 0.0
+0.5
+1
+
+PISR-NSGA-II
+
+00
+
+Fisher 2D
+
+Exact
+
+x 1 0 y
+
+PINN
+
+0.5
+
+1
+
+x
+
+0.5
+
+0.5
+
+Error
+1
+
+1
+
+0.5
+00
+
+1
+
+x
+
+0.5
+
+0.5
+
+0.5
+
+1
+10 2
+5.0 × 10 3
+
+0.5
+
+PISR-NSGA-II
+
+2D
+
+y
+
+0
+
+0.75
+0.50 0.50
+0.25
+0.25
+1
+
+Exact
+
+0.75
+
+y
+
+x 1 0 y
+
+PINN
+
+0.75
+
+x 1 0 y
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+PISR-NSGA-II
+
+0.5
+
+x
+
+2D
+PINN
+
+1
+
+0
+
+10 1
+
+1
+
+0
+
+0.5
+
+y
+
+0.5
+
+0.5
+
+0.75
+0.50 0.50
+0.25
+0.25
+1
+
+Duffing: 2u + u + u3 = 0 [RK4/FD truth]
+
+y
+
+0
+
+PISR-NSGA-II
+
+0.75
+
+y
+
+Exact
+
+2D
+
+y
+
+Fisher: 2u + u(1 u) = 0 [RK4/FD truth]
+
+1.0 × 10 1 0
+0
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+0.5
+
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+10 4
+0.5
+
+x
+
+1
+
+0
+
+Sine-Gordon 2D
+
+Figure 4: Reconstructed 2D symbolic solutions representing fields û(x, y) or stream function ψ̂(x, y) (for Navier-Stokes)
+discovered by PI-NSGA-II across the benchmark suite (Continued).
+
+17
+
+Navier-Stokes: y( 2 )x
+
+0
+
+0.5
+
+0.5
+
+x 1 0 y
+
+1.0
+
+Error
+1
+
+0.5
+
+0.5
+
+0.5
+
+00
+
+0.5
+
+x
+
+1
+
+0.0
+
+00
+
+0.5
+
+0.5
+
+1
+
+y
+
+y
+
+Exact (top view)
+
+0
+
+x 1 0 y
+
+PINN
+
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+PISR-NSGA-II
+
+0.5
+
+x
+
+2D
+
+4
+
+PISR-NSGA-II
+1.0 0.75
+0.5 0.50
+0.0 0.25
+1
+
+1
+
+0
+
+10 1
+
+1
+
+0
+
+0.5
+
+y
+
+Exact
+
+x ( 2 )y =
+
+1.0 × 10 1 0
+0
+
+0.5
+
+0.15
+0.15
+0.10 0.10
+0.05
+1
+0.05
+0.5
+
+Error
+
+PINN
+
+x 1 0 y
+
+7.5 × 10 1
+5.0 × 10 1
+2.5 × 10 1
+0.5
+
+x
+
+1
+
+Navier-Stokes 2D
+Figure 4: Reconstructed 2D symbolic solutions representing fields û(x, y) or stream function ψ̂(x, y) (for Navier-Stokes)
+discovered by PI-NSGA-II across the benchmark suite (Continued).
+
+18
+
+Table 4: Comparison of Symbolic Expressions (1D and 2D).
+PDE
+
+Method
+
+Symbolic Expression û
+
+Laplace (1D)
+
+PI-NSGA-II
+Exact
+
+x
+x
+
+Laplace (2D)
+
+PI-NSGA-II
+Exact
+
+(sin((π·x))·sinh((π·y)))
+11.5487
+sin(πx) sinh(πy)
+sinh(π)
+
+Poisson (1D)
+
+PI-NSGA-II
+Exact
+
+sin((π · x))
+sin(πx)
+
+Poisson (2D)
+
+PI-NSGA-II
+Exact
+
+(sin((π · x)) · sin((π · y)))
+sin(πx) sin(πy)
+
+Helmholtz (1D)
+
+PI-NSGA-II
+Exact
+
+sin((π · x))
+sin(πx)
+
+Helmholtz (2D)
+
+PI-NSGA-II
+Exact
+
+(sin((π · x)) · sin((π · y)))
+sin(πx) sin(πy)
+
+Schrodinger (1D)
+
+PI-NSGA-II
+Exact
+
+exp((i · (π · x)))
+eiπx
+
+Schrodinger (2D)
+
+PI-NSGA-II
+Exact
+
+exp((i · (π · (x + y))))
+eiπ(x+y)
+
+Airy (1D)
+
+PI-NSGA-II
+Exact
+
+(0.355957 · exp((((i − y) · P1 ( xi )) · x)))
+Ai(x)
+
+Airy (2D)
+
+PI-NSGA-II
+Exact
+
+(0.355 · exp((−1.03981 · P3 (x))))
+N/A
+
+HarmonicOscillator (1D)
+
+PI-NSGA-II
+Exact
+
+exp((−0.5 · (x)2 ))
+2
+e−0.5x
+
+HarmonicOscillator (2D)
+
+PI-NSGA-II
+Exact
+
+exp((−0.5 · ((x)2 + (y)2 )))
+2
+2
+e−0.5(x +y )
+
+Fisher (1D)
+
+PI-NSGA-II
+Exact
+
+(0.0951859 + (0.705967 · x))
+Numerical
+
+Fisher (2D)
+
+PI-NSGA-II
+Exact
+
+(0.0949327 + (0.377231 · (x + sin(y))))
+Numerical
+
+Duffing (1D)
+
+PI-NSGA-II
+Exact
+
+(J0 (sin((x + y))) − (1.33276 · x))
+Numerical
+
+Duffing (2D)
+
+PI-NSGA-II
+Exact
+
+(J0 (cos((1.34261 + x))) − (0.697767 · (x + y)))
+Numerical
+
+ThomasFermi (1D)
+
+PI-NSGA-II
+Exact
+
+exp((−1.61921 · ( PP33 (x)
++ sin((i · y)))))
+(x)
+Numerical
+
+ThomasFermi (2D)
+
+PI-NSGA-II
+Exact
+
+(0.957552 − (0.398172 · (x + sin(y))))
+Numerical
+
+NonlinearPoisson (2D)
+
+PI-NSGA-II
+Exact
+
+1
+(1+((x)2 +(y)2 ))
+2
+
+Liouville (2D)
+
+PI-NSGA-II
+Exact
+
+1/(1 + x + y2 )
+
+Sine-Gordon (2D)
+
+PI-NSGA-II
+Exact
+
+(sin((π · x)) · sin((π · y)))
+sin(πx) sin(πy)
+
+Navier-Stokes (2D)
+
+PI-NSGA-II
+Exact
+
+(y − (exp((−1.8101·x))·sin((6.28319·y)))
+)
+125.664
+eλx
+y − 2πRe
+sin(2πy)
+
+1/(1 + x + y2 )
+1
+(1+((x)2 +(y)2 ))
+2
+
+19
+
+Table 5: Performance Comparison: Numerical (RK4/FDM), Neural (PINN), and Symbolic (PISR-NSGA-II) Methods
+(Total MSE).
+
+PDE
+
+Dim
+
+RK4/FDM
+
+PINN
+
+PISR-NSGA-II
+
+Laplace
+
+1D
+
+(6.55 ± 0.00) × 10−32
+
+(0.00 ± 0.00) × 100
+
+(0.00 ± 0.00) × 100
+
+Laplace
+
+2D
+
+(6.23 ± 0.00) × 10−6
+
+(1.66 ± 0.00) × 10−8
+
+(1.65 ± 0.00) × 10−31
+
+Poisson
+
+1D
+
+(1.52 ± 0.00) × 10−16
+
+(0.00 ± 0.00) × 100
+
+(3.06 ± 0.00) × 10−31
+
+Poisson
+
+2D
+
+(6.16 ± 0.00) × 10−5
+
+(2.10 ± 0.00) × 10−9
+
+(9.32 ± 0.00) × 10−31
+
+Helmholtz
+
+1D
+
+(4.87 ± 0.00) × 10−16
+
+(0.00 ± 0.00) × 100
+
+(4.91 ± 0.00) × 10−31
+
+Helmholtz
+
+2D
+
+(9.41 ± 0.00) × 10−5
+
+(4.50 ± 0.00) × 10−9
+
+(1.37 ± 0.00) × 10−30
+
+Schrodinger
+
+1D
+
+(4.91 ± 0.00) × 10−1
+
+(3.21 ± 0.00) × 10−1
+
+(2.45 ± 0.00) × 10−31
+
+Schrodinger
+
+2D
+
+¯
+
+(9.61 ± 0.00) × 10−1
+
+(2.43 ± 0.00) × 10−30
+
+Airy
+
+1D
+
+(0.00 ± 0.00) × 100
+
+(2.00 ± 0.00) × 10−10
+
+(6.89 ± 0.00) × 10−3
+
+Airy
+
+2D
+
+¯
+
+(9.65 ± 0.00) × 10−5
+
+(2.01 ± 0.00) × 10−2
+
+HarmonicOscillator 1D
+
+(0.00 ± 0.00) × 100
+
+(7.00 ± 0.00) × 10−10
+
+(1.83 ± 0.00) × 10−33
+
+HarmonicOscillator 2D
+
+¯
+
+(3.28 ± 0.00) × 10−4
+
+(1.06 ± 0.00) × 10−32
+
+Fisher
+
+1D
+
+(0.00 ± 0.00) × 100
+
+(1.00 ± 0.00) × 10−10
+
+(4.39 ± 0.00) × 10−2
+
+Fisher
+
+2D
+
+¯
+
+(3.92 ± 0.00) × 10−5
+
+(1.85 ± 0.00) × 10−2
+
+Duffing
+
+1D
+
+(0.00 ± 0.00) × 100
+
+(1.00 ± 0.00) × 10−9
+
+(6.68 ± 0.00) × 10−2
+
+Duffing
+
+2D
+
+¯
+
+(2.09 ± 0.00) × 10−5
+
+(2.72 ± 0.00) × 10−1
+
+ThomasFermi
+
+1D
+
+(0.00 ± 0.00) × 100
+
+(7.00 ± 0.00) × 10−10
+
+(2.04 ± 0.00) × 10−3
+
+ThomasFermi
+
+2D
+
+¯
+
+(4.25 ± 0.00) × 10−5
+
+(1.35 ± 0.00) × 10−1
+
+NonlinearPoisson
+
+2D
+
+¯
+
+(1.07 ± 0.00) × 10−3
+
+(4.85 ± 0.00) × 10−32
+
+Liouville
+
+2D
+
+¯
+
+(9.88 ± 0.00) × 10−3
+
+(5.45 ± 0.00) × 10−32
+
+Sine-Gordon
+
+2D
+
+¯
+
+(3.00 ± 0.00) × 10−9
+
+(1.41 ± 0.00) × 10−30
+
+Navier-Stokes
+
+2D
+
+¯
+
+¯
+
+(6.23 ± 0.00) × 10−9
+
+20
+
+7. Conclusions
+This paper presented PISR-NSGA-II, a novel physics-informed symbolic regression framework
+designed to discover closed-form analytical solutions to complex differential equations. By restructuring the learning process into a tri-objective Pareto optimization problem, the framework successfully
+decoupled domain accuracy, boundary compliance, and equation complexity. This formulation eliminated the pervasive vulnerabilities associated with manual penalty weights, ensuring that candidate
+solutions strictly satisfied physical boundary states.
+The integration of exact Automated Symbolic Differentiation (AD) within an object-oriented
+syntax tree proved computationally superior to standard neural network backpropagation. Furthermore, hybridizing the evolutionary engine with a local second-order Gauss-Newton solver successfully
+bridged the gap between global topological search and local parameter optimization.
+Empirical evaluations across a rigorous 13-PDE benchmark suite revealed a clear, bifurcated
+performance profile. For equations with exact closed-form analytical solutions, PISR-NSGA-II consistently operates at machine-precision accuracy (10−30 to 10−33 ), autonomously reconstructing complex non-linear functional forms such as the 2D Navier-Stokes stream function. However, the study
+also highlights a fundamental limitation of the symbolic approach: when applied to highly non-linear
+PDEs lacking compact analytical solutions (e.g., Duffing, Fisher, and Thomas-Fermi), where the true
+physics require complex numerical approximations or infinite series, the algorithm struggles. Forcing
+a purely numerical field into a parsimonious symbolic tree restricts the solution manifold, resulting
+in higher residual errors (10−1 to 10−3 ) and sub-optimal hypervolume convergence.
+Despite these challenges in pure numerical approximation, for systems governed by definable analytical expressions, the symbolic approach consistently outperformed deep learning baselines (PINNs)
+by several orders of magnitude in convergence speed and residual error.
+
+21
+
+References
+Abo-bakr, R.M., Mohamed, N.A., Mohamed, S.A., 2022. Meta-heuristic algorithms for solving
+nonlinear differential equations based on multivariate Bernstein polynomials. Soft Computing 26,
+605–619. doi:10.1007/s00500-021-06535-1.
+Abo-Hammour, Z.S., Asasfeh, A.G., Al-Smadi, A.M., Alsmadi, O.M.K., 2010. A novel continuous
+genetic algorithm for the solution of optimal control problems. Optimal Control Applications and
+Methods 32, 414–432. doi:10.1002/oca.953.
+Albadarneh, R.B., Hammour, M.A., Alsmadi, O.M., Shawagfeh, N.T., 2021. A novel continuous
+genetic algorithm for solving PDEs. Italian Journal of Pure and Applied Mathematics 46, 534–
+543.
+Amuso, V.J., Enslin, J., 2007. The strength pareto evolutionary algorithm 2 (spea2) applied to
+simultaneous multi- mission waveform design, in: 2007 International Waveform Diversity and
+Design Conference, pp. 407–417. doi:10.1109/WDDC.2007.4339452.
+Baydin, A.G., Pearlmutter, B.A., Radul, A.A., Siskind, J.M., 2018. Automatic differentiation in
+machine learning: a survey. Journal of Machine Learning Research 18, 1–43. URL: http://jmlr.
+org/papers/v18/17-468.html.
+Bernstein, S.N., 1912. Démonstration du théorème de Weierstrass fondée sur le calcul des probabilités. Communications of the Kharkov Mathematical Society 13, 1–2.
+Cohen, B.G., Beykal, B., Bollas, G.M., 2024. Physics-informed genetic programming for discovery of
+partial differential equations from scarce and noisy data. Journal of Computational Physics 514,
+113261. doi:https://doi.org/10.1016/j.jcp.2024.113261.
+Cohen, J., 1988. Statistical Power Analysis for the Behavioral Sciences. 2nd ed., Lawrence Erlbaum
+Associates.
+Cuomo, S., Di Cola, V.S., Giampaolo, F., Giannini, G., Keola, R., Piccialli, F., 2022. Scientific machine learning through physics-informed neural networks: Where we are and what’s next. Journal
+of Scientific Computing 92, 88.
+Deb, K., Pratap, A., Agarwal, S., Meyarivan, T., 2002. A fast and elitist multiobjective genetic
+algorithm: Nsga-ii. IEEE Transactions on Evolutionary Computation 6, 182–197. doi:10.1109/
+4235.996017.
+Du, Y., Huang, Q., Huang, R., Yin, T., Tan, J., Yu, W., Li, X., 2022. Physics-informed evolutionary strategy based control for mitigating delayed voltage recovery. IEEE Transactions on Power
+Systems 37, 3516–3527. doi:10.1109/TPWRS.2021.3132328.
+Fish, J., Belytschko, T., 2007. A First Course in Finite Elements. John Wiley & Sons, Ltd. doi:10.
+1002/9780470510858.
+Karniadakis, G.E., Kevrekidis, I.G., Lu, L., Perdikaris, P., Wang, S., Yang, L., 2021. Physicsinformed machine learning. Nature Reviews Physics 3, 422–440.
+Koza, J.R., 1992. Genetic Programming: On the Programming of Computers by Means of Natural
+Selection. Complex Adaptive Systems, The MIT Press, Cambridge, Massachusetts. A Bradford
+Book.
+22
+
+Kutta, W., 1901. Beitrag zur näherungsweisen integration totaler differentialgleichungen. Zeitschrift
+für Mathematik und Physik 46, 435–453.
+Liu, X., Shao, P., Wang, Y., Liu, Y., 2026. Navigating multi-source threats in low-altitude urban
+airspace: A physics-informed cyclotron meta-heuristic method. Expert Systems with Applications
+306, 130964. doi:https://doi.org/10.1016/j.eswa.2025.130964.
+Lorentz, G.G., 1986. Bernstein Polynomials. Chelsea Publishing Company, New York.
+Lu, L., Meng, X., Mao, Z., Karniadakis, G.E., 2021. Deepxde: A deep learning library for solving
+differential equations. SIAM Review 63, 208–228.
+Mateescu, G.D., 2006. On the application of genetic algorithms to differential equation. Romanian
+Journal of Economic Forecasting 7, 5–8.
+Mirjalili, S., Mirjalili, S.M., Lewis, A., 2014. Grey wolf optimizer. Advances in Engineering Software
+69, 46–61. doi:https://doi.org/10.1016/j.advengsoft.2013.12.007.
+Morton, K.W., Mayers, D.F., 2012. Numerical Solution of Partial Differential Equations: An Introduction. 2nd ed., Cambridge University Press. doi:10.1017/CBO9780511812248.
+Oh, H., Amici, R., Bomarito, G., Zhe, S., Kirby, R., Hochhalter, J., 2023. Genetic programming
+based symbolic regression for analytical solutions to differential equations. doi:10.48550/arXiv.
+2302.03175.
+Ouyang, K., Yu, M., Ke, Z., Zhang, J., Chen, Y., Chen, H., 2026. Physics-informed evolution: An
+evolutionary framework for solving quantum control problems involving the schrödinger equation.
+URL: https://arxiv.org/abs/2502.05228, arXiv:2502.05228.
+Papadopoulos, A.I., Raptis, S.I., Lalas, A., Votis, K., Tyrovolas, D., Tegos, S.A., Pitilakis, A.,
+Ioannidis, S., Karagiannidis, G.K., Liaskos, C.K., 2024. Physics-informed metaheuristics for fast
+ris codebook compilation. IEEE Communications Magazine 62, 152–158. doi:10.1109/MCOM.001.
+2300582.
+Raissi, M., Perdikaris, P., Karniadakis, G.E., 2019a. Physics-informed neural networks: A deep
+learning framework for solving forward and inverse problems involving nonlinear partial differential
+equations. Journal of Computational Physics 378, 686–707. doi:10.1016/j.jcp.2018.10.045.
+Raissi, M., Perdikaris, P., Karniadakis, G.E., 2019b. Physics-informed neural networks: A deep
+learning framework for solving forward and inverse problems involving nonlinear partial differential
+equations. Journal of Computational Physics 378, 686–707.
+Richardson, L.F., 1911. The approximate arithmetical solution by finite differences of physical
+problems involving differential equations, with an application to the stresses in a masonry dam.
+Philosophical Transactions of the Royal Society of London. Series A, Containing Papers of a
+Mathematical or Physical Character 210, 307–357. URL: http://www.jstor.org/stable/90994.
+Runge, C., 1895. Ueber die numerische auflösung von differentialgleichungen. Mathematische Annalen 46, 167–178. doi:10.1007/BF01446807.
+Tsoulos, I.G., Lagaris, I.E., 2006. Solving differential equations with genetic programming. Computer
+Physics Communications 175, 297–307.
+23
+
+Zhang, J., 2024. AI-enhanced multi-scale physics-informed heuristic simulation for complex system optimization. Faculty of Science and Technology, Rajabhat Maha Sarakham University
+Preprint/Article ID: zjc1639834588.
+
+24
+
+

@@ -99,6 +99,14 @@ Complex PDEProblem::exact(double x, double y) const {
                 double val = y - std::exp(lambda * x) * std::sin(2.0 * PI * y) / (2.0 * PI * Re);
                 return Complex(val, 0.0);
             }
+            case PDE::NAVIER_STOKES_UNSTEADY: {
+                // Taylor-Green Vortex (componente u)
+                // u(x,y,t) = sin(x)cos(y)exp(-2*nu*t)
+                // Usamos PI para escala
+                double nu = k2;
+                double val = std::sin(PI * x) * std::cos(PI * y) * std::exp(-2.0 * PI * PI * nu * 0.0); // t=0 por ahora en exact()
+                return Complex(val, 0.0);
+            }
             default: return 0.0;
         }
     }
@@ -303,68 +311,48 @@ std::string PDEProblem::name() const { return pde_name(type); }
 
 // ─── Fabricación ─────────────────────────────────────────────────────────────
 PDEProblem make_laplace(int dim) {
-    PDEProblem p;
-    p.type = PDE::LAPLACE;
-    p.dim  = dim;
-    p.k2   = 0.0;
+    PDEProblem p; p.type = PDE::LAPLACE; p.dim = dim;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
 PDEProblem make_poisson(int dim) {
-    PDEProblem p;
-    p.type = PDE::POISSON;
-    p.dim  = dim;
-    p.k2   = 0.0;
+    PDEProblem p; p.type = PDE::POISSON; p.dim = dim;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
 PDEProblem make_helmholtz(int dim, double k) {
-    PDEProblem p;
-    p.type = PDE::HELMHOLTZ;
-    p.dim  = dim;
-    p.k2   = k * k;
+    PDEProblem p; p.type = PDE::HELMHOLTZ; p.dim = dim; p.k2 = k*k;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
 PDEProblem make_schrodinger(int dim) {
-    PDEProblem p;
-    p.type = PDE::SCHRODINGER;
-    p.dim  = dim;
-    p.k2   = 0.0;
+    PDEProblem p; p.type = PDE::SCHRODINGER; p.dim = dim;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
 PDEProblem make_nonlinear_poisson() {
-    PDEProblem p;
-    p.type = PDE::NONLINEAR_POISSON;
-    p.dim  = 2;
-    p.k2   = 0.0;
+    PDEProblem p; p.type = PDE::NONLINEAR_POISSON; p.dim = 2;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
 PDEProblem make_liouville() {
-    PDEProblem p;
-    p.type = PDE::LIOUVILLE;
-    p.dim  = 2;
-    p.k2   = 0.0;
+    PDEProblem p; p.type = PDE::LIOUVILLE; p.dim = 2;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
 PDEProblem make_sine_gordon() {
-    PDEProblem p;
-    p.type = PDE::SINE_GORDON;
-    p.dim  = 2;
-    p.k2   = 0.0;
+    PDEProblem p; p.type = PDE::SINE_GORDON; p.dim = 2;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
-
 PDEProblem make_airy(int dim) {
-    PDEProblem p;
-    p.type = PDE::AIRY;
-    p.dim  = dim;
-    p.is_numerical = true;
+    PDEProblem p; p.type = PDE::AIRY; p.dim = dim; p.is_numerical = true;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
-
 PDEProblem make_harmonic_oscillator(int dim) {
-    PDEProblem p;
-    p.type = PDE::HARMONIC_OSCILLATOR;
-    p.dim  = dim;
-    p.is_numerical = true;
+    PDEProblem p; p.type = PDE::HARMONIC_OSCILLATOR; p.dim = dim; p.is_numerical = true;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
 
@@ -374,29 +362,37 @@ PDEProblem make_navier_stokes() {
     p.dim  = 2;
     p.k2   = 0.05; // nu = 1.0 / Re = 0.05 (Re = 20)
     p.is_numerical = false;
+    p.dim_u = Dimension(2, -1, 0, 0, 0); // L^2 / T
+    p.dim_x = Units::Length;
+    p.dim_y = Units::Length;
     return p;
 }
+
+PDEProblem make_navier_stokes_unsteady() {
+    PDEProblem p;
+    p.type = PDE::NAVIER_STOKES_UNSTEADY;
+    p.dim  = 2;
+    p.k2   = 0.01; // Viscosidad nu
+    p.dim_u = Units::Velocity;
+    p.dim_x = Units::Length;
+    p.dim_y = Units::Length;
+    p.dim_t = Units::Time;
+    return p;
+}
+
 
 PDEProblem make_fisher(int dim) {
-    PDEProblem p;
-    p.type = PDE::FISHER;
-    p.dim  = dim;
-    p.is_numerical = true;
+    PDEProblem p; p.type = PDE::FISHER; p.dim = dim; p.is_numerical = true;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
-
 PDEProblem make_duffing(int dim) {
-    PDEProblem p;
-    p.type = PDE::DUFFING;
-    p.dim  = dim;
-    p.is_numerical = true;
+    PDEProblem p; p.type = PDE::DUFFING; p.dim = dim; p.is_numerical = true;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }
-
 PDEProblem make_thomas_fermi(int dim) {
-    PDEProblem p;
-    p.type = PDE::THOMAS_FERMI;
-    p.dim  = dim;
-    p.is_numerical = true;
+    PDEProblem p; p.type = PDE::THOMAS_FERMI; p.dim = dim; p.is_numerical = true;
+    p.dim_u = Units::None; p.dim_x = Units::None; p.dim_y = Units::None;
     return p;
 }

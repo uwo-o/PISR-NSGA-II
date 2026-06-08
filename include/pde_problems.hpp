@@ -5,6 +5,7 @@
 // =============================================================================
 
 #include "common.hpp"
+#include "dimensions.hpp"
 #include <vector>
 #include <functional>
 
@@ -16,6 +17,12 @@ struct PDEProblem {
     double k2 = 0.0;   // coeficiente k² en Helmholtz: ∇²u + k²u = f
     bool   is_numerical = false; // Indica si requiere validación vía NumericalSolver
     std::vector<Complex> numerical_truth; // Malla de referencia pre-calculada
+
+    // Dimensiones para coherencia física
+    Dimension dim_u = Units::None;
+    Dimension dim_x = Units::Length;
+    Dimension dim_y = Units::Length;
+    Dimension dim_t = Units::Time;
 
     // Puntos de colocación interior (rejilla uniforme)
     std::vector<Point> domain_points(int n) const;
@@ -53,6 +60,7 @@ PDEProblem make_sine_gordon();
 PDEProblem make_airy(int dim);
 PDEProblem make_harmonic_oscillator(int dim);
 PDEProblem make_navier_stokes();
+PDEProblem make_navier_stokes_unsteady();
 PDEProblem make_fisher(int dim);
 PDEProblem make_duffing(int dim);
 PDEProblem make_thomas_fermi(int dim);

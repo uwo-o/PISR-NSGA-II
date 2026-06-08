@@ -10,7 +10,7 @@ cmake .. && make -j$(nproc)
 cd ..
 
 echo ">>> Step 1: Symbolic Benchmark"
-# ./build/pi_nsga2 "$@"
+./build/pi_nsga2 "$@"
 
 echo ">>> Step 2: PINN Baseline"
 # .venv/bin/python3.12 pinn_baseline.py "$@"

@@ -13,41 +13,35 @@
 // ─── PIIndividual::evaluate ───────────────────────────────────────────────────
 void PIIndividual::evaluate(const PDEProblem& prob, 
                           const std::vector<Point>& dom, 
-                          const std::vector<Point>& bnd) 
+                          const std::vector<Point>& bnd,
+                          int current_gen) 
 {
     if (!tree) { mse_domain = 1e18; mse_boundary = 1e18; return; }
     
-    tree = remove_nested_polynomials(std::move(tree));
-    
     double pde_mse = 0.0;
+    // Evitamos std::move para prevenir que tree quede nulo accidentalmente
+    // tree = remove_nested_polynomials(std::move(tree)); 
+
     if (prob.type == PDE::NAVIER_STOKES) {
         double h = 0.01; // Step for finite differences
         double nu = prob.k2; // nu = 1.0 / Re = 0.05
         
-        auto eval_laplacian = [&](const NodePtr& t, double x, double y) {
-            double v   = t->eval(x,   y).real();
-            double vxp = t->eval(x+h, y).real();
-            double vxm = t->eval(x-h, y).real();
-            double vyp = t->eval(x, y+h).real();
-            double vym = t->eval(x, y-h).real();
-            return (vxp + vxm + vyp + vym - 4.0 * v) / (h * h);
-        };
-        
         for (auto& p : dom) {
-            double val_xp = tree->eval(p.x+h, p.y).real();
-            double val_xm = tree->eval(p.x-h, p.y).real();
-            double val_yp = tree->eval(p.x, p.y+h).real();
-            double val_ym = tree->eval(p.x, p.y-h).real();
-            
-            double psi_x = (val_xp - val_xm) / (2.0 * h);
-            double psi_y = (val_yp - val_ym) / (2.0 * h);
-            
-            double L_val = (val_xp + val_xm + val_yp + val_ym - 4.0 * tree->eval(p.x, p.y).real()) / (h * h);
-            double L_xp  = eval_laplacian(tree, p.x+h, p.y);
-            double L_xm  = eval_laplacian(tree, p.x-h, p.y);
-            double L_yp  = eval_laplacian(tree, p.x, p.y+h);
-            double L_ym  = eval_laplacian(tree, p.x, p.y-h);
-            
+            AD ad_c = tree->ad_eval(p.x, p.y, prob.dim);
+            double psi_x = ad_c.dx.real();
+            double psi_y = ad_c.dy.real();
+            double L_val = (ad_c.dxx + ad_c.dyy).real();
+
+            AD ad_xp = tree->ad_eval(p.x+h, p.y, prob.dim);
+            AD ad_xm = tree->ad_eval(p.x-h, p.y, prob.dim);
+            AD ad_yp = tree->ad_eval(p.x, p.y+h, prob.dim);
+            AD ad_ym = tree->ad_eval(p.x, p.y-h, prob.dim);
+
+            double L_xp = (ad_xp.dxx + ad_xp.dyy).real();
+            double L_xm = (ad_xm.dxx + ad_xm.dyy).real();
+            double L_yp = (ad_yp.dxx + ad_yp.dyy).real();
+            double L_ym = (ad_ym.dxx + ad_ym.dyy).real();
+
             double L_x = (L_xp - L_xm) / (2.0 * h);
             double L_y = (L_yp - L_ym) / (2.0 * h);
             
@@ -59,6 +53,27 @@ void PIIndividual::evaluate(const PDEProblem& prob,
                 mse_domain = 1e18; mse_boundary = 1e18; return;
             }
             pde_mse += res * res;
+        }
+        if (!dom.empty()) pde_mse /= dom.size();
+    } else if (prob.type == PDE::NAVIER_STOKES_UNSTEADY) {
+        // Navier-Stokes 2D + Tiempo (Vorticidad-StreamFunction o Directo)
+        // Usamos Taylor-Green decay como referencia: u_t + (u.grad)u = nu*laplacian(u)
+        double nu = prob.k2;
+        for (auto& p : dom) {
+            AD ad = tree->ad_eval_t(p.x, p.y, p.t, prob.dim);
+            
+            // Suponemos que el árbol representa la función de corriente psi
+            // u = psi_y, v = -psi_x
+            // Ecuación de vorticidad: w_t + u*w_x + v*w_y = nu*laplacian(w)
+            // donde w = -laplacian(psi)
+            
+            // Para simplificar el benchmark "BOSS", usaremos una forma directa u_t + u*u_x ...
+            // Pero como el árbol devuelve un escalar, definimos el residuo como:
+            // R = u_t + u*u_x + v*u_y - nu*(u_xx + u_yy)  [Solo componente u]
+            // Para este benchmark, el árbol debe satisfacer la física.
+            
+            Complex res = ad.dt + ad.v * ad.dx - nu * (ad.dxx + ad.dyy);
+            pde_mse += std::norm(res);
         }
         if (!dom.empty()) pde_mse /= dom.size();
     } else {
@@ -88,10 +103,21 @@ void PIIndividual::evaluate(const PDEProblem& prob,
     tree_size = tree->count_nodes();
     root_type = tree->get_type();
 
+    // Penalización por inconsistencia dimensional ADAPTATIVA
+    // Comienza en 1.0 (permisivo) y sube a 1000.0 (estricto) en 100 gens.
+    double max_p = 1000.0;
+    double current_p = 1.0 + (max_p - 1.0) * std::min(1.0, (double)current_gen / 100.0);
+    
+    double dim_penalty = 1.0;
+    auto d_opt = tree->get_dimension(prob);
+    if (!d_opt.has_value() || *d_opt != prob.dim_u) {
+        dim_penalty = current_p; 
+    }
+
     double alpha = 20.0; 
     double beta = 1.0;
-    mse_domain = beta * pde_mse + alpha * raw_bc_mse; 
-    mse_boundary = raw_bc_mse; 
+    mse_domain = (beta * pde_mse + alpha * raw_bc_mse) * dim_penalty; 
+    mse_boundary = raw_bc_mse * dim_penalty; 
 }
 
 double PIIndividual::get_validation_mse(const PDEProblem& prob, 
@@ -163,14 +189,14 @@ PISolver::PISolver(const PDEProblem& prob, unsigned seed)
 PIIndividual PISolver::random_individual() {
     PIIndividual ind;
     ind.tree = random_tree(Config::MAX_TREE_DEPTH, gen_);
-    ind.evaluate(prob_, dom_pts_, bnd_pts_);
+    ind.evaluate(prob_, dom_pts_, bnd_pts_, current_gen_);
     return ind;
 }
 
 PIIndividual PISolver::random_individual_special() {
     PIIndividual ind;
     ind.tree = random_tree_special(Config::MAX_TREE_DEPTH, gen_, prob_);
-    ind.evaluate(prob_, dom_pts_, bnd_pts_);
+    ind.evaluate(prob_, dom_pts_, bnd_pts_, current_gen_);
     // Refuerzo agresivo desactivado temporalmente para debugging
     // hill_climb_constants(ind, 100); 
     return ind;
@@ -190,16 +216,15 @@ PIIndividual PISolver::make_offspring(const PIIndividual& a, const PIIndividual&
 
     if (is_elite) {
         // Individuos élite: Mutación de parámetros para ajuste fino (70%) vs Estructural (30%)
-        if (p_dist(gen_) < 0.7) child.tree->mutate_erc(gen_, Config::ERC_SIGMA * 0.5); 
-        else                    child.tree = tree_mutate(child.tree, gen_);
+        if (p_dist(gen_) < 0.7) child.tree->mutate_erc(gen_, Config::ERC_SIGMA * 0.5);
+        else                    child.tree = tree_mutate(child.tree, gen_, prob_);
     } else {
         // Individuos normales: Mutación estructural estándar
         if (p_dist(gen_) < Config::MUTATION_PROB)
-            child.tree = tree_mutate(child.tree, gen_);
-        if (p_dist(gen_) < 0.4) 
+            child.tree = tree_mutate(child.tree, gen_, prob_);
+        if (p_dist(gen_) < 0.4)
             child.tree->mutate_erc(gen_, Config::ERC_SIGMA);
     }
-    
     return child;
 }
 
@@ -230,24 +255,26 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
         dom_pts_.clear();
         bnd_pts_.clear();
         if (prob_.dim == 1) {
-            // 1D: puntos interiores x ∈ (0,1), y=0
+            // 1D: puntos interiores x ∈ (0,1), y=0, t ∈ (0,1)
             for (int i = 0; i < Config::N_DOMAIN; ++i)
-                dom_pts_.push_back({dist(gen_), 0.0});
-            // 1D: Únicas fronteras válidas son x=0 y x=1
-            bnd_pts_.push_back({0.0, 0.0});
-            bnd_pts_.push_back({1.0, 0.0});
+                dom_pts_.push_back({dist(gen_), 0.0, dist(gen_)});
+            // 1D: Fronteras x=0 y x=1
+            bnd_pts_.push_back({0.0, 0.0, dist(gen_)});
+            bnd_pts_.push_back({1.0, 0.0, dist(gen_)});
         } else {
-            // 2D: puntos aleatorios en (0,1)^2
+            // 2D: puntos aleatorios en (0,1)^2, t ∈ (0,1)
             for (int i = 0; i < Config::N_DOMAIN; ++i)
-                dom_pts_.push_back({dist(gen_), dist(gen_)});
-            // 2D: 4 lados del cuadrado
-            int pts_per_side = Config::N_BOUNDARY / 4;
+                dom_pts_.push_back({dist(gen_), dist(gen_), dist(gen_)});
+            // 2D: 4 lados del cuadrado + condición inicial t=0
+            int pts_per_side = Config::N_BOUNDARY / 5;
             for (int i = 0; i < pts_per_side; ++i) {
-                double t = dist(gen_);
-                bnd_pts_.push_back({0.0, t});
-                bnd_pts_.push_back({1.0, t});
-                bnd_pts_.push_back({t, 0.0});
-                bnd_pts_.push_back({t, 1.0});
+                double t_pt = dist(gen_);
+                double s_pt = dist(gen_);
+                bnd_pts_.push_back({0.0, s_pt, t_pt});
+                bnd_pts_.push_back({1.0, s_pt, t_pt});
+                bnd_pts_.push_back({s_pt, 0.0, t_pt});
+                bnd_pts_.push_back({s_pt, 1.0, t_pt});
+                bnd_pts_.push_back({dist(gen_), dist(gen_), 0.0}); // Condición inicial
             }
         }
     };
@@ -257,16 +284,13 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
     gen_pts();
 
     NodePtr exact_tree = get_exact_solution_tree(prob_);
-    int n_exact = 0;
-    if (exact_tree) {
-        n_exact = static_cast<int>(0.25 * pop_size);
-    }
+    int n_exact = (exact_tree) ? static_cast<int>(0.25 * pop_size) : 0;
     int n_special = static_cast<int>(0.20 * pop_size);
     for (int i = 0; i < pop_size; ++i) {
-        if (i < n_exact) {
+        if (i < n_exact && exact_tree) {
             PIIndividual ind;
             ind.tree = exact_tree->clone();
-            ind.evaluate(prob_, dom_pts_, bnd_pts_);
+            ind.evaluate(prob_, dom_pts_, bnd_pts_, current_gen_);
             population_.push_back(std::move(ind));
         } else if (i < n_exact + n_special) {
             population_.push_back(random_individual_special());
@@ -278,7 +302,8 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
 
 
     for (int g = 0; g < max_gen; ++g) {
-        // 1. Regenerar Puntos Dinámicos cada 20 generaciones (EVITA TRAMPAS Y MEMORIZACIÓN)
+        current_gen_ = g;
+        // 1. Regenerar Puntos Dinámicos cada 20 generaciones
         // Nota: g>0 para no destruir las semillas exactas que ya se evaluaron antes del loop
         if (g > 0 && g % 20 == 0) {
             gen_pts();
@@ -286,7 +311,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
             // Re-evaluar población con la nueva "física"
             #pragma omp parallel for
             for (size_t i = 0; i < population_.size(); ++i) {
-                population_[i].evaluate(prob_, dom_pts_, bnd_pts_);
+                population_[i].evaluate(prob_, dom_pts_, bnd_pts_, current_gen_);
             }
         }
 
@@ -335,7 +360,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
         if (has_best_ever_) {
             PIIndividual elite;
             elite.tree = best_ever_.tree->clone();
-            elite.evaluate(prob_, dom_pts_, bnd_pts_);
+            elite.evaluate(prob_, dom_pts_, bnd_pts_, current_gen_);
             offspring.push_back(std::move(elite));
         }
 
@@ -348,7 +373,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
 
         #pragma omp parallel for
         for (size_t i = 0; i < offspring.size(); ++i) {
-            offspring[i].evaluate(prob_, dom_pts_, bnd_pts_);
+            offspring[i].evaluate(prob_, dom_pts_, bnd_pts_, current_gen_);
         }
 
         std::vector<PIIndividual> combined;

@@ -38,6 +38,7 @@ PDE_ORDER = [
     "Airy", "HarmonicOscillator",
     "Fisher", "Duffing", "ThomasFermi",
     "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes",
+    "Navier-Stokes-Unsteady"
 ]
 
 # Ecuaciones cuya "u_exact" en el CSV proviene de RK4 (no hay fórmula cerrada)
@@ -58,6 +59,7 @@ PDE_LABELS = {
     "Liouville":          r"Liouville: $\nabla^2 u = e^u$  [FD truth]",
     "Sine-Gordon":        r"Sine-Gordon: $\nabla^2 u = \sin(u)$  [FD truth]",
     "Navier-Stokes":      r"Navier-Stokes: $\psi_y (\nabla^2 \psi)_x - \psi_x (\nabla^2 \psi)_y = \nu \nabla^4 \psi$",
+    "Navier-Stokes-Unsteady": r"Navier-Stokes (Unsteady): $u_t + u u_x = \nu \nabla^2 u$"
 }
 
 CMAP_SOLUTION = "viridis"
@@ -137,6 +139,15 @@ def plot_1d(pde, df_pi, df_pn=None):
 
 # ─── 2D ────────────────────────────────────────────────────────────────────────
 def plot_2d(pde, df_pi, df_pn=None):
+    # Si hay columna 't', filtramos por t=0 (Condición Inicial / Slice)
+    if "t" in df_pi.columns:
+        t_unique = np.unique(df_pi["t"].values)
+        t_slice = t_unique[0] # Usar el primer instante (t=0 usualmente)
+        df_pi = df_pi[df_pi["t"] == t_slice]
+        if df_pn is not None and "t" in df_pn.columns:
+            df_pn = df_pn[df_pn["t"] == t_slice]
+        print(f"  [2D-Slice] {pde} at t={t_slice:.2f}")
+
     N = int(np.sqrt(len(df_pi)))
     if N * N != len(df_pi):
         print(f"  [WARN] {pde} 2D: len={len(df_pi)} no es cuadrado perfecto, saltando.")
@@ -282,13 +293,14 @@ def plot_equation(pde, dim):
 def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
-    skips_1d = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes"}   # solo 2D
+    skips_1d = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady"}   # solo 2D/3D
     skips_2d = set()
 
     for pde in PDE_ORDER:
         if pde not in skips_1d:
             plot_equation(pde, 1)
         if pde not in skips_2d:
+            # Para Navier-Stokes-Unsteady, graficamos el slice temporal t=0 si es 2D
             plot_equation(pde, 2)
 
     print("\nPlots updated in", FIGS_DIR)
