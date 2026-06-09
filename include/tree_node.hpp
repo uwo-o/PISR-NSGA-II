@@ -19,10 +19,12 @@ inline bool is_unary(NodeType t) {
     return t == NodeType::SIN  || t == NodeType::COS  ||
            t == NodeType::SINH || t == NodeType::COSH ||
            t == NodeType::EXP  || t == NodeType::SQR  ||
+           t == NodeType::LOG  || t == NodeType::TANH ||
            t == NodeType::BESSEL_J || t == NodeType::GAMMA || t == NodeType::GAUSSIAN;
 }
 inline bool is_terminal(NodeType t) {
-    return t == NodeType::VAR_X || t == NodeType::VAR_Y || t == NodeType::VAR_T || t == NodeType::ERC || t == NodeType::CONST_I;
+    return t == NodeType::VAR_X || t == NodeType::VAR_Y || t == NodeType::VAR_T || 
+           t == NodeType::ERC || t == NodeType::CONST_I || t == NodeType::CONST_PI || t == NodeType::CONST_E;
 }
 
 class PDEProblem;
@@ -143,6 +145,8 @@ public:
 NodePtr make_var(char v);
 NodePtr make_erc(Complex val);
 NodePtr make_const_i();
+NodePtr make_const_pi();
+NodePtr make_const_e();
 NodePtr make_binary(NodeType op, NodePtr l, NodePtr r);
 NodePtr make_unary(NodeType op, NodePtr child);
 

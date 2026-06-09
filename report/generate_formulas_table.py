@@ -46,6 +46,7 @@ def main():
         ("Liouville", 2): r"1 / (1 + x^2 + y^2)",
         ("Sine-Gordon", 2): r"\sin(\pi x) \sin(\pi y)",
         ("Navier-Stokes", 2): r"y - \frac{e^{\lambda x}}{2 \pi \text{Re}} \sin(2 \pi y)",
+        ("Navier-Stokes-Unsteady", 2): r"\sin(\pi x) \cos(\pi y) e^{-0.1 t}",
         ("Fisher", 1): r"\text{Numerical}",
         ("Fisher", 2): r"\text{Numerical}",
         ("Duffing", 1): r"\text{Numerical}",
@@ -66,9 +67,9 @@ def main():
         r"    \midrule"
     ]
     
-    for pde in ["Laplace", "Poisson", "Helmholtz", "Schrodinger", "Airy", "HarmonicOscillator", "Fisher", "Duffing", "ThomasFermi", "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes"]:
+    for pde in ["Laplace", "Poisson", "Helmholtz", "Schrodinger", "Airy", "HarmonicOscillator", "Fisher", "Duffing", "ThomasFermi", "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady"]:
         for d in dims:
-            if pde in ["NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes"] and d == 1: continue
+            if pde in ["NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady"] and d == 1: continue
             p_pi = get_formula(pde, d, "PI-NSGA-II")
             ex_eq = exacts.get((pde, d), "N/A")
             
