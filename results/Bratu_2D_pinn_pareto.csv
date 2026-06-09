@@ -1,2 +1,2 @@
 method,pde,dim,mse_domain,mse_boundary,rank
-PINN,Fisher,1,0.1868034290,0.2591044966,1
+PINN,Bratu,2,0.3698771133,0.6888113494,1

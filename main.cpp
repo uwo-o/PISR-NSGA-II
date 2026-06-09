@@ -307,6 +307,9 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
     problems.push_back(make_thomas_fermi(2));
     problems.push_back(make_navier_stokes());
     problems.push_back(make_navier_stokes_unsteady());
+    problems.push_back(make_bratu());
+    problems.push_back(make_allen_cahn());
+    problems.push_back(make_lane_emden());
 
     std::vector<Stats> all_stats;
 
@@ -325,7 +328,7 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
         double num_mse_dom = 0.0;
         double num_mse_bnd = 0.0;
 
-        if (prob.dim == 1 || prob.type == PDE::LAPLACE || prob.type == PDE::POISSON || prob.type == PDE::HELMHOLTZ) {
+        if (prob.type != PDE::NAVIER_STOKES && prob.type != PDE::NAVIER_STOKES_UNSTEADY) {
             has_numerical = true;
             auto t_num0 = std::chrono::steady_clock::now();
             auto num_sol = NumericalSolver::solve(prob, 50);

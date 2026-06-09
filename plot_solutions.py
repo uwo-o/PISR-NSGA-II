@@ -38,11 +38,15 @@ PDE_ORDER = [
     "Airy", "HarmonicOscillator",
     "Fisher", "Duffing", "ThomasFermi",
     "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes",
-    "Navier-Stokes-Unsteady"
+    "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn", "Lane-Emden"
 ]
 
 # Ecuaciones cuya "u_exact" en el CSV proviene de RK4 (no hay fórmula cerrada)
-NUMERICAL_TRUTH = {"Airy", "HarmonicOscillator", "Liouville", "Sine-Gordon", "NonlinearPoisson", "Fisher", "Duffing", "ThomasFermi"}
+NUMERICAL_TRUTH = {
+    "Airy", "HarmonicOscillator", "Liouville", "Sine-Gordon", 
+    "NonlinearPoisson", "Fisher", "Duffing", "ThomasFermi",
+    "Bratu", "Allen-Cahn", "Lane-Emden"
+}
 
 # Etiqueta del eje / título para cada ecuación
 PDE_LABELS = {
@@ -57,9 +61,12 @@ PDE_LABELS = {
     "ThomasFermi":        r"Thomas-Fermi: $\nabla^2 u = u^2 / (x+y+0.5)$  [RK4/FD truth]",
     "NonlinearPoisson":   r"Nonlinear Poisson: $\nabla^2 u + u^2 = f$  [FD truth]",
     "Liouville":          r"Liouville: $\nabla^2 u = e^u$  [FD truth]",
-    "Sine-Gordon":        r"Sine-Gordon: $\nabla^2 u = \sin(u)$  [FD truth]",
+    "Sine-Gordon":        r"Sine-Gordon: $\nabla^2 u = \sin(u)$",
     "Navier-Stokes":      r"Navier-Stokes: $\psi_y (\nabla^2 \psi)_x - \psi_x (\nabla^2 \psi)_y = \nu \nabla^4 \psi$",
-    "Navier-Stokes-Unsteady": r"Navier-Stokes (Unsteady): $u_t + u u_x = \nu \nabla^2 u$"
+    "Navier-Stokes-Unsteady": r"Navier-Stokes (Unsteady): $u_t + u u_x = \nu \nabla^2 u$",
+    "Bratu":              r"Bratu: $\nabla^2 u + \lambda e^u = 0$",
+    "Allen-Cahn":         r"Allen-Cahn: $u_t = \epsilon^2 \Delta u - (u^3 - u)$",
+    "Lane-Emden":         r"Lane-Emden: $u'' + \frac{2}{x} u' + u^n = 0$"
 }
 
 CMAP_SOLUTION = "viridis"
@@ -293,8 +300,8 @@ def plot_equation(pde, dim):
 def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
-    skips_1d = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady"}   # solo 2D/3D
-    skips_2d = set()
+    skips_1d = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn"}   # solo 2D/3D
+    skips_2d = {"Lane-Emden"} # Lane-Emden es 1D en este benchmark
 
     for pde in PDE_ORDER:
         if pde not in skips_1d:

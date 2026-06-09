@@ -157,6 +157,12 @@ def build_problem(pde_name, dim):
     def ref_duffing_2d(x,y):    return 1.0 - 0.75 * (x + y)
     def ref_tf_1d(x):           return np.where(x < 0.01, 1.0, 0.2)
     def ref_tf_2d(x,y):         return 1.0 - 0.4 * (x + y)
+    def ref_bratu(x,y):         return np.log(2.0 / (np.cosh(x + y)**2))
+    def ref_allen_cahn(x,y):
+        eps = np.sqrt(0.01)
+        return np.tanh((x + y - 1.0) / (eps * np.sqrt(2.0)))
+    def ref_lane_emden(x):      return 1.0 - (x**2) / 6.0
+    def ref_ns_unsteady(x,y):   return np.sin(_pi*x)*np.sin(_pi*y)
 
     # ── Definición del término de PDE (residuo) ───────────────────────────────
     def make_pde(pde_name, dim):
@@ -257,6 +263,34 @@ def build_problem(pde_name, dim):
                 convective = psi_y * L_x - psi_x * L_y
                 return convective - nu * biharmonic
 
+            elif pde_name == "Navier-Stokes-Unsteady":
+                psi_x = dde.grad.jacobian(u, x, i=0, j=0)
+                psi_y = dde.grad.jacobian(u, x, i=0, j=1)
+                psi_xx = dde.grad.hessian(u, x, i=0, j=0)
+                psi_yy = dde.grad.hessian(u, x, i=1, j=1)
+                L = psi_xx + psi_yy
+                L_x = dde.grad.jacobian(L, x, i=0, j=0)
+                L_y = dde.grad.jacobian(L, x, i=0, j=1)
+                L_xx = dde.grad.hessian(L, x, i=0, j=0)
+                L_yy = dde.grad.hessian(L, x, i=1, j=1)
+                biharmonic = L_xx + L_yy
+                nu = 0.01  # matches C++ k2=0.01
+                convective = psi_y * L_x - psi_x * L_y
+                return convective - nu * biharmonic
+
+            elif pde_name == "Bratu":
+                # ∇²u + 2 * exp(u) = 0
+                return lap + 2.0 * torch.exp(u)
+
+            elif pde_name == "Allen-Cahn":
+                # 0.01 * ∇²u - (u³ - u) = 0
+                return 0.01 * lap - (u**3 - u)
+
+            elif pde_name == "Lane-Emden":
+                # ∇²u + (2/x) * u' + 1 = 0
+                u_x = dde.grad.jacobian(u, x, i=0, j=0)
+                return lap + (2.0 / (x[:, 0:1] + 1e-6)) * u_x + 1.0
+
             return lap
         return pde
 
@@ -278,6 +312,10 @@ def build_problem(pde_name, dim):
         ("Liouville",  2): (None,               ref_liouville),
         ("Sine-Gordon",2): (None,               ref_sine_gordon),
         ("Navier-Stokes",2): (None,             ref_navier_stokes),
+        ("Navier-Stokes-Unsteady",2): (None,    ref_ns_unsteady),
+        ("Bratu",      2): (None,               ref_bratu),
+        ("Allen-Cahn", 2): (None,               ref_allen_cahn),
+        ("Lane-Emden", 1): (ref_lane_emden,     None),
         ("Fisher",     1): (ref_fisher_1d,      None),
         ("Fisher",     2): (None,               ref_fisher_2d),
         ("Duffing",    1): (ref_duffing_1d,     None),
@@ -302,7 +340,9 @@ def build_problem(pde_name, dim):
                                      lambda _, on_bnd: on_bnd)]
 
     # ── Arquitectura de red: más profunda para ecuaciones no lineales ─────────
-    nonlinear = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Airy", "Navier-Stokes", "Fisher", "Duffing", "ThomasFermi"}
+    nonlinear = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Airy", "Navier-Stokes", 
+                 "Navier-Stokes-Unsteady", "Fisher", "Duffing", "ThomasFermi", 
+                 "Bratu", "Allen-Cahn", "Lane-Emden"}
     if pde_name in nonlinear:
         layers = [dim] + [128]*5 + [1]
         if pde_name == "Navier-Stokes" and use_cuda:
@@ -500,7 +540,12 @@ def main():
         ("Liouville",          2),
         ("Sine-Gordon",        2),
         ("Navier-Stokes",      2),
-    ]
+        ("Navier-Stokes-Unsteady", 2),
+        ("Bratu",              2),
+        ("Allen-Cahn",         2),
+        ("Lane-Emden",         1),
+        ]
+
 
     if args.only:
         name, d = args.only.rsplit("_", 1)

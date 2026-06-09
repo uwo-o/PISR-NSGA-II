@@ -1,0 +1,2 @@
+method,pde,dim,mse_domain,mse_boundary,rank
+PINN,Lane-Emden,1,0.9050771828,0.8580911227,1

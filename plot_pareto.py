@@ -24,7 +24,12 @@ warnings.filterwarnings("ignore")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
-PDE_ORDER   = ["Laplace", "Poisson", "Helmholtz", "Schrodinger", "Fisher", "Duffing", "ThomasFermi", "NonlinearPoisson"]
+PDE_ORDER   = [
+    "Laplace", "Poisson", "Helmholtz", "Schrodinger", 
+    "Airy", "HarmonicOscillator", "Fisher", "Duffing", "ThomasFermi", 
+    "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes",
+    "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn", "Lane-Emden"
+]
 DIMS        = [1, 2]
 LOG_EPS     = 1e-12
 

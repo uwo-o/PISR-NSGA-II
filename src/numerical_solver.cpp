@@ -121,6 +121,12 @@ Complex get_laplacian_value(const PDEProblem& prob, double x, double y, Complex 
             return prob.source(x, y) - std::exp(u);
         case PDE::SINE_GORDON:
             return prob.source(x, y) + std::sin(u.real());
+        case PDE::BRATU:
+            return -2.0 * std::exp(u);
+        case PDE::ALLEN_CAHN:
+            return (u*u*u - u) / 0.01;
+        case PDE::LANE_EMDEN:
+            return -1.0; // u'' + (2/x)u' = -1 (para n=0)
         default:
             return 0.0;
     }

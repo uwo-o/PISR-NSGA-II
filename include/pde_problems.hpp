@@ -64,3 +64,6 @@ PDEProblem make_navier_stokes_unsteady();
 PDEProblem make_fisher(int dim);
 PDEProblem make_duffing(int dim);
 PDEProblem make_thomas_fermi(int dim);
+PDEProblem make_bratu();
+PDEProblem make_allen_cahn();
+PDEProblem make_lane_emden();

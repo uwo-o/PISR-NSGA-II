@@ -25,7 +25,12 @@ matplotlib.rcParams.update({
     "figure.titlesize": 22,
 })
 
-PDES_TO_PLOT = ["Laplace_2D", "Helmholtz_2D", "Schrodinger_2D", "Fisher_2D", "Duffing_2D", "ThomasFermi_2D", "Liouville_2D", "Sine-Gordon_2D"]
+PDES_TO_PLOT = [
+    "Laplace_2D", "Helmholtz_2D", "Schrodinger_2D", 
+    "Fisher_2D", "Duffing_2D", "ThomasFermi_2D", 
+    "Liouville_2D", "Sine-Gordon_2D", "Bratu_2D", 
+    "Allen-Cahn_2D", "Lane-Emden_1D"
+]
 
 def plot_convergence():
     # Calcular filas necesarias para 3 columnas

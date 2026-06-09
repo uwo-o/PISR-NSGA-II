@@ -1,8 +1,10 @@
 #include "pde_problems.hpp"
 #include <cmath>
-#include <iostream>
+#include <algorithm>
 
-static const double PI = std::acos(-1.0);
+namespace {
+    const double PI_INTERNAL = 3.14159265358979323846;
+}
 
 std::string PDEProblem::name() const {
     return pde_name(type);
@@ -18,8 +20,8 @@ Complex PDEProblem::exact(double x, double y) const {
             case PDE::LAPLACE:   return x;
             case PDE::POISSON:   
             case PDE::HELMHOLTZ: 
-            case PDE::SINE_GORDON: return std::sin(PI * x);
-            case PDE::SCHRODINGER: return std::exp(I_COMPLEX * PI * x);
+            case PDE::SINE_GORDON: return std::sin(PI_INTERNAL * x);
+            case PDE::SCHRODINGER: return std::exp(I_COMPLEX * PI_INTERNAL * x);
             case PDE::HARMONIC_OSCILLATOR: return std::exp(-0.5 * x * x);
             case PDE::AIRY:      return std::exp(-0.5 * x);
             case PDE::FISHER:
@@ -27,18 +29,19 @@ Complex PDEProblem::exact(double x, double y) const {
             case PDE::THOMAS_FERMI: return 1.0 / (x + 1.0);
             case PDE::NONLINEAR_POISSON:
             case PDE::LIOUVILLE: return 1.0 / (1.0 + x * x);
+            case PDE::LANE_EMDEN: return 1.0 - (x * x) / 6.0;
             default: return 0.0;
         }
     } else {
         switch (type) {
             case PDE::LAPLACE:
-                return std::sin(PI * x) * std::sinh(PI * y) / std::sinh(PI);
+                return std::sin(PI_INTERNAL * x) * std::sinh(PI_INTERNAL * y) / std::sinh(PI_INTERNAL);
             case PDE::POISSON:
             case PDE::HELMHOLTZ:
             case PDE::SINE_GORDON:
-                return std::sin(PI * x) * std::sin(PI * y);
+                return std::sin(PI_INTERNAL * x) * std::sin(PI_INTERNAL * y);
             case PDE::SCHRODINGER:
-                return std::exp(I_COMPLEX * PI * (x + y));
+                return std::exp(I_COMPLEX * PI_INTERNAL * (x + y));
             case PDE::HARMONIC_OSCILLATOR:
                 return std::exp(-0.5 * (x*x + y*y));
             case PDE::AIRY:
@@ -52,11 +55,17 @@ Complex PDEProblem::exact(double x, double y) const {
                 return 1.0 / (1.0 + x*x + y*y);
             case PDE::NAVIER_STOKES: {
                 double Re = 1.0 / k2;
-                double lambda = Re / 2.0 - std::sqrt(Re * Re / 4.0 + 4.0 * PI * PI);
-                return y - std::exp(lambda * x) * std::sin(2.0 * PI * y) / (2.0 * PI * Re);
+                double lambda = Re / 2.0 - std::sqrt(Re * Re / 4.0 + 4.0 * PI_INTERNAL * PI_INTERNAL);
+                return y - std::exp(lambda * x) * std::sin(2.0 * PI_INTERNAL * y) / (2.0 * PI_INTERNAL * Re);
             }
             case PDE::NAVIER_STOKES_UNSTEADY:
-                return std::sin(PI * x) * std::sin(PI * y); // Stream function psi
+                return std::sin(PI_INTERNAL * x) * std::sin(PI_INTERNAL * y); 
+            case PDE::BRATU:
+                return std::log(2.0 / (std::cosh(x + y) * std::cosh(x + y)));
+            case PDE::ALLEN_CAHN: {
+                double eps = std::sqrt(0.01);
+                return std::tanh((x + y - 1.0) / (eps * std::sqrt(2.0))); 
+            }
             default: return 0.0;
         }
     }
@@ -65,10 +74,13 @@ Complex PDEProblem::exact(double x, double y) const {
 Complex PDEProblem::source(double x, double y) const {
     switch (type) {
         case PDE::LAPLACE: return 0.0;
+        case PDE::BRATU: return 0.0; 
+        case PDE::ALLEN_CAHN: return 0.0;
+        case PDE::LANE_EMDEN: return 0.0;
         case PDE::POISSON: 
-            return (dim == 1) ? (PI*PI*std::sin(PI*x)) : (2.0*PI*PI*std::sin(PI*x)*std::sin(PI*y));
+            return (dim == 1) ? (PI_INTERNAL*PI_INTERNAL*std::sin(PI_INTERNAL*x)) : (2.0*PI_INTERNAL*PI_INTERNAL*std::sin(PI_INTERNAL*x)*std::sin(PI_INTERNAL*y));
         case PDE::HELMHOLTZ: {
-            double f_poisson = (dim == 1) ? (PI*PI*std::sin(PI*x)) : (2.0*PI*PI*std::sin(PI*x)*std::sin(PI*y));
+            double f_poisson = (dim == 1) ? (PI_INTERNAL*PI_INTERNAL*std::sin(PI_INTERNAL*x)) : (2.0*PI_INTERNAL*PI_INTERNAL*std::sin(PI_INTERNAL*x)*std::sin(PI_INTERNAL*y));
             return f_poisson - k2 * exact(x, y);
         }
         case PDE::NONLINEAR_POISSON: {
@@ -86,13 +98,13 @@ Complex PDEProblem::source(double x, double y) const {
 }
 
 Complex PDEProblem::pde_residual_ad(const AD& ad, double x, double y) const {
-    Complex laplacian = (dim == 1) ? ad.dxx : (ad.dxx + ad.dyy);
     Complex u = ad.v;
+    Complex laplacian = ad.dxx + ad.dyy;
     switch (type) {
         case PDE::LAPLACE: return laplacian;
         case PDE::POISSON: return laplacian + source(x, y);
         case PDE::HELMHOLTZ: return laplacian + k2 * u + source(x, y);
-        case PDE::SCHRODINGER: return laplacian + (static_cast<double>(dim)*PI*PI) * u;
+        case PDE::SCHRODINGER: return laplacian + (static_cast<double>(dim)*PI_INTERNAL*PI_INTERNAL) * u;
         case PDE::HARMONIC_OSCILLATOR: return laplacian - (dim == 1 ? x*x : x*x+y*y)*u + (static_cast<double>(dim))*u;
         case PDE::NONLINEAR_POISSON: return laplacian + u*u - source(x, y);
         case PDE::LIOUVILLE: return laplacian + std::exp(u) - source(x, y);
@@ -101,6 +113,9 @@ Complex PDEProblem::pde_residual_ad(const AD& ad, double x, double y) const {
         case PDE::FISHER: return laplacian + u*(1.0-u);
         case PDE::DUFFING: return laplacian + u + u*u*u;
         case PDE::THOMAS_FERMI: return laplacian - u*u / (x+y+0.5);
+        case PDE::BRATU: return laplacian + 2.0 * std::exp(u);
+        case PDE::ALLEN_CAHN: return 0.01 * laplacian - (u*u*u - u);
+        case PDE::LANE_EMDEN: return laplacian + (2.0 / (x + 1e-6)) * ad.dx + 1.0;
         default: return 0.0;
     }
 }
@@ -140,17 +155,24 @@ PDEProblem make_fisher(int d) { PDEProblem p; p.type = PDE::FISHER; p.dim = d; p
 PDEProblem make_duffing(int d) { PDEProblem p; p.type = PDE::DUFFING; p.dim = d; p.is_numerical = true; return p; }
 PDEProblem make_thomas_fermi(int d) { PDEProblem p; p.type = PDE::THOMAS_FERMI; p.dim = d; p.is_numerical = true; return p; }
 
+PDEProblem make_bratu() { PDEProblem p; p.type = PDE::BRATU; p.dim = 2; return p; }
+PDEProblem make_allen_cahn() { PDEProblem p; p.type = PDE::ALLEN_CAHN; p.dim = 2; p.k2 = 0.01; return p; }
+PDEProblem make_lane_emden() { PDEProblem p; p.type = PDE::LANE_EMDEN; p.dim = 1; p.is_numerical = false; return p; }
+
 Complex PDEProblem::pde_second_derivative(double x, Complex u) const {
     switch (type) {
         case PDE::LAPLACE: return 0.0;
         case PDE::POISSON: return source(x, 0.0);
         case PDE::HELMHOLTZ: return source(x, 0.0) - k2 * u;
-        case PDE::SCHRODINGER: return -(PI * PI) * u;
+        case PDE::SCHRODINGER: return -(PI_INTERNAL * PI_INTERNAL) * u;
         case PDE::AIRY:      return x * u;
         case PDE::HARMONIC_OSCILLATOR: return (x*x - 1.0) * u;
         case PDE::FISHER: return -u * (1.0 - u);
         case PDE::DUFFING: return -u - u * u * u;
         case PDE::THOMAS_FERMI: return u * u / (x + 0.5);
+        case PDE::BRATU: return -2.0 * std::exp(u);
+        case PDE::ALLEN_CAHN: return (u*u*u - u) / 0.01;
+        case PDE::LANE_EMDEN: return -1.0; 
         default: return 0.0;
     }
 }

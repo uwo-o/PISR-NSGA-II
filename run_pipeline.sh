@@ -13,7 +13,7 @@ echo ">>> Step 1: Symbolic Benchmark"
 ./build/pi_nsga2 "$@"
 
 echo ">>> Step 2: PINN Baseline"
-# .venv/bin/python3.12 pinn_baseline.py "$@"
+.venv/bin/python3.12 pinn_baseline.py "$@"
 
 echo ">>> Step 3: Analysis and Plotting"
 .venv/bin/python3 plot_pareto.py

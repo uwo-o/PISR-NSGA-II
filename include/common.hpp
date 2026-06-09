@@ -10,6 +10,8 @@
 
 using Complex = std::complex<double>;
 const Complex I_COMPLEX(0.0, 1.0);
+const double PI_VAL = 3.14159265358979323846;
+const double E_VAL  = 2.71828182845904523536;
 
 // ─── Tipos de PDE soportados ──────────────────────────────────────────────────
 enum class PDE { 
@@ -17,7 +19,8 @@ enum class PDE {
     NONLINEAR_POISSON, LIOUVILLE, SINE_GORDON,
     AIRY, HARMONIC_OSCILLATOR, GROSS_PITAEVSKII,
     NAVIER_STOKES, NAVIER_STOKES_UNSTEADY,
-    FISHER, DUFFING, THOMAS_FERMI
+    FISHER, DUFFING, THOMAS_FERMI,
+    BRATU, ALLEN_CAHN, LANE_EMDEN
 };
 
 inline std::string pde_name(PDE t) {
@@ -37,6 +40,9 @@ inline std::string pde_name(PDE t) {
         case PDE::FISHER:            return "Fisher";
         case PDE::DUFFING:           return "Duffing";
         case PDE::THOMAS_FERMI:      return "ThomasFermi";
+        case PDE::BRATU:             return "Bratu";
+        case PDE::ALLEN_CAHN:        return "Allen-Cahn";
+        case PDE::LANE_EMDEN:        return "Lane-Emden";
         default: return "Unknown";
     }
 }
@@ -86,8 +92,8 @@ struct ConvergenceStats {
 
 // ─── Parámetros globales ──────────────────────────────────────────────────────
 namespace Config {
-    constexpr int    POP_SIZE       = 150;   
-    constexpr int    MAX_GEN        = 250;   
+    constexpr int    POP_SIZE       = 200;   
+    constexpr int    MAX_GEN        = 300;   
     constexpr int    N_DOMAIN       = 600;   
     constexpr int    N_BOUNDARY     = 200;   
     constexpr double ERC_SIGMA      = 0.20;  

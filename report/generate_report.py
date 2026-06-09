@@ -21,12 +21,14 @@ PDE_BASE_NAMES = [
     "Laplace", "Poisson", "Helmholtz", "Schrodinger",
     "Airy", "HarmonicOscillator",
     "Fisher", "Duffing", "ThomasFermi",
-    "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes",
+    "NonlinearPoisson", "Liouville", "Sine-Gordon", 
+    "Navier-Stokes", "Navier-Stokes-Unsteady",
+    "Bratu", "Allen-Cahn", "Lane-Emden"
 ]
 DIMS = [1, 2]
 
 # PDEs que solo existen en 2D
-ONLY_2D = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes"}
+ONLY_2D = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn"}
 
 os.makedirs(TABLES_DIR, exist_ok=True)
 os.makedirs(FIGS_DIR,   exist_ok=True)
@@ -60,24 +62,18 @@ def load_pi_rk4() -> pd.DataFrame:
     df = pd.read_csv(path)
     df["best_mse_domain"]   = pd.to_numeric(df["best_mse_domain"],   errors="coerce")
     df["best_mse_boundary"] = pd.to_numeric(df["best_mse_boundary"], errors="coerce")
+    df["runtime_s"]         = pd.to_numeric(df["runtime_s"],         errors="coerce")
     df["mse_total"] = df["best_mse_domain"] + df["best_mse_boundary"]
-    # pde ya viene como "Laplace_1D", "Poisson_2D", etc.
     return df
 
 
 def load_pinn() -> pd.DataFrame:
-    """
-    Carga todos los *_pinn_pareto.csv y los normaliza al mismo esquema que
-    all_runs_summary.csv: columnas method, pde (con sufijo _ND), mse_total.
-    """
     pattern = os.path.join(RESULTS_DIR, "**", "*pinn_pareto.csv")
     files   = glob.glob(pattern, recursive=True)
-    # También buscar en el nivel raíz de results/
     files  += glob.glob(os.path.join(RESULTS_DIR, "*pinn_pareto.csv"))
-    files   = list(set(files))   # deduplicar
+    files   = list(set(files))
 
-    if not files:
-        return pd.DataFrame()
+    if not files: return pd.DataFrame()
 
     dfs = []
     for f in files:
@@ -85,58 +81,85 @@ def load_pinn() -> pd.DataFrame:
             tmp = pd.read_csv(f)
             tmp["mse_domain"]   = pd.to_numeric(tmp["mse_domain"],   errors="coerce")
             tmp["mse_boundary"] = pd.to_numeric(tmp["mse_boundary"], errors="coerce")
-            # Normalizar nombre de PDE: añadir sufijo _ND si no lo tiene
+            # PINNs suelen no tener runtime_s en los CSVs individuales, asignamos NaN
+            if "runtime_s" not in tmp.columns: tmp["runtime_s"] = np.nan
+            else: tmp["runtime_s"] = pd.to_numeric(tmp["runtime_s"], errors="coerce")
+
             if "dim" in tmp.columns:
                 tmp["pde"] = tmp["pde"].astype(str) + "_" + tmp["dim"].astype(int).astype(str) + "D"
-            # Renombrar columnas para que coincidan con el schema principal
-            tmp = tmp.rename(columns={
-                "mse_domain":   "best_mse_domain",
-                "mse_boundary": "best_mse_boundary",
-            })
-            tmp["method"]    = "PINN"
+            tmp = tmp.rename(columns={"mse_domain": "best_mse_domain", "mse_boundary": "best_mse_boundary"})
+            tmp["method"] = "PINN"
             tmp["mse_total"] = tmp["best_mse_domain"] + tmp["best_mse_boundary"]
-            dfs.append(tmp[["method", "pde", "best_mse_domain", "best_mse_boundary", "mse_total"]])
-        except Exception as e:
-            print(f"  [WARN] Skipping {f}: {e}")
+            dfs.append(tmp[["method", "pde", "best_mse_domain", "best_mse_boundary", "mse_total", "runtime_s"]])
+        except Exception as e: print(f"  [WARN] Skipping {f}: {e}")
 
-    if not dfs:
-        return pd.DataFrame()
-
+    if not dfs: return pd.DataFrame()
     df = pd.concat(dfs, ignore_index=True)
-    # Si hay varias corridas del PINN para la misma PDE, promediar
     df = df.groupby(["method", "pde"], as_index=False).agg(
         best_mse_domain  = ("best_mse_domain",  "mean"),
         best_mse_boundary= ("best_mse_boundary","mean"),
         mse_total        = ("mse_total",         "mean"),
         mse_total_std    = ("mse_total",         "std"),
+        runtime_s        = ("runtime_s",         "mean"),
     )
     return df
 
 
 def load_all() -> pd.DataFrame:
-    """Une PI-NSGA-II/RK4 con PINN en un único DataFrame."""
     df_main = load_pi_rk4()
     df_pinn = load_pinn()
-
-    # Añadir columna std al df_main si no existe
-    if not df_main.empty:
-        df_main["mse_total_std"] = 0.0
-
-    if df_pinn.empty and df_main.empty:
-        return pd.DataFrame()
-    if df_pinn.empty:
-        return df_main
-    if df_main.empty:
-        return df_pinn
-
-    # Alinear columnas
-    keep = ["method", "pde", "best_mse_domain", "best_mse_boundary",
-            "mse_total", "mse_total_std"]
+    if not df_main.empty: df_main["mse_total_std"] = 0.0
+    if df_pinn.empty and df_main.empty: return pd.DataFrame()
+    if df_pinn.empty: return df_main
+    if df_main.empty: return df_pinn
+    keep = ["method", "pde", "best_mse_domain", "best_mse_boundary", "mse_total", "mse_total_std", "runtime_s"]
     for c in keep:
         if c not in df_main.columns: df_main[c] = np.nan
         if c not in df_pinn.columns: df_pinn[c] = np.nan
-
     return pd.concat([df_main[keep], df_pinn[keep]], ignore_index=True)
+
+# ─── Tabla 3: Tiempo de Ejecución ─────────────────────────────────────────────
+def make_runtime_table():
+    df = load_all()
+    if df.empty: return
+
+    lines = [
+        r"\begin{table*}[ht]",
+        r"  \centering",
+        r"  \caption{Execution Time Comparison (seconds).}",
+        r"  \label{tab:runtime_stats}",
+        r"  \resizebox{\textwidth}{!}{",
+        r"  \begin{tabular}{llccc}",
+        r"    \toprule",
+        r"    \textbf{PDE} & \textbf{Dim} & \textbf{RK4/FDM} & \textbf{PINN} & \textbf{PISR-NSGA-II} \\",
+        r"    \midrule"
+    ]
+
+    for pde_base in PDE_BASE_NAMES:
+        for d in DIMS:
+            if pde_base in ONLY_2D and d == 1: continue
+            full_name = f"{pde_base}_{d}D"
+            sub = df[df["pde"] == full_name]
+
+            t_pi  = sub[sub["method"] == "PI-NSGA-II"]["runtime_s"].mean()
+            t_num = sub[sub["method"] == "RK4/FDM"]["runtime_s"].mean()
+            t_pinn = sub[sub["method"] == "PINN"]["runtime_s"].mean()
+
+            def f_t(v):
+                if v is None or np.isnan(v) or not np.isfinite(v): return "---"
+                if v < 0.001: return f"{v:.2e}s"
+                return f"{v:.3f}s"
+
+            lines.append(rf"    {pde_base} & {d}D & {f_t(t_num)} & {f_t(t_pinn)} & {f_t(t_pi)} \\")
+            lines.append(r"    \midrule")
+
+    if len(lines) > 9: lines[-1] = r"    \bottomrule"
+    else: lines.append(r"    \bottomrule")
+
+    lines += [r"  \end{tabular}", r"  }", r"\end{table*}"]
+    out = os.path.join(TABLES_DIR, "runtime_comparison.tex")
+    with open(out, "w") as f: f.write("\n".join(lines) + "\n")
+    print(f"  [OK] {out}")
 
 
 # ─── Tabla 1: Solo PISR-NSGA-II (métricas detalladas) ────────────────────────
@@ -285,5 +308,6 @@ if __name__ == "__main__":
     print("Generando tablas LaTeX…")
     make_symbolic_table()
     make_global_comparison_table()
+    make_runtime_table()
     copy_figures()
     print("\nReport generation complete. Tables in:", TABLES_DIR)

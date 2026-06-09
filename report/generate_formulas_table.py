@@ -52,7 +52,10 @@ def main():
         ("Duffing", 1): r"\text{Numerical}",
         ("Duffing", 2): r"\text{Numerical}",
         ("ThomasFermi", 1): r"\text{Numerical}",
-        ("ThomasFermi", 2): r"\text{Numerical}"
+        ("ThomasFermi", 2): r"\text{Numerical}",
+        ("Bratu", 2): r"\ln(2/\cosh^2(r))",
+        ("Allen-Cahn", 2): r"\tanh(r/\epsilon)",
+        ("Lane-Emden", 1): r"1 - x^2/6"
     }
     
     lines = [
@@ -67,9 +70,10 @@ def main():
         r"    \midrule"
     ]
     
-    for pde in ["Laplace", "Poisson", "Helmholtz", "Schrodinger", "Airy", "HarmonicOscillator", "Fisher", "Duffing", "ThomasFermi", "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady"]:
+    for pde in ["Laplace", "Poisson", "Helmholtz", "Schrodinger", "Airy", "HarmonicOscillator", "Fisher", "Duffing", "ThomasFermi", "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn", "Lane-Emden"]:
         for d in dims:
-            if pde in ["NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady"] and d == 1: continue
+            if pde in ["NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn"] and d == 1: continue
+            if pde == "Lane-Emden" and d == 2: continue
             p_pi = get_formula(pde, d, "PI-NSGA-II")
             ex_eq = exacts.get((pde, d), "N/A")
             
