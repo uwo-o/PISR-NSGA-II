@@ -324,7 +324,7 @@ NodePtr random_tree(int depth, std::mt19937& gen, bool force_t) {
     return make_unary(NodeType::TANH, random_tree(depth-1, gen));
 }
 NodePtr random_tree_special(int depth, std::mt19937& gen, const PDEProblem& prob) {
-    std::uniform_int_distribution<int> type_dist(0, 15);
+    std::uniform_int_distribution<int> type_dist(0, 19);
     int choice = type_dist(gen);
     switch (choice) {
         case 0: { // Template: Interfaz Móvil / Solitón (tanh(x - ct))
@@ -405,6 +405,26 @@ NodePtr random_tree_special(int depth, std::mt19937& gen, const PDEProblem& prob
             auto log_x = make_unary(NodeType::LOG, std::move(x_plus_eps));
             auto c_log = make_binary(NodeType::MUL, make_erc(0.5), std::move(log_x));
             return make_unary(NodeType::EXP, std::move(c_log));
+        }
+        case 16: { // Semilla: Paquete de Ondas (Gaussiana * Coseno)
+            auto gauss = make_unary(NodeType::GAUSSIAN, make_binary(NodeType::MUL, make_erc(1.0), make_var('x')));
+            auto osc = make_unary(NodeType::COS, make_binary(NodeType::MUL, make_erc(PI_VAL), make_var('x')));
+            return make_binary(NodeType::MUL, std::move(gauss), std::move(osc));
+        }
+        case 17: { // Semilla: Decaimiento Exponencial con Potencia (x^a * exp(-bx))
+            auto pwr = make_binary(NodeType::POW, make_var('x'), make_erc(0.5));
+            auto dec = make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-1.0), make_var('x')));
+            return make_binary(NodeType::MUL, std::move(pwr), std::move(dec));
+        }
+        case 18: { // Semilla: Solitón Modulado (Tanh * Sin)
+            auto step = make_unary(NodeType::TANH, make_binary(NodeType::MUL, make_erc(2.0), make_var('x')));
+            auto osc = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(5.0), make_var('x')));
+            return make_binary(NodeType::MUL, std::move(step), std::move(osc));
+        }
+        case 19: { // Semilla: Espectral Forzada (x(1-x) * sin(pi*x))
+            auto enforcer = make_binary(NodeType::MUL, make_var('x'), make_binary(NodeType::SUB, make_erc(1.0), make_var('x')));
+            auto mode = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_const_pi(), make_var('x')));
+            return make_binary(NodeType::MUL, std::move(enforcer), std::move(mode));
         }
         default: { // Si hay una semilla específica para este problema, úsala el resto de las veces
 
