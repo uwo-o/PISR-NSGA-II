@@ -98,13 +98,14 @@ struct ConvergenceStats {
 namespace Config {
     constexpr int    POP_SIZE       = 200;   
     constexpr int    MAX_GEN        = 300;   
-    constexpr int    N_DOMAIN       = 600;   
-    constexpr int    N_BOUNDARY     = 200;   
+    constexpr int    N_DOMAIN       = 2000;   
+    constexpr int    N_BOUNDARY     = 500;   
     constexpr double ERC_SIGMA      = 0.20;  
-    constexpr int    MAX_TREE_DEPTH = 12;
+    constexpr int    MAX_TREE_DEPTH = 8;
+
     constexpr int    CODON_LENGTH   = 64;    
     constexpr double CROSSOVER_PROB = 0.80;  
     constexpr double MUTATION_PROB  = 0.3;  
-    constexpr int    TOURNAMENT_SIZE = 3;    
+    constexpr int    TOURNAMENT_SIZE = 6;    
     constexpr double STOP_THRESHOLD  = 1e-7; // Alta precisión analítica
 }

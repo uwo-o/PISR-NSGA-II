@@ -324,7 +324,7 @@ NodePtr random_tree(int depth, std::mt19937& gen, bool force_t) {
     return make_unary(NodeType::TANH, random_tree(depth-1, gen));
 }
 NodePtr random_tree_special(int depth, std::mt19937& gen, const PDEProblem& prob) {
-    std::uniform_int_distribution<int> type_dist(0, 19);
+    std::uniform_int_distribution<int> type_dist(0, 27);
     int choice = type_dist(gen);
     switch (choice) {
         case 0: { // Template: Interfaz Móvil / Solitón (tanh(x - ct))
@@ -425,6 +425,46 @@ NodePtr random_tree_special(int depth, std::mt19937& gen, const PDEProblem& prob
             auto enforcer = make_binary(NodeType::MUL, make_var('x'), make_binary(NodeType::SUB, make_erc(1.0), make_var('x')));
             auto mode = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_const_pi(), make_var('x')));
             return make_binary(NodeType::MUL, std::move(enforcer), std::move(mode));
+        }
+        case 20: { // Semilla: Lorentziana (Resonancia) -> 1 / (1 + (ax)^2)
+            auto ax = make_binary(NodeType::MUL, make_erc(1.0), make_var('x'));
+            auto den = make_binary(NodeType::ADD, make_erc(1.0), make_unary(NodeType::SQR, std::move(ax)));
+            return make_binary(NodeType::DIV, make_erc(1.0), std::move(den));
+        }
+        case 21: { // Semilla: Auto-similaridad (Escala de Difusión) -> x / sqrt(t+1)
+            auto t_plus = make_binary(NodeType::ADD, make_var('t'), make_erc(1.0));
+            auto sqrt_t = make_binary(NodeType::POW, std::move(t_plus), make_erc(0.5));
+            return make_binary(NodeType::DIV, make_var('x'), std::move(sqrt_t));
+        }
+        case 22: { // Semilla: Doble Kink (Interacción de frentes) -> tanh(a(x-b)) + tanh(c(x-d))
+            auto k1 = make_unary(NodeType::TANH, make_binary(NodeType::SUB, make_var('x'), make_erc(0.2)));
+            auto k2 = make_unary(NodeType::TANH, make_binary(NodeType::SUB, make_var('x'), make_erc(0.8)));
+            return make_binary(NodeType::ADD, std::move(k1), std::move(k2));
+        }
+        case 23: { // Semilla: Sinc (Bessel-ish) -> sin(ax)/(ax)
+            auto ax = make_binary(NodeType::MUL, make_erc(1.0), make_var('x'));
+            auto sin_ax = make_unary(NodeType::SIN, ax->clone());
+            return make_binary(NodeType::DIV, std::move(sin_ax), std::move(ax));
+        }
+        case 24: { // Semilla: Thomas-Fermi Ratio -> 1 / (1 + a*sqrt(x) + bx)
+            auto sqrt_x = make_binary(NodeType::POW, make_var('x'), make_erc(0.5));
+            auto a_sqrt = make_binary(NodeType::MUL, make_erc(1.0), std::move(sqrt_x));
+            auto b_x = make_binary(NodeType::MUL, make_erc(1.0), make_var('x'));
+            auto den = make_binary(NodeType::ADD, make_erc(1.0), make_binary(NodeType::ADD, std::move(a_sqrt), std::move(b_x)));
+            return make_binary(NodeType::DIV, make_erc(1.0), std::move(den));
+        }
+        case 25: { // Semilla: Oscilador Amortiguado -> exp(-ax) * sin(wx)
+            auto decay = make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-0.5), make_var('x')));
+            auto osc = make_unary(NodeType::SIN, make_binary(NodeType::MUL, make_erc(5.0), make_var('x')));
+            return make_binary(NodeType::MUL, std::move(decay), std::move(osc));
+        }
+        case 26: { // Semilla: Airy No-lineal -> exp(-ax^1.5)
+            auto pwr = make_binary(NodeType::POW, make_var('x'), make_erc(1.5));
+            return make_unary(NodeType::EXP, make_binary(NodeType::MUL, make_erc(-1.0), std::move(pwr)));
+        }
+        case 27: { // Semilla: Solitón Sech -> 1 / cosh(ax)
+            auto ch = make_unary(NodeType::COSH, make_binary(NodeType::MUL, make_erc(1.0), make_var('x')));
+            return make_binary(NodeType::DIV, make_erc(1.0), std::move(ch));
         }
         default: { // Si hay una semilla específica para este problema, úsala el resto de las veces
 

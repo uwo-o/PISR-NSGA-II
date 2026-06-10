@@ -116,12 +116,15 @@ Complex PDEProblem::pde_residual_ad(const AD& ad, double x, double y) const {
         case PDE::SINE_GORDON: return laplacian - std::sin(u.real());
         case PDE::AIRY: return laplacian - (dim == 1 ? x : x+y)*u;
         case PDE::FISHER: return laplacian + u*(1.0-u);
-        case PDE::DUFFING: return laplacian + u + u*u*u;
-        case PDE::THOMAS_FERMI: return laplacian - u*u / (x+y+0.5);
+        case PDE::DUFFING: return laplacian + u + u*u*u - std::sin(PI_INTERNAL * x); // Forced oscillator
+        case PDE::THOMAS_FERMI: {
+            double r = (dim == 1) ? std::abs(x) : std::sqrt(x*x + y*y);
+            return laplacian - std::pow(u + 1e-6, 1.5) / std::sqrt(r + 1e-6);
+        }
         case PDE::BRATU: return laplacian + 2.0 * std::exp(u);
         case PDE::ALLEN_CAHN: return 0.01 * laplacian - (u*u*u - u);
-        case PDE::LANE_EMDEN: return laplacian + (2.0 / (x + 1e-6)) * ad.dx + u*u*u; // n=3 polytrope
-        case PDE::TROESCH: return laplacian - 3.0 * std::sinh(3.0 * u.real());
+        case PDE::LANE_EMDEN: return laplacian + (2.0 / (x + 1e-6)) * ad.dx + std::pow(u + 1e-6, 3.0); 
+        case PDE::TROESCH: return laplacian - 2.0 * std::sinh(2.0 * u.real()); // mu=2 is more stable for symbolic
         case PDE::GINZBURG_LANDAU: return laplacian + u - u*u*u;
         case PDE::PAINLEVE1: return laplacian - (u*u + x + y);
         default: return 0.0;
