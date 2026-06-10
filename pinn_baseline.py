@@ -58,7 +58,7 @@ else:
 _pi = np.pi
 RESULTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 os.makedirs(RESULTS_DIR, exist_ok=True)
-METHOD = "PINN"
+METHOD = "DeepXDE"
 
 import torch.nn as nn
 
@@ -163,6 +163,9 @@ def build_problem(pde_name, dim):
         return np.tanh((x + y - 1.0) / (eps * np.sqrt(2.0)))
     def ref_lane_emden(x):      return 1.0 - (x**2) / 6.0
     def ref_ns_unsteady(x,y):   return np.sin(_pi*x)*np.sin(_pi*y)
+    def ref_troesch(x):         return np.sinh(3.0 * x) / np.sinh(3.0)
+    def ref_ginzburg_landau(x): return np.tanh(x)
+    def ref_painleve1(x):       return 0.5 * x**2
 
     # ── Definición del término de PDE (residuo) ───────────────────────────────
     def make_pde(pde_name, dim):
@@ -287,9 +290,21 @@ def build_problem(pde_name, dim):
                 return 0.01 * lap - (u**3 - u)
 
             elif pde_name == "Lane-Emden":
-                # ∇²u + (2/x) * u' + 1 = 0
+                # ∇²u + (2/x) * u' + u³ = 0
                 u_x = dde.grad.jacobian(u, x, i=0, j=0)
-                return lap + (2.0 / (x[:, 0:1] + 1e-6)) * u_x + 1.0
+                return lap + (2.0 / (x[:, 0:1] + 1e-6)) * u_x + u**3
+
+            elif pde_name == "Troesch":
+                # u'' = 3 * sinh(3u)
+                return lap - 3.0 * torch.sinh(3.0 * u)
+
+            elif pde_name == "Ginzburg-Landau":
+                # u'' + u - u³ = 0
+                return lap + u - u**3
+
+            elif pde_name == "Painleve-I":
+                # u'' = u² + x
+                return lap - (u**2 + x[:, 0:1])
 
             return lap
         return pde
@@ -316,6 +331,9 @@ def build_problem(pde_name, dim):
         ("Bratu",      2): (None,               ref_bratu),
         ("Allen-Cahn", 2): (None,               ref_allen_cahn),
         ("Lane-Emden", 1): (ref_lane_emden,     None),
+        ("Troesch",    1): (ref_troesch,        None),
+        ("Ginzburg-Landau", 1): (ref_ginzburg_landau, None),
+        ("Painleve-I", 1): (ref_painleve1,      None),
         ("Fisher",     1): (ref_fisher_1d,      None),
         ("Fisher",     2): (None,               ref_fisher_2d),
         ("Duffing",    1): (ref_duffing_1d,     None),
@@ -342,10 +360,13 @@ def build_problem(pde_name, dim):
     # ── Arquitectura de red: más profunda para ecuaciones no lineales ─────────
     nonlinear = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Airy", "Navier-Stokes", 
                  "Navier-Stokes-Unsteady", "Fisher", "Duffing", "ThomasFermi", 
-                 "Bratu", "Allen-Cahn", "Lane-Emden"}
+                 "Bratu", "Allen-Cahn", "Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I"}
+    
+    # Memoria VRAM: GTX 1050 Ti tiene solo 4GB. 
+    # Navier-Stokes con derivadas de 4to orden consume mucha memoria.
     if pde_name in nonlinear:
         layers = [dim] + [128]*5 + [1]
-        if pde_name == "Navier-Stokes" and use_cuda:
+        if (pde_name == "Navier-Stokes" or pde_name == "Navier-Stokes-Unsteady") and use_cuda:
             n_dom = 1000  # Reduce memory usage on GPU for 4th-order derivatives
         else:
             n_dom = 3000 if dim == 2 else 2000
@@ -478,8 +499,8 @@ def _solve_and_eval_inner(pde_name, dim, run_dir, epochs_override=None, is_test=
     p_path = os.path.join(run_dir, f"{label}_pinn_pareto.csv")
     with open(p_path, "w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["method","pde","dim","mse_domain","mse_boundary","rank"])
-        w.writerow([METHOD, pde_name, dim, f"{mse_dom:.10f}", f"{mse_bnd:.10f}", 1])
+        w.writerow(["method","pde","dim","mse_domain","mse_boundary","runtime_s","rank"])
+        w.writerow([METHOD, pde_name, dim, f"{mse_dom:.10f}", f"{mse_bnd:.10f}", f"{rt:.4f}", 1])
 
     return {"pde": label, "dim": dim, "mse_dom": mse_dom,
             "mse_bnd": mse_bnd, "rt": rt}
@@ -516,7 +537,7 @@ def solve_and_eval(pde_name, dim, run_dir, epochs_override=None, is_test=False):
 
 # ─────────────────────────────────────────────────────────────────────────────
 def main():
-    parser = argparse.ArgumentParser(description="PINN baseline para PI-NSGA-II comparison")
+    parser = argparse.ArgumentParser(description="DeepXDE baseline para PI-NSGA-II comparison")
     parser.add_argument("--epochs", type=int, default=None,
                         help="Override Adam epochs (default auto per problem)")
     parser.add_argument("--runs",   type=int, default=1)
@@ -525,27 +546,19 @@ def main():
     parser.add_argument("--test",   action="store_true", help="Fast test mode")
     args = parser.parse_args()
 
-    # Todos los problemas en el mismo orden que PI-NSGA-II
+    # The Hardcore Physics Benchmark
     problems = [
-        ("Laplace",            1), ("Laplace",            2),
-        ("Poisson",            1), ("Poisson",            2),
-        ("Helmholtz",          1), ("Helmholtz",          2),
-        ("Schrodinger",        1), ("Schrodinger",        2),
         ("Airy",               1), ("Airy",               2),
-        ("HarmonicOscillator", 1), ("HarmonicOscillator", 2),
         ("Fisher",             1), ("Fisher",             2),
         ("Duffing",            1), ("Duffing",            2),
         ("ThomasFermi",        1), ("ThomasFermi",        2),
-        ("NonlinearPoisson",   2),
-        ("Liouville",          2),
-        ("Sine-Gordon",        2),
         ("Navier-Stokes",      2),
         ("Navier-Stokes-Unsteady", 2),
-        ("Bratu",              2),
-        ("Allen-Cahn",         2),
         ("Lane-Emden",         1),
+        ("Troesch",            1),
+        ("Ginzburg-Landau",    1),
+        ("Painleve-I",         1),
         ]
-
 
     if args.only:
         name, d = args.only.rsplit("_", 1)
@@ -562,6 +575,12 @@ def main():
                 res = solve_and_eval(pde_name, dim, run_dir, args.epochs, is_test=args.test)
                 res["run"] = run_idx
                 all_results.append(res)
+                
+                # Forzar limpieza de memoria después de cada problema
+                import gc
+                gc.collect()
+                if use_cuda:
+                    torch.cuda.empty_cache()
             except Exception as e:
                 print(f"  [ERROR] {pde_name} {dim}D: {e}")
 
@@ -584,7 +603,7 @@ def main():
             })
 
     print("\n\n" + "="*60)
-    print("  RESUMEN FINAL — PINN")
+    print("  RESUMEN FINAL — DeepXDE")
     print("="*60)
     print(f"{'PDE':<30} {'MSE Dom':>12} {'MSE Bnd':>12} {'Tiempo':>10}")
     print("-"*60)

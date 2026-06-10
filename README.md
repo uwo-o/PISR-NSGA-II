@@ -2,7 +2,7 @@
 
 This repository contains the C++ and Python codebase, benchmark evaluation suite, and automated publication-quality reporting system comparing three paradigms for solving differential equations:
 1. **PI-NSGA-II**: Our proposed Physics-Informed Multi-Objective Symbolic Regression solver using exact Automatic Differentiation (AD).
-2. **PINNs (Physics-Informed Neural Networks)**: A deep neural network baseline powered by DeepXDE, optimized for execution on consumer GPUs.
+2. **DeepXDE**: A deep neural network baseline powered by DeepXDE, optimized for execution on consumer GPUs.
 
 ---
 
@@ -14,7 +14,7 @@ This repository contains the C++ and Python codebase, benchmark evaluation suite
   * Zero truncation error allows discovery of exact PDE residual gradients.
   * Rich operator library: `+`, `-`, `*`, `/`, `sin`, `cos`, `exp`, `log`, `sinh`, `cosh`, `tanh`, `sqrt`, `atan`.
   * Real-valued Ephemeral Random Constants (ERCs) with Gaussian mutation.
-* **PINNs (Baseline)**:
+* **DeepXDE (Baseline)**:
   * Deep neural networks built using the DeepXDE framework.
   * Memory-optimized execution using VRAM-conserving techniques (mixed-precision training, gradient accumulation, and reduced hidden layers) to prevent CUDA out-of-memory errors on limited VRAM hardware.
 
@@ -44,7 +44,7 @@ This repository contains the C++ and Python codebase, benchmark evaluation suite
 │   └── pi_solver.hpp     # Physics-Informed Symbolic Regression (Exact AD)
 ├── src/                  # C++ Source files
 ├── main.cpp              # C++ Main entry point
-├── pinn_baseline.py      # PINN baseline execution (DeepXDE, PyTorch backend)
+├── pinn_baseline.py      # DeepXDE baseline execution (PyTorch backend)
 ├── plot_solutions.py     # 3D surface and 1D curve plotting pipeline
 ├── plot_pareto.py        # Pareto front and Hypervolume graphing
 ├── stats_analysis.py     # Multi-run statistics & Wilcoxon testing
@@ -75,14 +75,14 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel $(nproc)
 ```
 
-### 3. Run PINN Baseline
+### 3. Run DeepXDE Baseline
 ```bash
 python3 pinn_baseline.py --only Laplace_2D
 ```
-*Use `--only <equation_name>` to restrict training, or run without flags to train PINN baselines on all 13 problems.*
+*Use `--only <equation_name>` to restrict training, or run without flags to train DeepXDE baselines on all 13 problems.*
 
 ### 4. Run the Full Evaluation & Compile Report
-The automated pipeline executes the symbolic search runs, trains PINN baselines, regenerates all vector PDF graphics, and compiles the LaTeX PDF:
+The automated pipeline executes the symbolic search runs, trains DeepXDE baselines, regenerates all vector PDF graphics, and compiles the LaTeX PDF:
 ```bash
 ./run_pipeline.sh
 ```

@@ -18,17 +18,16 @@ FIGS_DIR    = os.path.join(REPORT_DIR, "figures")
 
 # Ecuaciones base (en orden de la tabla)
 PDE_BASE_NAMES = [
-    "Laplace", "Poisson", "Helmholtz", "Schrodinger",
-    "Airy", "HarmonicOscillator",
-    "Fisher", "Duffing", "ThomasFermi",
-    "NonlinearPoisson", "Liouville", "Sine-Gordon", 
+    "Airy", "Fisher", "Duffing", "ThomasFermi",
     "Navier-Stokes", "Navier-Stokes-Unsteady",
-    "Bratu", "Allen-Cahn", "Lane-Emden"
+    "Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I"
 ]
 DIMS = [1, 2]
 
 # PDEs que solo existen en 2D
-ONLY_2D = {"NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn"}
+ONLY_2D = {"Navier-Stokes", "Navier-Stokes-Unsteady"}
+# PDEs que solo existen en 1D
+ONLY_1D = {"Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I"}
 
 os.makedirs(TABLES_DIR, exist_ok=True)
 os.makedirs(FIGS_DIR,   exist_ok=True)
@@ -88,7 +87,7 @@ def load_pinn() -> pd.DataFrame:
             if "dim" in tmp.columns:
                 tmp["pde"] = tmp["pde"].astype(str) + "_" + tmp["dim"].astype(int).astype(str) + "D"
             tmp = tmp.rename(columns={"mse_domain": "best_mse_domain", "mse_boundary": "best_mse_boundary"})
-            tmp["method"] = "PINN"
+            tmp["method"] = "DeepXDE"
             tmp["mse_total"] = tmp["best_mse_domain"] + tmp["best_mse_boundary"]
             dfs.append(tmp[["method", "pde", "best_mse_domain", "best_mse_boundary", "mse_total", "runtime_s"]])
         except Exception as e: print(f"  [WARN] Skipping {f}: {e}")
@@ -131,19 +130,20 @@ def make_runtime_table():
         r"  \resizebox{\textwidth}{!}{",
         r"  \begin{tabular}{llccc}",
         r"    \toprule",
-        r"    \textbf{PDE} & \textbf{Dim} & \textbf{RK4/FDM} & \textbf{PINN} & \textbf{PISR-NSGA-II} \\",
+        r"    \textbf{PDE} & \textbf{Dim} & \textbf{RK4/FDM} & \textbf{DeepXDE} & \textbf{PISR-NSGA-II} \\",
         r"    \midrule"
     ]
 
     for pde_base in PDE_BASE_NAMES:
         for d in DIMS:
             if pde_base in ONLY_2D and d == 1: continue
+            if pde_base in ONLY_1D and d == 2: continue
             full_name = f"{pde_base}_{d}D"
             sub = df[df["pde"] == full_name]
 
             t_pi  = sub[sub["method"] == "PI-NSGA-II"]["runtime_s"].mean()
             t_num = sub[sub["method"] == "RK4/FDM"]["runtime_s"].mean()
-            t_pinn = sub[sub["method"] == "PINN"]["runtime_s"].mean()
+            t_pinn = sub[sub["method"] == "DeepXDE"]["runtime_s"].mean()
 
             def f_t(v):
                 if v is None or np.isnan(v) or not np.isfinite(v): return "---"
@@ -188,6 +188,8 @@ def make_symbolic_table():
         for d in DIMS:
             if pde_base in ONLY_2D and d == 1:
                 continue
+            if pde_base in ONLY_1D and d == 2:
+                continue
             full_pde_name = f"{pde_base}_{d}D"
             sub = df[(df["pde"] == full_pde_name) & (df["method"] == "PI-NSGA-II")]
             if sub.empty: continue
@@ -218,7 +220,7 @@ def make_symbolic_table():
     print(f"  [OK] {out}")
 
 
-# ─── Tabla 2: Comparación global RK4/FDM vs PINN vs PISR-NSGA-II ─────────────
+# ─── Tabla 2: Comparación global RK4/FDM vs DeepXDE vs PISR-NSGA-II ─────────────
 def make_global_comparison_table():
     df = load_all()
     if df.empty:
@@ -228,18 +230,20 @@ def make_global_comparison_table():
     lines = [
         r"\begin{table*}[ht]",
         r"  \centering",
-        r"  \caption{Performance Comparison: Numerical (RK4/FDM), Neural (PINN), and Symbolic (PISR-NSGA-II) Methods (Total MSE).}",
+        r"  \caption{Performance Comparison: Numerical (RK4/FDM), Neural (DeepXDE), and Symbolic (PISR-NSGA-II) Methods (Total MSE).}",
         r"  \label{tab:global_comp_stats}",
         r"  \resizebox{\textwidth}{!}{",
         r"  \begin{tabular}{llccc}",
         r"    \toprule",
-        r"    \textbf{PDE} & \textbf{Dim} & \textbf{RK4/FDM} & \textbf{PINN} & \textbf{PISR-NSGA-II} \\",
+        r"    \textbf{PDE} & \textbf{Dim} & \textbf{RK4/FDM} & \textbf{DeepXDE} & \textbf{PISR-NSGA-II} \\",
         r"    \midrule"
     ]
 
     for pde_base in PDE_BASE_NAMES:
         for d in DIMS:
             if pde_base in ONLY_2D and d == 1:
+                continue
+            if pde_base in ONLY_1D and d == 2:
                 continue
 
             full_name = f"{pde_base}_{d}D"
@@ -261,10 +265,10 @@ def make_global_comparison_table():
             else:
                 f_num = "—"
 
-            # ── PINN ──
-            pinn_sub = sub[sub["method"] == "PINN"]
+            # ── DeepXDE ──
+            pinn_sub = sub[sub["method"] == "DeepXDE"]
             if not pinn_sub.empty:
-                # PINN puede tener mse_total_std ya calculado al promediar corridas
+                # DeepXDE puede tener mse_total_std ya calculado al promediar corridas
                 m = pinn_sub["mse_total"].mean()
                 s_col = "mse_total_std" if "mse_total_std" in pinn_sub.columns else "mse_total"
                 s_val = pinn_sub[s_col].mean() if s_col == "mse_total_std" else pinn_sub["mse_total"].std()

@@ -14,12 +14,12 @@
 
 // ─── PIIndividual::evaluate ───────────────────────────────────────────────────
 void PIIndividual::evaluate(const PDEProblem& prob, 
-                          const std::vector<Point>& dom, 
-                          const std::vector<Point>& bnd,
-                          int current_gen) 
+                            const std::vector<Point>& dom, 
+                            const std::vector<Point>& bnd, 
+                            int current_gen) 
 {
     if (!tree) { mse_domain = 1e18; mse_boundary = 1e18; return; }
-    
+
     double pde_mse = 0.0;
     if (prob.type == PDE::NAVIER_STOKES_UNSTEADY) {
         double nu = prob.k2;
@@ -29,11 +29,12 @@ void PIIndividual::evaluate(const PDEProblem& prob,
             double psi_x = ad_c.dx.real(), psi_y = ad_c.dy.real();
             double u = psi_y, v = -psi_x;
             double w = -(ad_c.dxx + ad_c.dyy).real(); 
-            
+
             AD ad_xp = tree->ad_eval_t(p.x+h, p.y, p.t, prob.dim);
             AD ad_xm = tree->ad_eval_t(p.x-h, p.y, p.t, prob.dim);
             AD ad_yp = tree->ad_eval_t(p.x, p.y+h, p.t, prob.dim);
             AD ad_ym = tree->ad_eval_t(p.x, p.y-h, p.t, prob.dim);
+
             double w_xp = -(ad_xp.dxx + ad_xp.dyy).real();
             double w_xm = -(ad_xm.dxx + ad_xm.dyy).real();
             double w_yp = -(ad_yp.dxx + ad_yp.dyy).real();
@@ -119,9 +120,9 @@ void PIIndividual::evaluate(const PDEProblem& prob,
         complexity_penalty = 1.0 + 0.1 * (tree_size - 25); 
     }
 
-    double alpha = 20.0; 
-    double beta = 1.0;
-    mse_domain = (beta * pde_mse + alpha * raw_bc_mse) * dim_penalty * complexity_penalty; 
+    // Puro Pareto modificado: Cerramos el "agujero legal" de las constantes.
+    // Ahora Obj1 = Error Total, Obj2 = Error Frontera.
+    mse_domain = (pde_mse + raw_bc_mse) * dim_penalty * complexity_penalty; 
     mse_boundary = raw_bc_mse * dim_penalty * complexity_penalty; 
 }
 
@@ -227,7 +228,8 @@ double PIIndividual::get_validation_mse(const PDEProblem& prob,
     if (!val_dom.empty()) sum_dom /= val_dom.size();
     if (!val_bnd.empty()) sum_bnd /= val_bnd.size();
 
-    return sum_dom + 20.0 * sum_bnd; 
+    // Para validación/selección del "Best Ever", usamos suma simple sin pesos
+    return sum_dom + sum_bnd; 
 }
 
 // ─── PISolver ─────────────────────────────────────────────────────────────────
@@ -377,35 +379,9 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
         }
 
         if (stagnation_counter_ >= 100) {
-            if (cataclysm_count_ < 1) {
-                std::cout << "  [!] Cataclismo: Estancamiento detectado (" << stagnation_counter_ 
-                          << " gens). Reinyectando diversidad especializada (Intento 1/1)...\n";
-                
-                std::vector<PIIndividual> next_pop;
-                PIIndividual best_copy;
-                best_copy.mse_domain = best_ever_.mse_domain;
-                best_copy.mse_boundary = best_ever_.mse_boundary;
-                best_copy.rank = best_ever_.rank;
-                best_copy.crowding = best_ever_.crowding;
-                best_copy.tree_size = best_ever_.tree_size;
-                best_copy.root_type = best_ever_.root_type;
-                if (best_ever_.tree) best_copy.tree = best_ever_.tree->clone();
-                next_pop.push_back(std::move(best_copy));
-                
-                for (int i = 1; i < pop_size; ++i) {
-                    PIIndividual ind = (dist(gen_) < 0.5) ? random_individual_special() : random_individual();
-                    ind.evaluate(prob_, dom_pts_, bnd_pts_, current_gen_);
-                    next_pop.push_back(std::move(ind));
-                }
-                population_ = std::move(next_pop);
-                population_ = nsga2_select_next(std::move(population_), pop_size);
-                
-                cataclysm_count_++;
-                stagnation_counter_ = 0;
-            } else {
-                std::cout << "  [!] Early Stop: Sin mejoras tras inyección de genes. Terminando en gen " << g << ".\n";
-                break;
-            }
+            std::cout << "  [!] Early Stop: Estancamiento prolongado detectado (" << stagnation_counter_ 
+                      << " gens sin mejora). Terminando en gen " << g << ".\n";
+            break;
         }
 
         std::vector<PIIndividual> offspring;
@@ -436,11 +412,21 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
         for (auto& o : offspring) combined.push_back(std::move(o));
         population_ = nsga2_select_next(std::move(combined), pop_size);
 
-        // Hill Climbing robusto en el top 25% del Frente de Pareto
-        int n_top = pop_size * 0.25;
-        #pragma omp parallel for
-        for (int i = 0; i < n_top; ++i) {
-            hill_climb_constants(population_[i], 50);
+        // ─── ESTRATEGIA MEMÉTICA INTENSIVA ──────────────────────────────────
+        // Cada 10 generaciones, el Top 5% del frente de Pareto recibe entrenamiento pesado
+        if (g > 0 && g % 10 == 0) {
+            int n_elite = std::max(1, (int)(pop_size * 0.05));
+            #pragma omp parallel for
+            for (int i = 0; i < n_elite; ++i) {
+                hill_climb_constants(population_[i], 500); // 10 veces más iteraciones
+            }
+        } else {
+            // Hill Climbing estándar para el top 20% en generaciones normales
+            int n_hc = pop_size * 0.20;
+            #pragma omp parallel for
+            for (int i = 0; i < n_hc; ++i) {
+                hill_climb_constants(population_[i], 50);
+            }
         }
 
         double current_best_train = 1e18;

@@ -20,7 +20,8 @@ enum class PDE {
     AIRY, HARMONIC_OSCILLATOR, GROSS_PITAEVSKII,
     NAVIER_STOKES, NAVIER_STOKES_UNSTEADY,
     FISHER, DUFFING, THOMAS_FERMI,
-    BRATU, ALLEN_CAHN, LANE_EMDEN
+    BRATU, ALLEN_CAHN, LANE_EMDEN,
+    TROESCH, GINZBURG_LANDAU, PAINLEVE1
 };
 
 inline std::string pde_name(PDE t) {
@@ -43,13 +44,16 @@ inline std::string pde_name(PDE t) {
         case PDE::BRATU:             return "Bratu";
         case PDE::ALLEN_CAHN:        return "Allen-Cahn";
         case PDE::LANE_EMDEN:        return "Lane-Emden";
+        case PDE::TROESCH:           return "Troesch";
+        case PDE::GINZBURG_LANDAU:   return "Ginzburg-Landau";
+        case PDE::PAINLEVE1:         return "Painleve-I";
         default: return "Unknown";
     }
 }
 
 // ─── Tipos de Nodo del árbol ──────────────────────────────────────────────────
 enum class NodeType {
-    ADD, SUB, MUL, DIV,
+    ADD, SUB, MUL, DIV, POW,
     SIN, COS, SINH, COSH, EXP, SQR, LOG, TANH,
     LEGENDRE, HERMITE, CHEBYSHEV, LAGUERRE,
     BESSEL_J, GAMMA, GAUSSIAN,
@@ -101,7 +105,6 @@ namespace Config {
     constexpr int    CODON_LENGTH   = 64;    
     constexpr double CROSSOVER_PROB = 0.80;  
     constexpr double MUTATION_PROB  = 0.3;  
-    constexpr double PI_ALPHA       = 0.5;   
     constexpr int    TOURNAMENT_SIZE = 3;    
     constexpr double STOP_THRESHOLD  = 1e-7; // Alta precisión analítica
 }

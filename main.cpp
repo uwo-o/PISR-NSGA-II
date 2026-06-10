@@ -40,10 +40,9 @@ void save_pareto_csv(const std::vector<Ind>& pop,
     f << std::fixed << std::setprecision(10);
     f << "method,pde,dim,mse_domain,mse_boundary,tree_size,rank\n";
     for (auto& ind : pop) {
-        if (ind.rank == 1)
-            f << method << "," << pde_label << "," << dim << ","
-              << ind.mse_domain << "," << ind.mse_boundary << ","
-              << ind.tree_size << "," << ind.rank << "\n";
+        f << method << "," << pde_label << "," << dim << ","
+          << ind.mse_domain << "," << ind.mse_boundary << ","
+          << ind.tree_size << "," << ind.rank << "\n";
     }
 }
 
@@ -96,16 +95,15 @@ void save_best_grid(const std::vector<Ind>& pop, const PDEProblem& prob, const s
             f << "x,u_exact,u_approx\n";
             for (int i = 0; i <= 100; ++i) {
                 double x = (double)i / 100.0;
-                f << x << "," << std::real(prob.exact(x, 0)) << "," << std::real(best->tree->eval(x, 0)) << "\n";
+                f << x << "," << std::real(prob.numerical_exact(x, 0)) << "," << std::real(best->tree->eval(x, 0)) << "\n";
             }
         } else {
             f << "x,y,u_exact,u_approx\n";
-            int N = 50;
-            for (int i = 0; i <= N; ++i) {
-                for (int j = 0; j <= N; ++j) {
-                    double x = (double)i / N;
-                    double y = (double)j / N;
-                    f << x << "," << y << "," << std::real(prob.exact(x, y)) << "," << std::real(best->tree->eval(x, y)) << "\n";
+            for (int i = 0; i <= 30; ++i) {
+                for (int j = 0; j <= 30; ++j) {
+                    double x = (double)i / 30.0;
+                    double y = (double)j / 30.0;
+                    f << x << "," << y << "," << std::real(prob.numerical_exact(x, y)) << "," << std::real(best->tree->eval(x, y)) << "\n";
                 }
             }
         }
@@ -290,26 +288,24 @@ void print_table(const std::string& lbl, const Stats& p) {
 std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose, bool is_test) {
     unsigned seed_base = 1000u * (unsigned)(run_id + 1);
     std::vector<PDEProblem> problems;
+    
+    // 1D y 2D Hardcore Equations
     for (int d : {1, 2}) {
-        problems.push_back(make_laplace(d));
-        problems.push_back(make_poisson(d));
-        problems.push_back(make_helmholtz(d, 1.0));
-        problems.push_back(make_schrodinger(d));
-        problems.push_back(make_harmonic_oscillator(d));
         problems.push_back(make_airy(d));
         problems.push_back(make_fisher(d));
         problems.push_back(make_duffing(d));
         problems.push_back(make_thomas_fermi(d));
     }
 
-    problems.push_back(make_nonlinear_poisson());
-    problems.push_back(make_liouville());
-    problems.push_back(make_thomas_fermi(2));
+    // Navier-Stokes (The "Boss" Analyticals)
     problems.push_back(make_navier_stokes());
     problems.push_back(make_navier_stokes_unsteady());
-    problems.push_back(make_bratu());
-    problems.push_back(make_allen_cahn());
+    
+    // 1D Only Hardcore Numerical Equations
     problems.push_back(make_lane_emden());
+    problems.push_back(make_troesch());
+    problems.push_back(make_ginzburg_landau());
+    problems.push_back(make_painleve1());
 
     std::vector<Stats> all_stats;
 

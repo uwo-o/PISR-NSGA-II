@@ -26,10 +26,9 @@ matplotlib.rcParams.update({
 })
 
 PDES_TO_PLOT = [
-    "Laplace_2D", "Helmholtz_2D", "Schrodinger_2D", 
-    "Fisher_2D", "Duffing_2D", "ThomasFermi_2D", 
-    "Liouville_2D", "Sine-Gordon_2D", "Bratu_2D", 
-    "Allen-Cahn_2D", "Lane-Emden_1D"
+    "Airy_2D", "Fisher_2D", "Duffing_2D", "ThomasFermi_2D", 
+    "Navier-Stokes_2D", "Navier-Stokes-Unsteady_2D",
+    "Lane-Emden_1D", "Troesch_1D", "Ginzburg-Landau_1D", "Painleve-I_1D"
 ]
 
 def plot_convergence():
@@ -107,11 +106,11 @@ def plot_pareto_fronts():
     n_pdes = len(PDES_TO_PLOT)
     n_cols = 3
     n_rows = (n_pdes + n_cols - 1) // n_cols
-    fig, axes = plt.subplots(n_rows, n_cols, figsize=(16.5, 4.5 * n_rows), sharey=False, layout="constrained")
-    axes = axes.flatten()
+    fig = plt.figure(figsize=(6 * n_cols, 5 * n_rows))
+    fig.subplots_adjust(hspace=0.4, wspace=0.3)
     
     for idx, pde_name in enumerate(PDES_TO_PLOT):
-        ax = axes[idx]
+        ax = fig.add_subplot(n_rows, n_cols, idx + 1, projection='3d')
         
         # PI-NSGA-II Pareto
         gn_file = os.path.join(RESULTS_DIR, f"{pde_name}_pi_gn_pareto.csv")
@@ -121,30 +120,42 @@ def plot_pareto_fronts():
             if len(df) == 0:
                 continue
                 
-            x = df["mse_domain"].clip(lower=1e-12)
-            y = df["mse_boundary"].clip(lower=1e-12)
+            x = df["mse_domain"].clip(lower=1e-20)
+            y = df["mse_boundary"].clip(lower=1e-20)
             z = df["tree_size"]
+            r = df["rank"]
             
-            # Plot 2D scatter with color mapped to 3rd dimension
-            scatter = ax.scatter(x, y, c=z, cmap='viridis', s=100, alpha=0.9, edgecolors="white", linewidth=0.8, zorder=3)
+            # Identify fronts
+            mask_rank1 = (r == 1)
+            mask_dominated = (r > 1)
             
-            # Add colorbar to current axis
-            cbar = fig.colorbar(scatter, ax=ax, pad=0.02)
-            cbar.set_label("Complexity (Tree Nodes)", rotation=270, labelpad=15, fontweight="bold")
+            # Plot dominated (transparent)
+            if mask_dominated.any():
+                ax.scatter(np.log10(x[mask_dominated]), 
+                           np.log10(y[mask_dominated]), 
+                           z[mask_dominated], 
+                           c='gray', s=30, alpha=0.4, label='Dominated')
+            
+            # Plot rank 1 (opaque)
+            if mask_rank1.any():
+                scatter = ax.scatter(np.log10(x[mask_rank1]), 
+                                     np.log10(y[mask_rank1]), 
+                                     z[mask_rank1], 
+                                     c=z[mask_rank1], cmap='viridis', s=80, alpha=1.0, 
+                                     edgecolors="white", linewidth=0.5, label='Pareto Front')
+                # Colorbar only for the main front
+                cbar = fig.colorbar(scatter, ax=ax, pad=0.1, shrink=0.6)
+                cbar.set_label("Complexity", rotation=270, labelpad=15)
             
         ax.set_title(pde_name.replace("_", " "), pad=15, fontweight="bold")
-        ax.set_xlabel("Domain MSE (Ω)", labelpad=8)
-        ax.set_ylabel("Boundary MSE (∂Ω)", labelpad=8)
+        ax.set_xlabel("log10(Dom MSE)", labelpad=10)
+        ax.set_ylabel("log10(Bnd MSE)", labelpad=10)
+        ax.set_zlabel("Complexity", labelpad=10)
         
-        ax.set_xscale("log")
-        ax.set_yscale("log")
-        ax.grid(True, which="both", ls="--", alpha=0.4, zorder=0)
+        # Orientación para ver bien las 3 dimensiones
+        ax.view_init(elev=25, azim=-135)
 
-    # Ocultar ejes vacíos
-    for i in range(n_pdes, len(axes)):
-        axes[i].set_visible(False)
-        
-    plt.suptitle("Pareto Fronts: Domain vs. Boundary (Color = Complexity)", fontweight="bold")
+    plt.suptitle("3D Pareto Analysis: Domain MSE vs. Boundary MSE vs. Complexity", fontweight="bold", y=0.95)
     out_path = os.path.join(FIGS_DIR, "pareto_fronts.pdf")
     fig.savefig(out_path, bbox_inches="tight", format="pdf")
     print(f"Generated: {out_path}")

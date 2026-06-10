@@ -126,7 +126,13 @@ Complex get_laplacian_value(const PDEProblem& prob, double x, double y, Complex 
         case PDE::ALLEN_CAHN:
             return (u*u*u - u) / 0.01;
         case PDE::LANE_EMDEN:
-            return -1.0; // u'' + (2/x)u' = -1 (para n=0)
+            return -u*u*u; // u'' + (2/x)u' + u³ = 0
+        case PDE::TROESCH:
+            return 3.0 * std::sinh(3.0 * u.real());
+        case PDE::GINZBURG_LANDAU:
+            return -u + u*u*u;
+        case PDE::PAINLEVE1:
+            return u*u + x + y;
         default:
             return 0.0;
     }

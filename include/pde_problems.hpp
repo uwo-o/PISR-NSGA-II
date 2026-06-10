@@ -67,3 +67,6 @@ PDEProblem make_thomas_fermi(int dim);
 PDEProblem make_bratu();
 PDEProblem make_allen_cahn();
 PDEProblem make_lane_emden();
+PDEProblem make_troesch();
+PDEProblem make_ginzburg_landau();
+PDEProblem make_painleve1();

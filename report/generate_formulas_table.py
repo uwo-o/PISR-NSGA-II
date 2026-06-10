@@ -31,31 +31,20 @@ def main():
     dims = [1, 2]
     
     exacts = {
-        ("Laplace", 1): r"x",
-        ("Laplace", 2): r"\frac{\sin(\pi x) \sinh(\pi y)}{\sinh(\pi)}",
-        ("Poisson", 1): r"\sin(\pi x)",
-        ("Poisson", 2): r"\sin(\pi x) \sin(\pi y)",
-        ("Helmholtz", 1): r"\sin(\pi x)",
-        ("Helmholtz", 2): r"\sin(\pi x) \sin(\pi y)",
-        ("Schrodinger", 1): r"e^{i \pi x}",
-        ("Schrodinger", 2): r"e^{i \pi (x+y)}",
-        ("Airy", 1): r"\text{Ai}(x)",
-        ("HarmonicOscillator", 1): r"e^{-0.5 x^2}",
-        ("HarmonicOscillator", 2): r"e^{-0.5 (x^2 + y^2)}",
-        ("NonlinearPoisson", 2): r"1 / (1 + x^2 + y^2)",
-        ("Liouville", 2): r"1 / (1 + x^2 + y^2)",
-        ("Sine-Gordon", 2): r"\sin(\pi x) \sin(\pi y)",
+        ("Airy", 1): r"\text{Numerical (Ground Truth)}",
+        ("Airy", 2): r"\text{Numerical (Ground Truth)}",
+        ("Fisher", 1): r"\text{Numerical (Ground Truth)}",
+        ("Fisher", 2): r"\text{Numerical (Ground Truth)}",
+        ("Duffing", 1): r"\text{Numerical (Ground Truth)}",
+        ("Duffing", 2): r"\text{Numerical (Ground Truth)}",
+        ("ThomasFermi", 1): r"\text{Numerical (Ground Truth)}",
+        ("ThomasFermi", 2): r"\text{Numerical (Ground Truth)}",
         ("Navier-Stokes", 2): r"y - \frac{e^{\lambda x}}{2 \pi \text{Re}} \sin(2 \pi y)",
-        ("Navier-Stokes-Unsteady", 2): r"\sin(\pi x) \cos(\pi y) e^{-0.1 t}",
-        ("Fisher", 1): r"\text{Numerical}",
-        ("Fisher", 2): r"\text{Numerical}",
-        ("Duffing", 1): r"\text{Numerical}",
-        ("Duffing", 2): r"\text{Numerical}",
-        ("ThomasFermi", 1): r"\text{Numerical}",
-        ("ThomasFermi", 2): r"\text{Numerical}",
-        ("Bratu", 2): r"\ln(2/\cosh^2(r))",
-        ("Allen-Cahn", 2): r"\tanh(r/\epsilon)",
-        ("Lane-Emden", 1): r"1 - x^2/6"
+        ("Navier-Stokes-Unsteady", 2): r"\sin(\pi x) \sin(\pi y)",
+        ("Lane-Emden", 1): r"1 - x^2/6",
+        ("Troesch", 1): r"\text{Numerical (Ground Truth)}",
+        ("Ginzburg-Landau", 1): r"\text{Numerical (Ground Truth)}",
+        ("Painleve-I", 1): r"\text{Numerical (Ground Truth)}"
     }
     
     lines = [
@@ -70,10 +59,16 @@ def main():
         r"    \midrule"
     ]
     
-    for pde in ["Laplace", "Poisson", "Helmholtz", "Schrodinger", "Airy", "HarmonicOscillator", "Fisher", "Duffing", "ThomasFermi", "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn", "Lane-Emden"]:
+    pde_list = [
+        "Airy", "Fisher", "Duffing", "ThomasFermi",
+        "Navier-Stokes", "Navier-Stokes-Unsteady",
+        "Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I"
+    ]
+    
+    for pde in pde_list:
         for d in dims:
-            if pde in ["NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes", "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn"] and d == 1: continue
-            if pde == "Lane-Emden" and d == 2: continue
+            if pde in ["Navier-Stokes", "Navier-Stokes-Unsteady"] and d == 1: continue
+            if pde in ["Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I"] and d == 2: continue
             p_pi = get_formula(pde, d, "PI-NSGA-II")
             ex_eq = exacts.get((pde, d), "N/A")
             

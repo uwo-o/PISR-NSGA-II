@@ -34,18 +34,17 @@ os.makedirs(FIGS_DIR, exist_ok=True)
 
 # Todas las ecuaciones que el benchmark genera
 PDE_ORDER = [
-    "Laplace", "Poisson", "Helmholtz", "Schrodinger",
-    "Airy", "HarmonicOscillator",
-    "Fisher", "Duffing", "ThomasFermi",
-    "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes",
-    "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn", "Lane-Emden"
+    "Airy", "Fisher", "Duffing", "ThomasFermi",
+    "Navier-Stokes", "Navier-Stokes-Unsteady", 
+    "Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I"
 ]
 
 # Ecuaciones cuya "u_exact" en el CSV proviene de RK4 (no hay fórmula cerrada)
 NUMERICAL_TRUTH = {
     "Airy", "HarmonicOscillator", "Liouville", "Sine-Gordon", 
     "NonlinearPoisson", "Fisher", "Duffing", "ThomasFermi",
-    "Bratu", "Allen-Cahn", "Lane-Emden"
+    "Bratu", "Allen-Cahn", "Lane-Emden",
+    "Troesch", "Ginzburg-Landau", "Painleve-I"
 }
 
 # Etiqueta del eje / título para cada ecuación
@@ -66,7 +65,10 @@ PDE_LABELS = {
     "Navier-Stokes-Unsteady": r"Navier-Stokes (Unsteady): $u_t + u u_x = \nu \nabla^2 u$",
     "Bratu":              r"Bratu: $\nabla^2 u + \lambda e^u = 0$",
     "Allen-Cahn":         r"Allen-Cahn: $u_t = \epsilon^2 \Delta u - (u^3 - u)$",
-    "Lane-Emden":         r"Lane-Emden: $u'' + \frac{2}{x} u' + u^n = 0$"
+    "Lane-Emden":         r"Lane-Emden: $u'' + \frac{2}{x} u' + u^3 = 0$",
+    "Troesch":            r"Troesch: $u'' = \mu \sinh(\mu u)$ [RK4 truth]",
+    "Ginzburg-Landau":    r"Ginzburg-Landau: $u'' + u - u^3 = 0$ [RK4 truth]",
+    "Painleve-I":         r"Painleve-I: $u'' = u^2 + x$ [RK4 truth]"
 }
 
 CMAP_SOLUTION = "viridis"
@@ -116,12 +118,16 @@ def plot_1d(pde, df_pi, df_pn=None):
         u_pi = df_pi["u_approx"].values
         ax_sol.plot(x, u_pi, "b--", lw=1.5, label="PISR-NSGA-II", zorder=4)
         err_pi = np.abs(u_exact - u_pi)
+        # Clip para evitar errores de escala logarítmica con ceros exactos
+        err_pi = np.clip(err_pi, 1e-32, None)
         ax_err.plot(x, err_pi, "b-", lw=1.3, label="Error PISR-NSGA-II")
 
     if df_pn is not None:
-        ax_sol.plot(df_pn["x"], df_pn["u_approx"], "g-.", lw=1.3, label="PINN", zorder=6)
+        ax_sol.plot(df_pn["x"], df_pn["u_approx"], "g-.", lw=1.3, label="DeepXDE", zorder=6)
         err_pn = np.abs(df_pn["u_exact"].values - df_pn["u_approx"].values)
-        ax_err.plot(df_pn["x"], err_pn, "g-", lw=1.2, label="Error PINN")
+        # Clip para evitar errores de escala logarítmica con ceros exactos
+        err_pn = np.clip(err_pn, 1e-32, None)
+        ax_err.plot(df_pn["x"], err_pn, "g-", lw=1.2, label="Error DeepXDE")
 
     ax_sol.set_ylabel("u(x)", labelpad=60)
     ax_sol.set_xticks([0, 0.5, 1])
@@ -173,8 +179,13 @@ def plot_2d(pde, df_pi, df_pn=None):
         Z_pi = df_pi["u_approx"].values.reshape(N, N)
         cols.append(("PISR-NSGA-II", Z_pi, np.abs(Z_ex - Z_pi), CMAP_SOLUTION))
     if has_pinn:
-        Z_pn = df_pn["u_approx"].values.reshape(N, N)
-        cols.append(("PINN", Z_pn, np.abs(Z_ex - Z_pn), CMAP_SOLUTION))
+        N_pn = int(np.sqrt(len(df_pn)))
+        if N_pn * N_pn == len(df_pn):
+            Z_pn = df_pn["u_approx"].values.reshape(N_pn, N_pn)
+            Z_ex_pn = df_pn["u_exact"].values.reshape(N_pn, N_pn)
+            cols.append(("DeepXDE", Z_pn, np.abs(Z_ex_pn - Z_pn), CMAP_SOLUTION))
+        else:
+            print(f"  [WARN] {pde} 2D: len(df_pn)={len(df_pn)} no es cuadrado perfecto, saltando DeepXDE.")
 
     n_cols = len(cols)
     fig = plt.figure(figsize=(15 * n_cols, 22))
@@ -193,7 +204,10 @@ def plot_2d(pde, df_pi, df_pn=None):
 
     def surface(row, col, Z, title, cmap=CMAP_SOLUTION):
         ax = fig.add_subplot(gs[row, col], projection="3d")
-        surf = ax.plot_surface(X, Y, Z, cmap=cmap, alpha=0.92,
+        N_Z = Z.shape[0]
+        xs = np.linspace(0, 1, N_Z)
+        X_Z, Y_Z = np.meshgrid(xs, xs)
+        surf = ax.plot_surface(X_Z, Y_Z, Z, cmap=cmap, alpha=0.92,
                                rcount=30, ccount=30,
                                linewidth=0, antialiased=False)
         ax.set_title(title, pad=35, fontweight="bold")
@@ -273,7 +287,7 @@ def plot_2d(pde, df_pi, df_pn=None):
 def plot_equation(pde, dim):
     suffix = f"_{dim}D"
     path_pi = find_file(f"grid_{pde}{suffix}_PI-NSGA-II.csv")
-    path_pn = find_file(f"grid_{pde}{suffix}_PINN.csv")
+    path_pn = find_file(f"grid_{pde}{suffix}_DeepXDE.csv") or find_file(f"grid_{pde}{suffix}_PINN.csv")
 
     if not path_pi:
         print(f"  [SKIP] Sin datos para {pde} {dim}D.")

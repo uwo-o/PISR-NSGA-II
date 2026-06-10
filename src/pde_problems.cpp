@@ -24,12 +24,15 @@ Complex PDEProblem::exact(double x, double y) const {
             case PDE::SCHRODINGER: return std::exp(I_COMPLEX * PI_INTERNAL * x);
             case PDE::HARMONIC_OSCILLATOR: return std::exp(-0.5 * x * x);
             case PDE::AIRY:      return std::exp(-0.5 * x);
-            case PDE::FISHER:
-            case PDE::DUFFING:   return std::tanh(x);
-            case PDE::THOMAS_FERMI: return 1.0 / (x + 1.0);
+            case PDE::FISHER:    return 1.0 / (1.0 + std::exp(-x));
+            case PDE::DUFFING:   return 1.0 / std::cosh(x);
+            case PDE::THOMAS_FERMI: return 1.0 / (x + 0.5);
             case PDE::NONLINEAR_POISSON:
             case PDE::LIOUVILLE: return 1.0 / (1.0 + x * x);
             case PDE::LANE_EMDEN: return 1.0 - (x * x) / 6.0;
+            case PDE::TROESCH: return std::sinh(3.0 * x) / std::sinh(3.0);
+            case PDE::GINZBURG_LANDAU: return std::tanh(x);
+            case PDE::PAINLEVE1: return 0.5 * x * x;
             default: return 0.0;
         }
     } else {
@@ -47,9 +50,11 @@ Complex PDEProblem::exact(double x, double y) const {
             case PDE::AIRY:
                 return std::exp(-0.5 * (x + y));
             case PDE::FISHER:
+                return 1.0 / (1.0 + std::exp(-(x + y)));
             case PDE::DUFFING:
-                return std::tanh(x + y);
+                return 1.0 / std::cosh(x + y);
             case PDE::THOMAS_FERMI:
+                return 1.0 / (x + y + 0.5);
             case PDE::NONLINEAR_POISSON:
             case PDE::LIOUVILLE:
                 return 1.0 / (1.0 + x*x + y*y);
@@ -115,7 +120,10 @@ Complex PDEProblem::pde_residual_ad(const AD& ad, double x, double y) const {
         case PDE::THOMAS_FERMI: return laplacian - u*u / (x+y+0.5);
         case PDE::BRATU: return laplacian + 2.0 * std::exp(u);
         case PDE::ALLEN_CAHN: return 0.01 * laplacian - (u*u*u - u);
-        case PDE::LANE_EMDEN: return laplacian + (2.0 / (x + 1e-6)) * ad.dx + 1.0;
+        case PDE::LANE_EMDEN: return laplacian + (2.0 / (x + 1e-6)) * ad.dx + u*u*u; // n=3 polytrope
+        case PDE::TROESCH: return laplacian - 3.0 * std::sinh(3.0 * u.real());
+        case PDE::GINZBURG_LANDAU: return laplacian + u - u*u*u;
+        case PDE::PAINLEVE1: return laplacian - (u*u + x + y);
         default: return 0.0;
     }
 }
@@ -157,7 +165,10 @@ PDEProblem make_thomas_fermi(int d) { PDEProblem p; p.type = PDE::THOMAS_FERMI; 
 
 PDEProblem make_bratu() { PDEProblem p; p.type = PDE::BRATU; p.dim = 2; return p; }
 PDEProblem make_allen_cahn() { PDEProblem p; p.type = PDE::ALLEN_CAHN; p.dim = 2; p.k2 = 0.01; return p; }
-PDEProblem make_lane_emden() { PDEProblem p; p.type = PDE::LANE_EMDEN; p.dim = 1; p.is_numerical = false; return p; }
+PDEProblem make_lane_emden() { PDEProblem p; p.type = PDE::LANE_EMDEN; p.dim = 1; p.is_numerical = true; return p; }
+PDEProblem make_troesch() { PDEProblem p; p.type = PDE::TROESCH; p.dim = 1; p.is_numerical = true; return p; }
+PDEProblem make_ginzburg_landau() { PDEProblem p; p.type = PDE::GINZBURG_LANDAU; p.dim = 1; p.is_numerical = true; return p; }
+PDEProblem make_painleve1() { PDEProblem p; p.type = PDE::PAINLEVE1; p.dim = 1; p.is_numerical = true; return p; }
 
 Complex PDEProblem::pde_second_derivative(double x, Complex u) const {
     switch (type) {
@@ -172,7 +183,10 @@ Complex PDEProblem::pde_second_derivative(double x, Complex u) const {
         case PDE::THOMAS_FERMI: return u * u / (x + 0.5);
         case PDE::BRATU: return -2.0 * std::exp(u);
         case PDE::ALLEN_CAHN: return (u*u*u - u) / 0.01;
-        case PDE::LANE_EMDEN: return -1.0; 
+        case PDE::LANE_EMDEN: return -u*u*u - (2.0 / (x + 1e-6)) * (u - 1.0); // Rough approximation of u'
+        case PDE::TROESCH: return 3.0 * std::sinh(3.0 * u.real());
+        case PDE::GINZBURG_LANDAU: return -u + u*u*u;
+        case PDE::PAINLEVE1: return u*u + x;
         default: return 0.0;
     }
 }

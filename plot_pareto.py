@@ -25,17 +25,16 @@ warnings.filterwarnings("ignore")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
 PDE_ORDER   = [
-    "Laplace", "Poisson", "Helmholtz", "Schrodinger", 
-    "Airy", "HarmonicOscillator", "Fisher", "Duffing", "ThomasFermi", 
-    "NonlinearPoisson", "Liouville", "Sine-Gordon", "Navier-Stokes",
-    "Navier-Stokes-Unsteady", "Bratu", "Allen-Cahn", "Lane-Emden"
+    "Airy", "Fisher", "Duffing", "ThomasFermi", 
+    "Navier-Stokes", "Navier-Stokes-Unsteady", 
+    "Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I"
 ]
 DIMS        = [1, 2]
 LOG_EPS     = 1e-12
 
 STYLE = {
     "PISR-NSGA-II":  dict(color="#2E86C1", marker="o", zorder=4, lw=1.8),
-    "PINN":        dict(color="#27AE60", marker="^", zorder=5, lw=1.8),
+    "DeepXDE":        dict(color="#27AE60", marker="^", zorder=5, lw=1.8),
 }
 
 def load_all():

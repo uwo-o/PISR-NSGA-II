@@ -537,7 +537,7 @@ and ensure that the final mathematical formulations remain elegant and human-int
 • Computational Runtime: The total wall-clock time required to achieve convergence. This
 metric assesses the execution efficiency of the native Automated Symbolic Differentiation (AD)
 embedded in the object-oriented trees, especially when compared against the backpropagation
-overhead of PINNs.
+overhead of DeepXDE.
 
 11
 
@@ -575,7 +575,6 @@ Population size
 Generations
 Domain collocation Nd
 Boundary points Nb
-Alpha α
 Max tree depth
 Crossover prob.
 Mutation prob.
@@ -589,7 +588,6 @@ PISR-NSGA-II
 150
 600
 200
-0.50
 8
 0.80
 0.30
@@ -604,7 +602,7 @@ framework:
 • Precision and Convergence Depth: As shown in Table 5, PISR-NSGA-II achieves near-zero
 machine-precision errors (10−30 to 10−33 ) across all linear and non-linear analytical equations
 (Laplace, Poisson, Helmholtz, Schrödinger, Nonlinear Poisson, Liouville, and Sine-Gordon).
-In contrast, the PINN baseline, despite training for 10, 000 Adam epochs, is fundamentally
+In contrast, the DeepXDE baseline, despite training for 10, 000 Adam epochs, is fundamentally
 bounded by the optimization dynamics of neural networks, plateauing between 10−8 and 10−12 .
 12
 
@@ -967,7 +965,7 @@ Navier-Stokes
 
 • Computational Efficiency: PISR-NSGA-II completes its structural search and parameter
 optimization in under a minute for most PDEs. For analytical cases, the boundary-conforming
-seeding strategy combined with the local Gauss-Newton optimizer enables immediate convergence at generation 0. Conversely, PINNs require backpropagation-based gradient descent over
+seeding strategy combined with the local Gauss-Newton optimizer enables immediate convergence at generation 0. Conversely, DeepXDE requires backpropagation-based gradient descent over
 thousands of collocation points on deep neural architectures, resulting in long training runtimes
 (exceeding 1.5 hours per 2D equation on GPU).
 • Exact Symbolic Reconstruction: Table 4 demonstrates that PISR-NSGA-II successfully
@@ -984,7 +982,7 @@ constraints exactly, yielding boundary errors of 10−32 (e.g., in 1D Fisher) an
 boundary leakage issues common in neural network baselines.
 • Numerical Reference Comparison (RK4/FDM): For equations lacking closed-form analytical solutions (Airy, Fisher, Duffing, and Thomas-Fermi), the 1D/2D numerical solutions
 computed via Runge-Kutta 4th order and Finite Difference relaxation serve as the Ground
-Truth (represented as (0.00 ± 0.00) × 100 error in Table 5). Both PISR-NSGA-II and PINN
+Truth (represented as (0.00 ± 0.00) × 100 error in Table 5). Both PISR-NSGA-II and DeepXDE
 solutions were evaluated against these discrete reference grids, with PISR-NSGA-II obtaining
 highly accurate symbolic approximations (e.g., 10−3 in 1D Airy) that capture the physical
 properties of the underlying fields.
