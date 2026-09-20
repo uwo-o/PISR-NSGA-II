@@ -1,0 +1,2 @@
+method,pde,noise_pct,best_mse_domain,best_mse_boundary,mse_total,runtime_s
+PySR,Navier-Stokes-Unsteady_2D,0.05,8.020394677498597e-07,0.0,8.020394677498597e-07,122.85059213638306
