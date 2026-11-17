@@ -1,0 +1,53 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Fisher (noise_pct=0.05) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Fisher:
+tanh(x)*0.30029076 + 0.5042241
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 2.180e+05
+Progress: 1013 / 1500 total iterations (67.533%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           4.631e-03  0.000e+00  y = 0.63433
+3           2.398e-03  3.291e-01  y = cos(cos(x))
+4           2.597e-04  2.223e+00  y = cos(cos(tanh(x)))
+5           8.951e-05  1.065e+00  y = (x * 0.23113) + 0.51876
+6           1.239e-05  1.978e+00  y = (tanh(x) * 0.30029) + 0.50422
+7           1.045e-05  1.702e-01  y = cos((tanh(x) * -0.38608) + 1.0478)
+8           1.016e-05  2.838e-02  y = (tanh(-0.093084 - x) * -0.32556) + 0.47105
+15          9.709e-06  6.461e-03  y = tanh(tanh(exp((x + -0.48961) * 0.96552))) * tanh(exp(e...
+                                      xp(x / 0.29895)))
+17          9.555e-06  7.971e-03  y = tanh(tanh(exp((x + -0.48907) * 0.95888)) * tanh(exp(ex...
+                                      p(x * 2.6094)) - 0.34686))
+18          9.514e-06  4.324e-03  y = tanh(exp(exp(x * inv(0.32566))) - 0.32566) * tanh(tanh...
+                                      (exp((x + -0.48907) * 0.95888)))
+19          9.487e-06  2.839e-03  y = tanh(tanh(tanh(exp(exp(((x + x) * 2.2267) - 0.22251)))...
+                                       * exp((x + -0.48935) * 0.96106)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           4.631e-03  0.000e+00  y = 0.63433
+3           2.398e-03  3.291e-01  y = cos(cos(x))
+4           2.597e-04  2.223e+00  y = cos(cos(tanh(x)))
+5           8.951e-05  1.065e+00  y = (x * 0.23113) + 0.51876
+6           1.239e-05  1.978e+00  y = (tanh(x) * 0.30029) + 0.50422
+7           9.876e-06  2.267e-01  y = tanh((sin(x) * 0.45191) + 0.54915)
+15          9.502e-06  4.822e-03  y = tanh((x * 13.98) + 2.4172) * tanh(tanh(exp((x + -0.489...
+                                      45) * 0.9622)))
+17          9.461e-06  2.180e-03  y = tanh(tanh(exp((x + -0.48945) * 0.9622) * tanh(exp(exp(...
+                                      x * 4.0735)) + -0.53466)))
+18          9.458e-06  3.687e-04  y = tanh(tanh(exp((x * 0.96276) + -0.47127)) * tanh(exp((x...
+                                       * 12.356) - 0.29207) + 1.6234))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_225819_hERZHE/hall_of_fame.csv

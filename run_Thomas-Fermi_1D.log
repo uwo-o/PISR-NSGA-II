@@ -1,0 +1,224 @@
+=============================================================
+  PISR-NSGA-II --- Orquestador de Ecuaciones PDE
+  Pop=500  Gen=1000  Runs=1
+  [!] Modo --replicable ACTIVADO (Semillas Deterministas)
+=============================================================
+
+
+[Run] PISR-NSGA-II en Thomas-Fermi_1D
+  [Referencia] Newton-DF (orden 2) + Richardson  n=2001  residuo discreto=3.33226e-09  dif. Richardson=1.3352e-06
+  [Oraculo] OK
+[INFO] Singularidad detectada en el PDE. Se usara Gradient Descent (Clipped Mode).
+  [PI/Thomas-Fermi] gen=0  best_dom(batch)=3.469390e-03  best_bnd(batch)=0.000000e+00  val_score(hof)=7.894925e-01  ref_err(solo registro)=3.963661e-01  infeasible=127/500  front1=14
+  [PI/Thomas-Fermi] gen=5  best_dom(batch)=1.512470e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=5.000004e-01  ref_err(solo registro)=2.673773e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=10  best_dom(batch)=6.494809e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=5.000004e-01  ref_err(solo registro)=2.674216e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=15  best_dom(batch)=6.494809e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=5.000004e-01  ref_err(solo registro)=2.674217e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=20  best_dom(batch)=6.526652e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=5.000004e-01  ref_err(solo registro)=2.674217e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=25  best_dom(batch)=3.326175e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.920203e-01  ref_err(solo registro)=2.645905e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=30  best_dom(batch)=3.326175e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.824272e-01  ref_err(solo registro)=2.581282e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=35  best_dom(batch)=1.909136e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.823230e-01  ref_err(solo registro)=2.574417e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=40  best_dom(batch)=1.939473e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.823230e-01  ref_err(solo registro)=2.574417e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=45  best_dom(batch)=1.939473e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.823230e-01  ref_err(solo registro)=2.574417e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=50  best_dom(batch)=1.762766e-07  best_bnd(batch)=0.000000e+00  val_score(hof)=4.823230e-01  ref_err(solo registro)=2.574417e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=55  best_dom(batch)=4.352710e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.691877e-01  ref_err(solo registro)=2.507063e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=60  best_dom(batch)=4.035017e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.691150e-01  ref_err(solo registro)=2.485215e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=65  best_dom(batch)=2.897313e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.684809e-01  ref_err(solo registro)=2.505286e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=70  best_dom(batch)=2.897313e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.684809e-01  ref_err(solo registro)=2.505286e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=75  best_dom(batch)=5.162734e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.684809e-01  ref_err(solo registro)=2.505286e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=80  best_dom(batch)=8.359579e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.410520e-01  ref_err(solo registro)=6.229972e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=85  best_dom(batch)=8.359579e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=90  best_dom(batch)=7.878135e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=95  best_dom(batch)=7.878135e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=100  best_dom(batch)=8.604152e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=105  best_dom(batch)=1.828703e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=110  best_dom(batch)=1.828703e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=115  best_dom(batch)=1.840830e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=120  best_dom(batch)=1.811336e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=125  best_dom(batch)=2.020694e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=130  best_dom(batch)=1.562744e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=135  best_dom(batch)=1.562744e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=140  best_dom(batch)=1.039596e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=145  best_dom(batch)=1.064213e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=150  best_dom(batch)=2.483854e-33  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=155  best_dom(batch)=2.333926e-28  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=160  best_dom(batch)=8.701104e-29  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=165  best_dom(batch)=5.539222e-31  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=170  best_dom(batch)=9.260574e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=175  best_dom(batch)=8.042324e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=180  best_dom(batch)=8.042267e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=185  best_dom(batch)=8.042017e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=190  best_dom(batch)=7.125093e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=195  best_dom(batch)=5.910609e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=200  best_dom(batch)=2.294008e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=205  best_dom(batch)=2.294008e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=210  best_dom(batch)=1.992015e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=215  best_dom(batch)=1.992015e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=220  best_dom(batch)=1.999795e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=225  best_dom(batch)=3.150609e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=230  best_dom(batch)=3.150609e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=235  best_dom(batch)=3.150609e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=240  best_dom(batch)=3.150609e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=245  best_dom(batch)=3.150609e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=250  best_dom(batch)=1.959651e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=255  best_dom(batch)=1.959651e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=260  best_dom(batch)=1.959651e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=265  best_dom(batch)=1.844246e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=270  best_dom(batch)=1.844246e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=275  best_dom(batch)=2.132383e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=280  best_dom(batch)=1.782553e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=285  best_dom(batch)=1.782553e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=290  best_dom(batch)=1.782553e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=295  best_dom(batch)=1.782553e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=300  best_dom(batch)=1.895224e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=305  best_dom(batch)=1.556460e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=310  best_dom(batch)=1.520284e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=315  best_dom(batch)=1.520284e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=320  best_dom(batch)=1.520284e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=325  best_dom(batch)=2.012294e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=330  best_dom(batch)=1.616644e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=335  best_dom(batch)=1.616644e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=340  best_dom(batch)=1.616644e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=345  best_dom(batch)=1.616644e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=350  best_dom(batch)=1.649108e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=355  best_dom(batch)=1.649108e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=360  best_dom(batch)=1.619628e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=365  best_dom(batch)=1.228053e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=370  best_dom(batch)=1.827905e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=375  best_dom(batch)=1.680406e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=380  best_dom(batch)=1.680406e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=385  best_dom(batch)=1.680406e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=390  best_dom(batch)=1.680406e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=395  best_dom(batch)=1.680406e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=400  best_dom(batch)=1.339557e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=405  best_dom(batch)=1.339557e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=410  best_dom(batch)=1.339557e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=415  best_dom(batch)=1.339557e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=420  best_dom(batch)=1.339557e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=4.175435e-01  ref_err(solo registro)=6.375868e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=425  best_dom(batch)=1.456061e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=2.688122e-01  ref_err(solo registro)=1.208303e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=430  best_dom(batch)=9.248699e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.608163e-01  ref_err(solo registro)=1.071057e-01  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=435  best_dom(batch)=9.248699e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.572318e-01  ref_err(solo registro)=9.749441e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=440  best_dom(batch)=9.248699e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.566372e-01  ref_err(solo registro)=9.440282e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=445  best_dom(batch)=9.248699e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564874e-01  ref_err(solo registro)=9.294061e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=450  best_dom(batch)=7.042934e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=455  best_dom(batch)=7.042934e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=460  best_dom(batch)=7.042934e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=465  best_dom(batch)=7.042934e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=470  best_dom(batch)=7.042934e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=475  best_dom(batch)=1.593417e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=480  best_dom(batch)=1.593417e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=485  best_dom(batch)=1.593417e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=490  best_dom(batch)=8.602680e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=495  best_dom(batch)=7.442786e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=500  best_dom(batch)=7.416361e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=505  best_dom(batch)=7.416361e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=510  best_dom(batch)=8.692402e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=515  best_dom(batch)=8.692402e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=520  best_dom(batch)=8.692402e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=525  best_dom(batch)=5.235174e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=530  best_dom(batch)=5.235174e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=535  best_dom(batch)=5.235174e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=540  best_dom(batch)=5.235174e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=545  best_dom(batch)=5.235174e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=550  best_dom(batch)=3.870931e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=555  best_dom(batch)=3.870931e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=560  best_dom(batch)=3.870931e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=565  best_dom(batch)=3.870931e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=570  best_dom(batch)=3.870931e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=575  best_dom(batch)=3.262491e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=580  best_dom(batch)=3.262491e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=585  best_dom(batch)=3.262491e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=2.564415e-01  ref_err(solo registro)=9.203234e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=590  best_dom(batch)=3.262491e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=595  best_dom(batch)=3.262491e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=600  best_dom(batch)=3.725973e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=605  best_dom(batch)=3.725973e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=610  best_dom(batch)=3.725973e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=615  best_dom(batch)=3.725973e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=620  best_dom(batch)=3.725973e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=625  best_dom(batch)=3.083407e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=630  best_dom(batch)=3.083407e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=635  best_dom(batch)=3.083407e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=640  best_dom(batch)=3.083407e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=645  best_dom(batch)=3.083407e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=650  best_dom(batch)=3.333542e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=655  best_dom(batch)=3.333542e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=660  best_dom(batch)=3.333542e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=665  best_dom(batch)=3.333542e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=670  best_dom(batch)=3.333542e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=675  best_dom(batch)=1.432425e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=680  best_dom(batch)=1.432425e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=685  best_dom(batch)=1.432425e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=690  best_dom(batch)=1.432425e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=695  best_dom(batch)=1.432425e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=700  best_dom(batch)=1.543323e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=705  best_dom(batch)=1.543323e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=710  best_dom(batch)=1.543323e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=715  best_dom(batch)=1.543323e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=720  best_dom(batch)=1.543323e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=725  best_dom(batch)=2.338205e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=730  best_dom(batch)=2.338205e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=735  best_dom(batch)=2.205954e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=740  best_dom(batch)=2.205954e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=745  best_dom(batch)=2.205954e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=750  best_dom(batch)=1.915218e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=755  best_dom(batch)=1.915218e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=760  best_dom(batch)=1.915218e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=765  best_dom(batch)=1.915218e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=770  best_dom(batch)=1.915218e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=775  best_dom(batch)=1.993694e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=780  best_dom(batch)=1.993694e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=785  best_dom(batch)=1.975940e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=790  best_dom(batch)=1.975940e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=795  best_dom(batch)=1.975940e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=800  best_dom(batch)=2.019084e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=805  best_dom(batch)=2.019084e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=810  best_dom(batch)=2.019084e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=815  best_dom(batch)=2.019084e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=820  best_dom(batch)=2.019084e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=825  best_dom(batch)=1.355438e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=830  best_dom(batch)=1.347668e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=835  best_dom(batch)=1.347668e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=840  best_dom(batch)=1.347668e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=845  best_dom(batch)=1.347668e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=850  best_dom(batch)=1.080403e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=855  best_dom(batch)=1.080403e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=860  best_dom(batch)=1.080403e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=865  best_dom(batch)=1.080403e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=870  best_dom(batch)=1.080403e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=875  best_dom(batch)=1.154158e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=880  best_dom(batch)=1.154158e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=885  best_dom(batch)=1.154158e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=890  best_dom(batch)=1.154158e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=895  best_dom(batch)=1.154158e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=900  best_dom(batch)=1.170461e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=905  best_dom(batch)=1.170461e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=910  best_dom(batch)=1.170461e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=915  best_dom(batch)=1.170461e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=920  best_dom(batch)=1.170461e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=925  best_dom(batch)=1.225665e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=930  best_dom(batch)=1.225665e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=935  best_dom(batch)=1.225665e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=940  best_dom(batch)=1.225665e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=945  best_dom(batch)=1.225665e-34  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=950  best_dom(batch)=6.231004e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=955  best_dom(batch)=6.231004e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=960  best_dom(batch)=6.231004e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=965  best_dom(batch)=6.231004e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=970  best_dom(batch)=6.231004e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=975  best_dom(batch)=7.161610e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=980  best_dom(batch)=7.161610e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=985  best_dom(batch)=7.161610e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=990  best_dom(batch)=7.161610e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [PI/Thomas-Fermi] gen=995  best_dom(batch)=7.161610e-35  best_bnd(batch)=0.000000e+00  val_score(hof)=8.271170e-02  ref_err(solo registro)=2.406144e-02  infeasible=0/500  front1=500
+  [Optimizer] Polishing 4 constants via Gradient Descent (Clipped Mode)...
+
++------------------+-------------+----------+-------------+-------------+----------+
+|   Ecuacion: Thomas-Fermi_1D                                                   |
++------------------+-------------+----------+-------------+-------------+----------+
+| Metodo           | MSE Dom.    | Pareto   | Best BIC    | MSE Solucion| Tiempo   |
++------------------+-------------+----------+-------------+-------------+----------+
+| PISR-NSGA-II     | 6.7882e-03  | 483      | -9.4161e+02 | 2.3588e-02  | 524.7  s |
++------------------+-------------+----------+-------------+-------------+----------+
+| Health Analytics | Infeasible: 0.0  % | Bloat Factor (Avg nodes): 5.9           |
++------------------+-------------+----------+-------------+-------------+----------+
+
+  Benchmark completado en 525.0s. Resultados en ./results/

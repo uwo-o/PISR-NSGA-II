@@ -19,10 +19,26 @@ enum class PDE {
     NONLINEAR_POISSON, LIOUVILLE, SINE_GORDON,
     AIRY, HARMONIC_OSCILLATOR, GROSS_PITAEVSKII,
     NAVIER_STOKES, NAVIER_STOKES_UNSTEADY,
+    SCHRODINGER_UNSTEADY,
     FISHER, DUFFING, THOMAS_FERMI,
     BRATU, ALLEN_CAHN, LANE_EMDEN,
-    TROESCH, GINZBURG_LANDAU, PAINLEVE1
+    TROESCH, GINZBURG_LANDAU, PAINLEVE1,
+    CUSTOM_THESIS // Corrida ad-hoc (-u''+3f'/f u'+au=u^3) -- NO es parte de
+                  // la suite de benchmarks, ver custom_runs/thesis_eq.cpp.
 };
+
+// ─── Tipo de condicion de borde (parte de la DEFINICION del problema) ─────────
+// Cada benchmark es un problema bien planteado: ecuacion + dominio + datos de
+// borde/iniciales. El tipo de dato no se detecta ni se infiere de la ecuacion:
+// se declara en la fabrica del problema, igual que los valores.
+//   DIRICHLET   : u dado en toda la frontera espacial (y, si es no estacionario,
+//                 ademas la condicion inicial u(x,0)). Para operadores de orden
+//                 espacial 4 se da tambien du/dn (ver PDEProblem::spatial_order).
+//   IVP_LEFT    : 1D estacionario, u(0) y u'(0) dados (problema de valor inicial).
+//   ANCHOR_LEFT : 1D, solo u(0) dado. Problema INDETERMINADO a proposito; solo
+//                 lo usa la corrida ad-hoc custom_runs/thesis_eq.cpp, nunca un
+//                 benchmark.
+enum class BCKind { DIRICHLET, IVP_LEFT, ANCHOR_LEFT };
 
 inline std::string pde_name(PDE t) {
     switch (t) {
@@ -30,6 +46,7 @@ inline std::string pde_name(PDE t) {
         case PDE::POISSON:     return "Poisson";
         case PDE::HELMHOLTZ:   return "Helmholtz";
         case PDE::SCHRODINGER:       return "Schrodinger";
+        case PDE::SCHRODINGER_UNSTEADY: return "Schrodinger-Unsteady";
         case PDE::NONLINEAR_POISSON: return "NonlinearPoisson";
         case PDE::LIOUVILLE:         return "Liouville";
         case PDE::SINE_GORDON:       return "Sine-Gordon";
@@ -47,6 +64,7 @@ inline std::string pde_name(PDE t) {
         case PDE::TROESCH:           return "Troesch";
         case PDE::GINZBURG_LANDAU:   return "Ginzburg-Landau";
         case PDE::PAINLEVE1:         return "Painleve-I";
+        case PDE::CUSTOM_THESIS:     return "CustomThesisEq";
         default: return "Unknown";
     }
 }
@@ -87,6 +105,25 @@ struct AD {
         dxxt(0), dyyt(0), dxxxx(0), dxxyy(0), dyyyy(0) {}
 };
 
+// Parte real de todo el jet. Las derivadas respecto de x, y, t (variables
+// reales) conmutan con Re, asi que Re(U)_xx == Re(U_xx), etc. Se aplica ANTES
+// del operador (posiblemente no lineal) en los problemas de campo real: lo
+// complejo queda solo como recurso de representacion del arbol (CONST_I,
+// rotaciones de fase), y lo que se optimiza es exactamente lo que se reporta,
+// Re(U). Sin esto, un arbol complejo con residuo bajo no garantizaba que Re(U)
+// resolviera la ecuacion, porque Re(U)^3 != Re(U^3).
+inline AD project_real(const AD& a) {
+    AD r;
+    r.v = a.v.real();
+    r.dx = a.dx.real();     r.dy = a.dy.real();     r.dt = a.dt.real();
+    r.dxx = a.dxx.real();   r.dyy = a.dyy.real();   r.dtt = a.dtt.real();
+    r.dxy = a.dxy.real();   r.dxt = a.dxt.real();   r.dyt = a.dyt.real();
+    r.dxxx = a.dxxx.real(); r.dxxy = a.dxxy.real(); r.dxyy = a.dxyy.real(); r.dyyy = a.dyyy.real();
+    r.dxxt = a.dxxt.real(); r.dyyt = a.dyyt.real();
+    r.dxxxx = a.dxxxx.real(); r.dxxyy = a.dxxyy.real(); r.dyyyy = a.dyyyy.real();
+    return r;
+}
+
 // ─── Punto en el dominio ──────────────────────────────────────────────────────
 struct Point {
     double x, y, t;
@@ -113,7 +150,8 @@ struct ConvergenceStats {
     double best_mse_domain;   // Mejor MSE de dominio del batch de entrenamiento de esta generacion (ruidoso: mini-batch cambia cada gen)
     double best_mse_boundary; // Idem, frontera
     double best_total_mse;    // best_mse_domain + best_mse_boundary (mismo batch, mismo ruido)
-    double best_val_mse;      // MSE del campeon del Hall of Fame contra la solucion exacta en grilla FIJA de validacion (senal confiable de progreso real)
+    double best_val_score;    // Puntaje de validacion del campeon: residuo + frontera en la grilla FIJA de validacion. Solo informacion de la EDP.
+    double champion_ref_err;  // Error del campeon contra la referencia. SOLO REGISTRO para analisis: ningun camino del algoritmo lo lee.
 };
 
 // ─── Parámetros globales ──────────────────────────────────────────────────────
@@ -144,6 +182,11 @@ namespace Config {
     // "a pelo". Distinto de GENERAL_MODE (que ademas apaga la frontera por
     // completo, ni siquiera como penalizacion blanda).
     extern bool   USE_ANSATZ;
+
+    // Representacion hibrida (solo si el ansatz aplica): parte de la poblacion
+    // representa U directamente, con la frontera medida, y compite con los
+    // individuos de ansatz. --no-hybrid lo apaga (ablacion).
+    extern bool   HYBRID_REPR;
 
     extern int    CORES;
     }

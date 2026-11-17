@@ -1,0 +1,40 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Lane-Emden ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Lane-Emden:
+0.99999976 - 0.16666669*x*x
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 1.810e+05
+Progress: 826 / 1500 total iterations (55.067%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.522e-03  0.000e+00  y = 0.94417
+4           2.120e-07  3.128e+00  y = cos(x * 0.58327)
+6           5.416e-08  6.822e-01  y = cos((x + -0.0081582) * 0.58926)
+7           2.540e-14  1.457e+01  y = ((x * -0.16667) * x) + 1
+9           2.455e-14  1.690e-02  y = ((x * (x * -0.16667)) - 0.21585) + 1.2158
+11          2.441e-14  2.874e-03  y = (x * 4.3684e-08) - (((x * x) * 0.16667) + -1)
+13          2.336e-14  2.209e-02  y = ((x * x) * -0.033959) - ((x * (x * 0.13271)) + -1)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.522e-03  0.000e+00  y = 0.94417
+4           2.120e-07  3.128e+00  y = cos(x * -0.58327)
+6           5.416e-08  6.822e-01  y = cos((x + -0.0081582) * 0.58926)
+7           2.529e-14  1.458e+01  y = 1 - ((x * 0.16667) * x)
+9           2.455e-14  1.482e-02  y = ((x * (x * -0.16667)) - 0.21585) + 1.2158
+11          2.441e-14  2.874e-03  y = (x * 4.3684e-08) - (((x * x) * 0.16667) + -1)
+13          2.336e-14  2.209e-02  y = ((x * x) * -0.033959) - ((x * (x * 0.13271)) + -1)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260820_210028_1UhmNH/hall_of_fame.csv

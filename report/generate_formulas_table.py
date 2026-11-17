@@ -1,151 +1,116 @@
 #!/usr/bin/env python3
+"""
+report/generate_formulas_table.py — Tabla de expresiones descubiertas.
+
+Una fila por problema de la suite (report/benchmarks.py), agrupada por familia:
+expresion del campeon de PISR-NSGA-II y solucion de referencia. Las formulas de
+PySR/PySINDy se agregan solo si sus logs son posteriores a la redefinicion de
+los problemas (benchmarks.is_fresh); antes resolvian otro problema.
+"""
+import glob
 import os
 
-# Rutas dinámicas relativas a la ubicación del script
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-ROOT_DIR = os.path.dirname(SCRIPT_DIR)
-RESULTS_DIR = os.path.join(ROOT_DIR, "results")
-TABLES_DIR = os.path.join(SCRIPT_DIR, "tables")
+from benchmarks import by_family, is_fresh, latest_result
 
-def get_formula(pde, dim, method):
-    label = f"{pde}_{dim}D"
-    import glob
-    pattern = os.path.join(RESULTS_DIR, "**", f"expr_{label}_{method}.tex")
-    matches = glob.glob(pattern, recursive=True)
-    if not matches:
-        return "N/A"
-    
-    path = matches[0]
-    with open(path, "r") as f:
-        content = f.read().strip()
-        # Eliminar signos de dólar y posibles prefijos de fórmula
-        content = content.replace("$$", "").replace("$", "")
-        for prefix in ["\\hat{u}(x,y) =", "\\hat{u}(x) ="]:
-            content = content.replace(prefix, "")
-        return content.strip()
-    return "N/A"
+REPORT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT_DIR = os.path.dirname(REPORT_DIR)
+TABLES_DIR = os.path.join(REPORT_DIR, "tables")
+
+
+def pisr_formula(b):
+    """Forma simplificada y verificada (simplify_expressions.py) si existe y es
+    posterior al campeon; si no, la expresion tal como la imprimio el binario."""
+    simp = latest_result(f"expr_{b.label}_simplified.tex")
+    raw = latest_result(f"expr_{b.label}_PISR-EMOAD.tex")
+    if simp and (not raw or os.path.getmtime(simp) >= os.path.getmtime(raw)):
+        return open(simp).read().strip().replace("$$", "").strip() or None
+    path = raw
+    if not path:
+        return None
+    s = open(path).read().strip().replace("$$", "").replace("$", "")
+    for prefix in (r"\hat{u}(x,y) =", r"\hat{u}(x) ="):
+        s = s.replace(prefix, "")
+    return s.strip() or None
+
+
+def sota_formula(b, method):
+    prefix = "pysr" if method == "PySR" else "sindy"
+    base = os.path.join(ROOT_DIR, "sota", "results", f"{prefix}_{b.base}_{b.dim}D")
+    cands = [base + ".log"] + sorted(glob.glob(base + "_run*.log"))
+    cands = [c for c in cands if os.path.exists(c) and is_fresh(c)]
+    if not cands:
+        return None
+    lines = open(cands[-1]).read().splitlines()
+    for i, line in enumerate(lines):
+        if "Best Discovered Equation" in line and i + 1 < len(lines):
+            eq = lines[i + 1].strip()
+            try:
+                import sympy as sp
+                expr = sp.sympify(eq)
+                expr = expr.xreplace({n: round(n, 3) for n in expr.atoms(sp.Number)})
+                return sp.latex(expr)
+            except Exception:
+                return r"\texttt{" + eq.replace("_", r"\_").replace("^", r"\^{}")[:100] + "}"
+    return None
+
+
+def cell(expr):
+    """Expresion en modo matematico, reducida al ancho de la columna si es larga."""
+    return r"\adjustbox{max width=\linewidth}{$\displaystyle " + expr + r"$}"
+
 
 def main():
     os.makedirs(TABLES_DIR, exist_ok=True)
-    pdes = ["Laplace", "Poisson", "Helmholtz", "Schrodinger"]
-    dims = [1, 2]
-    
-    exacts = {
-        ("Airy", 1): r"\text{Numerical (Ground Truth)}",
-        ("Airy", 2): r"\text{Numerical (Ground Truth)}",
-        ("Fisher", 1): r"\text{Numerical (Ground Truth)}",
-        ("Fisher", 2): r"\text{Numerical (Ground Truth)}",
-        ("Duffing", 1): r"\text{Numerical (Ground Truth)}",
-        ("Duffing", 2): r"\text{Numerical (Ground Truth)}",
-        # La ecuacion de Thomas-Fermi real (u''=u^{1.5}/\sqrt{x}) no tiene solucion
-        # cerrada conocida — se resuelve por shooting/RK4 para la verdad
-        # numerica (ver NumericalSolver), igual que Airy/Fisher/Duffing/etc.
-        # Antes esta fila mostraba una formula "ancla de frontera" (ademas ya
-        # desactualizada tras el fix de fuga de informacion de hoy — el ancla
-        # real ahora solo fija el origen, no una formula completa) — mostrar
-        # cualquier formula cerrada ahi era enganoso, no es la verdad exacta
-        # de la EDO no lineal. Se deja igual que el resto de las EDPs
-        # numericas: "Numerical (Ground Truth)", sin texto adicional.
-        ("Thomas-Fermi", 1): r"\text{Numerical (Ground Truth)}",
-        ("Thomas-Fermi", 2): r"\text{Numerical (Ground Truth)}",
-        ("Laplace", 1): r"x",
-        ("Poisson", 1): r"\sin(\pi x)",
-        ("HarmonicOscillator", 1): r"e^{-x^2/2}",
-        ("Navier-Stokes", 2): r"y - \frac{e^{\lambda x}}{2 \pi \text{Re}} \sin(2 \pi y)",
-        ("Navier-Stokes-Unsteady", 2): r"\sin(\pi x) \sin(\pi y) e^{-\lambda t}",
-        ("Lane-Emden", 1): r"1 - x^2/6",
-        ("Troesch", 1): r"\text{Numerical (Ground Truth)}",
-        ("Ginzburg-Landau", 1): r"\text{Numerical (Ground Truth)}",
-        ("Painleve-I", 1): r"\text{Numerical (Ground Truth)}"
-    }
-    
+    rows = []
+    any_sota = False
+    for _, title, items in by_family():
+        rows.append(rf"\multicolumn{{3}}{{l}}{{\familyrow{{{title}}}}} \\")
+        for b in items:
+            entries = [("PISR-NSGA-II", pisr_formula(b))]
+            for m in ("PySR", "PySINDy"):
+                f = sota_formula(b, m)
+                if f:
+                    entries.append((m, f))
+                    any_sota = True
+            entries.append(("Reference", b.reference))
+            for k, (method, f) in enumerate(entries):
+                name = b.label_tex if k == 0 else ""
+                body = cell(f) if f else r"\textit{no champion}"
+                if method == "Reference":
+                    method = r"\textcolor{muted}{Reference}"
+                    body = r"\textcolor{muted}{" + body + "}"
+                rows.append(rf"{name} & {method} & {body} \\")
+            rows.append(r"\addlinespace[3pt]")
+
+    caption = (r"Discovered closed-form solutions $\hat u$ (hall-of-fame champion after constant polishing), "
+               r"simplified with SymPy and verified against the champion on its export grid "
+               r"(maximum relative difference below $10^{-3}$; constants to 4 significant figures). "
+               r"For 2D problems whose champion uses the boundary ansatz, $\mathcal{C}[g]$ is the transfinite "
+               r"(Coons) interpolation of the boundary data $g$, so $\hat u = g$ on $\partial[0,1]^2$ exactly.")
+    if not any_sota:
+        caption += (r" External symbolic baselines (PySR, PySINDy) are omitted: their runs predate the "
+                    r"current problem definitions.")
     lines = [
-        r"\begin{table*}[ht]",
-        r"  \centering",
-        r"  \caption{Comparison of Symbolic Expressions (1D and 2D).}",
-        r"  \label{tab:formulas}",
-        r"  \resizebox{\textwidth}{!}{",
-        r"  \begin{tabular}{llp{14cm}}",
-        r"    \toprule",
-        r"    \textbf{PDE} & \textbf{Method} & \textbf{Symbolic Expression} $\hat{u}$ \\",
-        r"    \midrule"
+        r"\begin{longtable}{@{}L{0.19\linewidth}L{0.17\linewidth}L{0.60\linewidth}@{}}",
+        rf"\caption{{{caption}}}\label{{tab:formulas}}\\",
+        r"\toprule",
+        r"\textbf{Problem} & \textbf{Method} & \textbf{Expression} $\hat u$ \\",
+        r"\midrule",
+        r"\endfirsthead",
+        r"\toprule",
+        r"\textbf{Problem} & \textbf{Method} & \textbf{Expression} $\hat u$ \\",
+        r"\midrule",
+        r"\endhead",
+        r"\bottomrule",
+        r"\endlastfoot",
+        *rows,
+        r"\end{longtable}",
     ]
-    
-    pde_list = [
-        "Laplace", "Poisson", "HarmonicOscillator",
-        "Airy", "Fisher", "Duffing", "Thomas-Fermi",
-        "Navier-Stokes", "Navier-Stokes-Unsteady",
-        "Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I"
-    ]
-    sota_map = {
-        "Thomas-Fermi": "thomas_fermi",
-        "Lane-Emden": "lane_emden",
-        "Painleve-I": "painleve",
-        "Ginzburg-Landau": "ginzburg_landau"
-    }
-    def get_sota_formula(pde, d, method):
-        prefix = "pysr" if method == "PySR" else "sindy"
-        # sota_benchmark.sh guarda "{prefix}_{pde}_{d}D_run{N}.log" (con
-        # sufijo de corrida) — antes esto buscaba sin el sufijo y nunca
-        # encontraba nada, dejando la tabla vacia aunque el script sota si
-        # habia corrido. Se prueban ambos patrones (con y sin sufijo _run1)
-        # por compatibilidad con logs viejos generados a mano.
-        base = os.path.join(ROOT_DIR, "sota", "results", f"{prefix}_{pde}_{d}D")
-        log_path = base + ".log"
-        if not os.path.exists(log_path):
-            import glob as _glob
-            candidates = sorted(_glob.glob(base + "_run*.log"))
-            log_path = candidates[-1] if candidates else log_path
-        if not os.path.exists(log_path): return "---"
-        
-        with open(log_path, "r") as f:
-            lines = f.readlines()
-            
-        for i, line in enumerate(lines):
-            # PySR outputs "Best Discovered Equation by PySR for Airy:" then the equation
-            if "Best Discovered Equation" in line and i+1 < len(lines):
-                eq = lines[i+1].strip()
-                if "---" in eq: continue
-                try:
-                    import sympy as sp
-                    expr = sp.sympify(eq)
-                    expr = expr.xreplace({n: round(n, 3) for n in expr.atoms(sp.Number)})
-                    latex_str = sp.latex(expr)
-                    return f"${latex_str}$"
-                except Exception:
-                    eq = eq.replace("_", r"\_").replace("%", r"\%").replace("^", r"\textasciicircum{}")
-                    if len(eq) > 100: eq = eq[:97] + "..."
-                    return f"\\texttt{{{eq}}}"
-            # PySINDy parsing block removed
-        return "---"
-    
-    for pde in pde_list:
-        for d in dims:
-            if pde in ["Navier-Stokes", "Navier-Stokes-Unsteady"] and d == 1: continue
-            if pde in ["Lane-Emden", "Troesch", "Ginzburg-Landau", "Painleve-I",
-                       "Laplace", "Poisson", "HarmonicOscillator"] and d == 2: continue
-            p_pi = get_formula(pde, d, "PISR-EMOAD")
-            ex_eq = exacts.get((pde, d), "N/A")
-            
-            p_pysr = get_sota_formula(pde, d, "PySR")
-            # PySINDy solo corre en 1D (ver sota/run_pysindy.py: reformula el
-            # BVP como sistema u'=v, v'=f(u,v) — no aplica limpio a 2D).
-            p_sindy = get_sota_formula(pde, d, "PySINDy") if d == 1 else None
-            n_rows = 4 if p_sindy else 3
-            lines.append(rf"    \multirow{{{n_rows}}}{{*}}{{{pde} ({d}D)}}")
-            lines.append(rf"    & PISR-NSGA-II & ${p_pi}$ \\")
-            lines.append(rf"    & PySR & {p_pysr} \\")
-            if p_sindy:
-                lines.append(rf"    & PySINDy & {p_sindy} \\")
-            lines.append(rf"    & \textbf{{Exact}} & $\mathbf{{{ex_eq}}}$ \\")
-            lines.append(r"    \midrule")
-            
-    lines += [r"    \bottomrule", r"  \end{tabular}", r"  }", r"\end{table*}"]
-    
-    outpath = os.path.join(TABLES_DIR, "formulas_table.tex")
-    with open(outpath, "w") as f:
+    out = os.path.join(TABLES_DIR, "formulas_table.tex")
+    with open(out, "w") as f:
         f.write("\n".join(lines) + "\n")
-    print(f"Guardado: {outpath}")
+    print(f"  [OK] {os.path.relpath(out, ROOT_DIR)}")
+
 
 if __name__ == "__main__":
     main()

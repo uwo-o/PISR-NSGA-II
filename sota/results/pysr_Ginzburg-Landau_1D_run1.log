@@ -1,0 +1,47 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Ginzburg-Landau ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Ginzburg-Landau:
+tanh(x)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 1.930e+05
+Progress: 773 / 1500 total iterations (51.533%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           9.529e-03  0.000e+00  y = x
+2           7.231e-14  2.560e+01  y = tanh(x)
+4           6.861e-14  2.629e-02  y = tanh(x) * 1
+6           6.723e-14  1.015e-02  y = tanh(x / 1) * 1
+10          6.594e-14  4.847e-03  y = tanh(x) * cos(cos(x / -0.00097558) * 0.00064638)
+12          6.285e-14  2.394e-02  y = cos(cos((x + -869.58) / -0.00097539) * -0.00082032) * ...
+                                      tanh(x)
+19          6.213e-14  1.664e-03  y = cos(cos(((((sin(x) / -0.00097558) + 1.0514) - x) / -0....
+                                      00097558) * x) * -0.00097558) * tanh(x)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           9.529e-03  0.000e+00  y = x
+2           7.231e-14  2.560e+01  y = tanh(x)
+4           6.861e-14  2.629e-02  y = tanh(x) * 1
+6           6.723e-14  1.015e-02  y = tanh(x / 1) * 1
+8           6.699e-14  1.802e-03  y = tanh((x * 1) / 1) * 1
+10          6.395e-14  2.318e-02  y = tanh(cos(cos(x / -0.00097628) * 0.0010161) * x)
+12          6.219e-14  1.398e-02  y = cos(cos((x / -0.00097539) + 0.43141) * -0.00079688) * ...
+                                      tanh(x)
+14          6.167e-14  4.202e-03  y = tanh(x * cos((cos((x / -0.00097539) + x) + -0.17942) *...
+                                       -0.00082032))
+16          6.107e-14  4.896e-03  y = tanh(x) * cos((cos(x / -0.00097628) * cos(sin(x / -0.0...
+                                      020041))) * 0.0010161)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260820_210332_akAdpr/hall_of_fame.csv

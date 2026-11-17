@@ -1,0 +1,48 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Poisson ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Poisson:
+sin(x*3.1415927)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 5.570e+04
+Progress: 363 / 1500 total iterations (24.200%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           9.782e-02  0.000e+00  y = 0.63026
+3           9.169e-02  3.232e-02  y = tanh(cos(x))
+4           7.389e-14  2.785e+01  y = sin(x * 3.1416)
+6           7.336e-14  3.583e-03  y = sin((x * 3.1416) / 0.99999)
+10          6.955e-14  1.334e-02  y = sin(((x * (1 / 1)) * 3.1416) / 1)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 1.290e+05
+Progress: 1308 / 1500 total iterations (87.200%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           9.782e-02  0.000e+00  y = 0.63026
+3           9.169e-02  3.232e-02  y = tanh(cos(x))
+4           7.389e-14  2.785e+01  y = sin(x * 3.1416)
+6           6.955e-14  3.027e-02  y = sin((x * 3.1416) / 1)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           9.782e-02  0.000e+00  y = 0.63026
+3           9.169e-02  3.232e-02  y = tanh(cos(x))
+4           7.389e-14  2.785e+01  y = sin(x * 3.1416)
+6           6.955e-14  3.027e-02  y = sin((x * 3.1416) / 1)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260820_205111_ZVIIcY/hall_of_fame.csv

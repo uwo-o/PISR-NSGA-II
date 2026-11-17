@@ -1,0 +1,1 @@
+/usr/bin/c++  -fopenmp -O3 -march=native -DNDEBUG -Wl,--dependency-file=CMakeFiles/PISR-NSGA-II.dir/link.d "CMakeFiles/PISR-NSGA-II.dir/main.cpp.o" -o PISR-NSGA-II  libpisr_core.a -lm -lstdc++fs -fopenmp

@@ -1,0 +1,2 @@
+/usr/bin/ar qc libpisr_core.a CMakeFiles/pisr_core.dir/src/tree_node.cpp.o CMakeFiles/pisr_core.dir/src/pde_problems.cpp.o CMakeFiles/pisr_core.dir/src/numerical_solver.cpp.o CMakeFiles/pisr_core.dir/src/pi_solver.cpp.o CMakeFiles/pisr_core.dir/src/optimizer_nelder_mead.cpp.o CMakeFiles/pisr_core.dir/src/optimizer_de.cpp.o CMakeFiles/pisr_core.dir/src/oracle.cpp.o
+/usr/bin/ranlib libpisr_core.a

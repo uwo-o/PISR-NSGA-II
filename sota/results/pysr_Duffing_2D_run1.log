@@ -1,0 +1,146 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Duffing ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Duffing:
+cos(sin(x)*cos(sin(tanh(y) + tanh(y*tanh(tanh(x))))) + sin(y))
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 3.260e+04
+Progress: 222 / 1500 total iterations (14.800%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.447e-02  0.000e+00  target = 0.65159
+3           2.127e-02  2.413e-01  target = inv(exp(y))
+4           1.788e-02  1.738e-01  target = inv(1.0851 + y)
+5           5.172e-03  1.240e+00  target = cos(y) * cos(x)
+7           3.864e-03  1.458e-01  target = cos(0.17821 + x) * cos(y)
+8           2.032e-03  6.429e-01  target = cos(y) * cos(sin(x) + 0.15384)
+9           2.721e-04  2.010e+00  target = cos((tanh(x) * cos(y)) + sin(y))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 5.870e+04
+Progress: 551 / 1500 total iterations (36.733%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.447e-02  0.000e+00  target = 0.65159
+3           2.127e-02  2.413e-01  target = inv(exp(y))
+4           1.788e-02  1.738e-01  target = inv(1.0851 + y)
+5           5.172e-03  1.240e+00  target = cos(y) * cos(x)
+7           2.417e-03  3.804e-01  target = (cos(y) * cos(x)) + -0.052491
+8           1.540e-03  4.506e-01  target = cos((x + y) * 0.72724) * 0.91379
+9           2.721e-04  1.733e+00  target = cos((tanh(x) * cos(y)) + sin(y))
+11          2.705e-04  3.082e-03  target = cos((tanh(x - -0.0030469) * cos(y)) + sin(y)...
+                                           )
+12          9.269e-05  1.071e+00  target = cos(sin(y) + (cos(tanh(y) + 0.20245) * sin(x...
+                                           )))
+14          7.633e-05  9.711e-02  target = cos(sin(y) + (cos((x * 0.25265) + tanh(y)) *...
+                                            sin(x)))
+15          4.317e-05  5.699e-01  target = cos(sin(y) + (cos(tanh((y * sin(x)) + y)) * ...
+                                           sin(x)))
+17          3.840e-05  5.859e-02  target = cos(sin(y) + (cos(sin(tanh(y) + (tanh(tanh(x...
+                                           )) * y))) * sin(x)))
+18          2.666e-05  3.646e-01  target = cos(sin(y) + (cos(sin(tanh(y) + tanh(tanh(ta...
+                                           nh(x)) * y))) * sin(x)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 7.170e+04
+Progress: 950 / 1500 total iterations (63.333%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.447e-02  0.000e+00  target = 0.65159
+3           2.127e-02  2.413e-01  target = inv(exp(y))
+4           1.788e-02  1.738e-01  target = inv(1.0851 + y)
+5           5.172e-03  1.240e+00  target = cos(y) * cos(x)
+6           4.946e-03  4.474e-02  target = cos(tanh(x) + tanh(y))
+7           2.044e-03  8.834e-01  target = cos(tanh(x) + tanh(tanh(y)))
+8           1.444e-03  3.474e-01  target = cos(tanh(sin(y)) + tanh(sin(x)))
+9           2.721e-04  1.669e+00  target = cos((tanh(x) * cos(y)) + sin(y))
+11          2.655e-04  1.236e-02  target = cos((cos(y * 0.98551) * tanh(x)) + sin(y))
+12          9.269e-05  1.052e+00  target = cos(sin(y) + (cos(tanh(y) + 0.20245) * sin(x...
+                                           )))
+14          5.284e-05  2.810e-01  target = cos(sin(y) + sin(x * cos((x * 0.32883) + tan...
+                                           h(y))))
+15          4.317e-05  2.021e-01  target = cos(sin(y) + (cos(tanh((y * sin(x)) + y)) * ...
+                                           sin(x)))
+17          3.840e-05  5.859e-02  target = cos(sin(y) + (cos(sin(tanh(y) + (tanh(tanh(x...
+                                           )) * y))) * sin(x)))
+18          2.666e-05  3.646e-01  target = cos(sin(y) + (cos(sin(tanh(y) + tanh(tanh(ta...
+                                           nh(x)) * y))) * sin(x)))
+20          2.560e-05  2.028e-02  target = cos(sin(y) + (cos(sin(tanh(y) + tanh(y * tan...
+                                           h(tanh(x))))) * sin(x - 0.0021996)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 8.080e+04
+Progress: 1406 / 1500 total iterations (93.733%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.447e-02  0.000e+00  target = 0.65159
+3           2.127e-02  2.413e-01  target = inv(exp(y))
+4           1.788e-02  1.738e-01  target = inv(1.0851 + y)
+5           5.172e-03  1.240e+00  target = cos(y) * cos(x)
+6           4.946e-03  4.474e-02  target = cos(tanh(x) + tanh(y))
+7           2.044e-03  8.834e-01  target = cos(tanh(x) + tanh(tanh(y)))
+8           1.444e-03  3.474e-01  target = cos(tanh(sin(y)) + tanh(sin(x)))
+9           2.721e-04  1.669e+00  target = cos((tanh(x) * cos(y)) + sin(y))
+11          2.655e-04  1.236e-02  target = cos((cos(y * 0.98551) * tanh(x)) + sin(y))
+12          9.269e-05  1.052e+00  target = cos((cos(tanh(y) + 0.20245) * sin(x)) + sin(...
+                                           y))
+14          5.284e-05  2.810e-01  target = cos(sin(cos(tanh(y) + (x * 0.32883)) * x) + ...
+                                           sin(y))
+15          4.317e-05  2.021e-01  target = cos(sin(y) + (cos(tanh((y * sin(x)) + y)) * ...
+                                           sin(x)))
+16          3.593e-05  1.837e-01  target = cos((cos((tanh(sin(x)) * 0.34205) + tanh(y))...
+                                            * sin(x)) + sin(y))
+17          3.501e-05  2.585e-02  target = cos((sin(x) * cos(tanh(y) + (sin(sin(sin(x))...
+                                           ) * 0.34483))) + sin(y))
+18          2.666e-05  2.723e-01  target = cos(sin(y) + (cos(sin(tanh(y) + tanh(tanh(ta...
+                                           nh(x)) * y))) * sin(x)))
+20          1.899e-05  1.698e-01  target = cos(sin(y) + (sin(x) * cos(sin((y * tanh(tan...
+                                           h(tanh(x)))) + tanh(y + 0.033087)))))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.447e-02  0.000e+00  target = 0.65159
+3           2.127e-02  2.413e-01  target = inv(exp(y))
+4           1.788e-02  1.738e-01  target = inv(1.0851 + y)
+5           5.172e-03  1.240e+00  target = cos(y) * cos(x)
+6           4.946e-03  4.474e-02  target = cos(tanh(x) + tanh(y))
+7           2.044e-03  8.834e-01  target = cos(tanh(x) + tanh(tanh(y)))
+8           1.444e-03  3.474e-01  target = cos(tanh(sin(y)) + tanh(sin(x)))
+9           2.721e-04  1.669e+00  target = cos((tanh(x) * cos(y)) + sin(y))
+11          2.655e-04  1.236e-02  target = cos((cos(y * 0.98551) * tanh(x)) + sin(y))
+12          9.269e-05  1.052e+00  target = cos((cos(tanh(y) + 0.20245) * sin(x)) + sin(...
+                                           y))
+14          5.284e-05  2.810e-01  target = cos(sin(cos(tanh(y) + (x * 0.32883)) * x) + ...
+                                           sin(y))
+15          4.317e-05  2.021e-01  target = cos(sin(y) + (cos(tanh((y * sin(x)) + y)) * ...
+                                           sin(x)))
+16          3.332e-05  2.591e-01  target = cos(sin(y) + (sin(x) * cos(tanh(y) + (tanh(t...
+                                           anh(x)) * 0.36249))))
+17          3.240e-05  2.776e-02  target = cos((sin(x) * cos(tanh(y) + (tanh(sin(sin(x)...
+                                           )) * 0.36543))) + sin(y))
+18          2.666e-05  1.949e-01  target = cos(sin(y) + (cos(sin(tanh(y) + tanh(tanh(ta...
+                                           nh(x)) * y))) * sin(x)))
+20          1.899e-05  1.698e-01  target = cos(sin(y) + (sin(x) * cos(sin((y * tanh(tan...
+                                           h(tanh(x)))) + tanh(y + 0.033087)))))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260820_205804_VefHcj/hall_of_fame.csv

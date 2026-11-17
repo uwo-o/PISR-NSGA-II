@@ -1,0 +1,223 @@
+=============================================================
+  PISR-NSGA-II --- Orquestador de Ecuaciones PDE
+  Pop=500  Gen=1000  Runs=1
+  [!] Modo --replicable ACTIVADO (Semillas Deterministas)
+=============================================================
+
+
+[Run] PISR-NSGA-II en Troesch_1D
+  [Referencia] Newton-DF (orden 2) + Richardson  n=2001  residuo discreto=3.36781e-09  dif. Richardson=1.52424e-07
+  [Oraculo] OK
+  [PI/Troesch] gen=0  best_dom(batch)=1.347630e-01  best_bnd(batch)=0.000000e+00  val_score(hof)=4.148948e-01  ref_err(solo registro)=9.636867e-02  infeasible=114/500  front1=7
+  [PI/Troesch] gen=5  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.983840e-01  ref_err(solo registro)=4.640481e-02  infeasible=0/500  front1=487
+  [PI/Troesch] gen=10  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.983840e-01  ref_err(solo registro)=4.640481e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=15  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=20  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=25  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=30  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=35  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=40  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=45  best_dom(batch)=1.397596e-03  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=50  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=55  best_dom(batch)=1.640810e-03  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=60  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=65  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=70  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=75  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=80  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=85  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=90  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=95  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=100  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=105  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=110  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=115  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=120  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=125  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=130  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=135  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=140  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=145  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=150  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=155  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=160  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=165  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=170  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=175  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=180  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=185  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=190  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=195  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=200  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=205  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=210  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=215  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=220  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=225  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=230  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=235  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=240  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=245  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=250  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=255  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=260  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=265  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=270  best_dom(batch)=1.643263e-15  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=275  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=280  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=285  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=290  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=295  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=300  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=305  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=310  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=315  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=320  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=325  best_dom(batch)=8.580980e-15  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=330  best_dom(batch)=1.361336e-27  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=335  best_dom(batch)=1.361336e-27  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=340  best_dom(batch)=2.062901e-13  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=345  best_dom(batch)=3.451645e-13  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=350  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=355  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=360  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=365  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=370  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=375  best_dom(batch)=1.243669e-22  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=380  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=385  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=390  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=395  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=400  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=405  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=410  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=415  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=420  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=425  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=430  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=435  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=440  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=445  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=450  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=455  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=460  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=465  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=470  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=475  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=480  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=485  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=490  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=495  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=500  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=505  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=510  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=515  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=520  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=525  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=530  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=535  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=540  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=545  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=550  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=555  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=560  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=565  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=570  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=575  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=580  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=585  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=590  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=595  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=600  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=605  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=610  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=615  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=620  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=625  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=630  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=635  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=640  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=645  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=650  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=655  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=660  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=665  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=670  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=675  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=680  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=685  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=690  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=695  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=700  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=705  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=710  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=715  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=720  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=725  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=730  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=735  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=740  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=745  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=750  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=755  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=760  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=765  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=770  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=775  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=780  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=785  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=790  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=795  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=800  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=805  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=810  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=815  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=820  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=825  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=830  best_dom(batch)=9.264781e-37  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=835  best_dom(batch)=4.434444e-38  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=840  best_dom(batch)=1.906794e-38  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=845  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=850  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=855  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=860  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=865  best_dom(batch)=6.977403e-22  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=870  best_dom(batch)=1.625710e-29  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=875  best_dom(batch)=9.199602e-24  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=880  best_dom(batch)=1.731769e-39  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=885  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=890  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=895  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=900  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=905  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=910  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=915  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=920  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=925  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=930  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=935  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=940  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=945  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=950  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.974168e-01  ref_err(solo registro)=4.731183e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=955  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.591789e-01  ref_err(solo registro)=3.046812e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=960  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.515810e-01  ref_err(solo registro)=2.829407e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=965  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.364776e-01  ref_err(solo registro)=2.422446e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=970  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.290314e-01  ref_err(solo registro)=2.160632e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=975  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.267788e-01  ref_err(solo registro)=2.031840e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=980  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.267788e-01  ref_err(solo registro)=2.031840e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=985  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.267788e-01  ref_err(solo registro)=2.031840e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=990  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.267788e-01  ref_err(solo registro)=2.031840e-02  infeasible=0/500  front1=500
+  [PI/Troesch] gen=995  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=1.267788e-01  ref_err(solo registro)=2.031840e-02  infeasible=0/500  front1=500
+  [Optimizer] Polishing 3 constants via Adaptive Gradient Descent...
+
++------------------+-------------+----------+-------------+-------------+----------+
+|   Ecuacion: Troesch_1D                                                        |
++------------------+-------------+----------+-------------+-------------+----------+
+| Metodo           | MSE Dom.    | Pareto   | Best BIC    | MSE Solucion| Tiempo   |
++------------------+-------------+----------+-------------+-------------+----------+
+| PISR-NSGA-II     | 4.4010e-02  | 117      | -7.9415e+02 | 1.7464e-02  | 339.2  s |
++------------------+-------------+----------+-------------+-------------+----------+
+| Health Analytics | Infeasible: 0.0  % | Bloat Factor (Avg nodes): 4.0           |
++------------------+-------------+----------+-------------+-------------+----------+
+
+  Benchmark completado en 339.4s. Resultados en ./results/

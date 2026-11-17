@@ -3,4 +3,4 @@ build/
 *.pdf
 *.tex
 *.out
-*.log
+*.log.venv/

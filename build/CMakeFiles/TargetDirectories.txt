@@ -1,3 +1,6 @@
+/home/uwo/Projects/PISR-NSGA-II/build/CMakeFiles/pisr_core.dir
 /home/uwo/Projects/PISR-NSGA-II/build/CMakeFiles/PISR-NSGA-II.dir
+/home/uwo/Projects/PISR-NSGA-II/build/CMakeFiles/oracle_test.dir
+/home/uwo/Projects/PISR-NSGA-II/build/CMakeFiles/gradient_test.dir
 /home/uwo/Projects/PISR-NSGA-II/build/CMakeFiles/edit_cache.dir
 /home/uwo/Projects/PISR-NSGA-II/build/CMakeFiles/rebuild_cache.dir

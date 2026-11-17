@@ -1,133 +1,100 @@
 #!/usr/bin/env python3
 """
-plot_pareto.py — Pairwise Pareto front analysis for PISR-NSGA-II
-Generates 3-way trade-off plots: Domain vs Boundary, Domain vs Complexity, Boundary vs Complexity.
-"""
-import os, glob, warnings
-import numpy as np
-import pandas as pd
-import matplotlib
-import matplotlib.pyplot as plt
+plot_pareto.py — Frentes de Pareto por pares (dominio, frontera, complejidad)
+para cada problema de la suite (report/benchmarks.py).
 
+Escribe directamente report/figures/pareto_pairs_<Problema>_<d>D.pdf.
+Gris: soluciones dominadas; azul: frente no dominado (rank 1). Si la frontera
+es identicamente 0 (ansatz exacto en casi toda la poblacion), los ejes de
+frontera pasan a escala lineal con una nota: log(0) no se puede graficar.
+"""
+import os
+import sys
+import warnings
+
+import matplotlib
 matplotlib.use("Agg")
-matplotlib.rcParams.update({
-    "font.family":       "DejaVu Sans",
-    "font.size":         9,
-    "axes.titlesize":    10,
-    "axes.labelsize":    9,
-    "legend.fontsize":   8,
-    "xtick.labelsize":   8,
-    "ytick.labelsize":   8,
-    "figure.dpi":        200,
-})
-warnings.filterwarnings("ignore")
+import matplotlib.pyplot as plt
+import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RESULTS_DIR = os.path.join(BASE_DIR, "results")
+sys.path.insert(0, os.path.join(BASE_DIR, "report"))
+from benchmarks import BENCHMARKS, latest_result  # noqa: E402
 
-def load_all():
-    files = glob.glob(os.path.join(RESULTS_DIR, "**", "*_pareto.csv"), recursive=True)
-    if not files: return pd.DataFrame()
-    
-    dfs = []
-    for f in files:
-        try:
-            tmp = pd.read_csv(f)
-            # Ensure numeric types
-            for col in ["mse_domain", "mse_boundary", "tree_size"]:
-                if col in tmp.columns:
-                    tmp[col] = pd.to_numeric(tmp[col], errors='coerce')
-            dfs.append(tmp)
-        except Exception as e:
-            print(f"Warning: Skipping {f} due to error: {e}")
-            
-    if not dfs: return pd.DataFrame()
-    df = pd.concat(dfs, ignore_index=True)
-    df = df.dropna(subset=["mse_domain", "mse_boundary"])
-    return df
+FIGS_DIR = os.path.join(BASE_DIR, "report", "figures")
+os.makedirs(FIGS_DIR, exist_ok=True)
+warnings.filterwarnings("ignore")
 
-def plot_pairwise_pareto(df):
-    unique_pdes = df[["pde", "dim"]].drop_duplicates()
-    
-    for _, row in unique_pdes.iterrows():
-        pde_name = row["pde"]
-        dim = row["dim"]
-        pde_label = f"{pde_name}_{dim}D"
-        
-        sub = df[(df["pde"] == pde_name) & (df["dim"] == dim)]
-        if sub.empty: continue
-        # 3 objetivos (mse_domain, mse_boundary, tree_size) -> los 3 pares
-        # posibles, uno por columna. No dominados (rank==1, el frente de
-        # Pareto real) en verde lima; dominados (rank>1) en gris de fondo
-        # para dar contexto de que tan lejos quedaron del frente.
-        dominated = sub[sub["rank"] != 1]
-        pareto = sub[sub["rank"] == 1]
-        if pareto.empty: continue
+plt.rcParams.update({
+    "font.family": "DejaVu Sans",
+    "font.size": 10,
+    "axes.titlesize": 11,
+    "axes.titleweight": "bold",
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "legend.frameon": False,
+    "legend.fontsize": 9,
+})
+C_FRONT = "#2E86C1"
+C_DOM = "#BDC3C7"
 
-        LIME = "#9ACD32"
-        GRAY = "#B0B0B0"
 
-        # Muchas EDPs (la mayoria de las 1D, y ahora tambien Thomas-Fermi/
-        # Lane-Emden en 2D/1D) usan el ansatz de frontera EXACTO — ver
-        # apply_boundary_ansatz en pi_solver.cpp — que hace mse_boundary
-        # IDENTICAMENTE 0 por construccion para (casi) todo individuo. Antes
-        # esta funcion siempre graficaba esa columna en escala log en los dos
-        # paneles que la usan ("Physics vs. Boundary", "Boundary vs.
-        # Complexity") — log(0) no es graficable, asi que matplotlib
-        # simplemente OMITIA todos los puntos, dejando esos paneles casi
-        # vacios y dando la falsa impresion de "muy pocos puntos dominados/no
-        # dominados" cuando en realidad el problema era la escala del eje, no
-        # la cantidad de datos (confirmado comparando contra Navier-Stokes,
-        # que usa penalizacion blanda — mse_boundary nunca es exactamente 0
-        # ahi, y esos mismos paneles salen densamente poblados). Se detecta el
-        # caso degenerado y se cambia a escala lineal (el cluster en 0 queda
-        # visible como una linea real, en vez de desaparecer) mas una nota
-        # explicita de por que.
-        bnd_degenerate = (sub["mse_boundary"].abs() < 1e-9).mean() > 0.9
+def plot(b, df):
+    for c in ["mse_domain", "mse_boundary", "tree_size", "rank"]:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+    df = df.dropna(subset=["mse_domain", "mse_boundary", "tree_size"])
+    df = df[(df["mse_domain"] < 1e5) & (df["mse_boundary"] < 1e5)]
+    front, dom = df[df["rank"] == 1], df[df["rank"] != 1]
+    if front.empty:
+        return None
+    bnd_flat = (df["mse_boundary"].abs() < 1e-12).mean() > 0.9
+    floor = 1e-35
 
-        fig, axes = plt.subplots(1, 3, figsize=(15, 4))
-        plt.subplots_adjust(wspace=0.3)
+    pairs = [
+        ("mse_domain", "mse_boundary", "Domain residual MSE", "Boundary MSE", "Physics vs. boundary"),
+        ("mse_domain", "tree_size", "Domain residual MSE", "Complexity (nodes)", "Physics vs. complexity"),
+        ("mse_boundary", "tree_size", "Boundary MSE", "Complexity (nodes)", "Boundary vs. complexity"),
+    ]
+    fig, axes = plt.subplots(1, 3, figsize=(13, 3.8), layout="constrained")
+    for ax, (xc, yc, xl, yl, title) in zip(axes, pairs):
+        xlog = xc != "tree_size" and not (xc == "mse_boundary" and bnd_flat)
+        ylog = yc != "tree_size" and not (yc == "mse_boundary" and bnd_flat)
+        fx = (lambda s: s.clip(lower=floor)) if xlog else (lambda s: s)
+        fy = (lambda s: s.clip(lower=floor)) if ylog else (lambda s: s)
+        if not dom.empty:
+            ax.scatter(fx(dom[xc]), fy(dom[yc]), s=14, color=C_DOM, alpha=0.6, label="Dominated", zorder=1)
+        ax.scatter(fx(front[xc]), fy(front[yc]), s=30, color=C_FRONT, edgecolor="white", linewidth=0.5,
+                   label="Pareto front (rank 1)", zorder=2)
+        if xlog: ax.set_xscale("log")
+        if ylog: ax.set_yscale("log")
+        ax.set_xlabel(xl); ax.set_ylabel(yl); ax.set_title(title)
+        if bnd_flat and "mse_boundary" in (xc, yc):
+            ax.text(0.5, 0.92, "Exact boundary ansatz: boundary MSE ≡ 0", transform=ax.transAxes,
+                    ha="center", va="top", fontsize=8, color="#666666", style="italic")
+    axes[0].legend(loc="best")
+    name = f"{b.display} ({b.dim}D)".replace("\\'e", "é").replace('\\"o', "ö").replace("--", "–").replace("$", "")
+    fig.suptitle(f"Pareto trade-offs — {name}", fontsize=12, fontweight="bold")
+    return fig
 
-        pairs = [
-            ("mse_domain", "mse_boundary", "Domain MSE (Physics)", "Boundary MSE", "Physics vs. Boundary", True, not bnd_degenerate),
-            ("mse_domain", "tree_size", "Domain MSE (Physics)", "Complexity (Nodes)", "Physics vs. Complexity", True, False),
-            ("mse_boundary", "tree_size", "Boundary MSE", "Complexity (Nodes)", "Boundary vs. Complexity", not bnd_degenerate, False),
-        ]
-        for ax, (xcol, ycol, xlabel, ylabel, title, xlog, ylog) in zip(axes, pairs):
-            if not dominated.empty:
-                ax.scatter(dominated[xcol], dominated[ycol], color=GRAY, alpha=0.5, s=25,
-                           label="Dominada", zorder=1)
-            ax.scatter(pareto[xcol], pareto[ycol], color=LIME, edgecolors='k', linewidths=0.5, s=45,
-                       label="No dominada (Frente)", zorder=2)
-            if xlog: ax.set_xscale("log")
-            if ylog: ax.set_yscale("log")
-            ax.set_xlabel(xlabel)
-            ax.set_ylabel(ylabel)
-            ax.set_title(title)
-            ax.grid(True, which="both", ls="-", alpha=0.2)
-            if bnd_degenerate and "mse_boundary" in (xcol, ycol):
-                ax.text(0.5, 0.5, "Ansatz exacto: MSE Frontera ≡ 0\n(no es eje informativo para esta EDP)",
-                        transform=ax.transAxes, ha="center", va="center", fontsize=8,
-                        color="#666666", style="italic",
-                        bbox=dict(boxstyle="round", fc="white", ec="#cccccc", alpha=0.85))
-        axes[0].legend(loc="best", framealpha=0.9)
-
-        fig.suptitle(f"Pareto Trade-offs: {pde_label}", fontsize=12, fontweight='bold', y=1.05)
-        
-        save_path = os.path.join(RESULTS_DIR, f"{pde_label}_pareto_pairs.pdf")
-        plt.savefig(save_path, bbox_inches='tight')
-        plt.close()
-        print(f"  [Plot] Generated: {save_path}")
 
 def main():
-    print("Generating Pairwise Pareto Plots...")
-    df = load_all()
-    if df.empty:
-        print("No Pareto data found in results/ directory.")
-        return
-    
-    plot_pairwise_pareto(df)
-    print("Done.")
+    made = 0
+    for b in BENCHMARKS:
+        path = latest_result(f"{b.label}_pi_gn_pareto.csv")
+        if not path:
+            print(f"  [--] {b.label}: sin frente de Pareto")
+            continue
+        fig = plot(b, pd.read_csv(path))
+        if fig is None:
+            continue
+        out = os.path.join(FIGS_DIR, f"pareto_pairs_{b.label}.pdf")
+        fig.savefig(out, bbox_inches="tight")
+        plt.close(fig)
+        made += 1
+    print(f"{made} figuras de Pareto en {os.path.relpath(FIGS_DIR, BASE_DIR)}")
+
 
 if __name__ == "__main__":
     main()

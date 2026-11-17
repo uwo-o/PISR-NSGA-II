@@ -1,0 +1,28 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Laplace (noise_pct=0.0) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Laplace:
+x
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 2.760e+05
+Progress: 1130 / 1500 total iterations (75.333%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           0.000e+00  0.000e+00  y = x
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           0.000e+00  0.000e+00  y = x
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_215452_g9sVPP/hall_of_fame.csv

@@ -1,0 +1,71 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Thomas-Fermi ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Thomas-Fermi:
+1/(x + y + 0.4999997)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 6.870e+04
+Progress: 292 / 1500 total iterations (19.467%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           6.510e-02  0.000e+00  target = 0.73298
+2           5.293e-02  2.070e-01  target = cos(y)
+3           4.526e-02  1.565e-01  target = sin(cos(x))
+4           3.603e-02  2.280e-01  target = inv(x + 0.92267)
+5           1.902e-02  6.389e-01  target = cos(y) * cos(x)
+6           8.254e-03  8.349e-01  target = exp((0.64278 - y) - x)
+7           1.913e-03  1.462e+00  target = exp(cos(y + (x + 1.0187)))
+8           1.127e-03  5.295e-01  target = exp(sin(cos((x + 1.0292) + y)))
+9           1.127e-03  4.172e-07  target = inv(exp(sin(cos(y + (x + -2.1124)))))
+10          9.380e-04  1.833e-01  target = exp(sin(cos((x + 1.1548) + y))) * 1.1142
+15          2.330e-04  2.785e-01  target = exp(cos(((y + x) + cos(cos((x + 0.95787) + y...
+                                           ))) + 0.073039))
+18          2.131e-04  2.975e-02  target = exp(cos((x + (y + cos(cos(y + (x + cos(y + -...
+                                           0.3746)))))) + 0.071509))
+19          2.075e-04  2.675e-02  target = exp(cos(((x + y) + cos(cos((x + cos(sin(y) +...
+                                            -0.3746)) + y))) + 0.071509))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 9.740e+04
+Progress: 860 / 1500 total iterations (57.333%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           6.510e-02  0.000e+00  target = 0.73298
+2           5.293e-02  2.070e-01  target = cos(y)
+3           4.526e-02  1.565e-01  target = sin(cos(x))
+4           3.603e-02  2.280e-01  target = inv(y + 0.9227)
+5           1.902e-02  6.389e-01  target = cos(y) * cos(x)
+6           6.669e-13  2.407e+01  target = inv((x + y) + 0.5)
+10          6.666e-13  1.261e-04  target = inv((((x + y) + y) - y) + 0.5)
+12          6.661e-13  3.918e-04  target = inv((sin(y) + ((y + x) - sin(y))) + 0.5)
+18          6.659e-13  5.227e-05  target = inv(((y + y) + ((((x - y) - y) + (y + y)) - ...
+                                           y)) + 0.5)
+20          6.601e-13  4.358e-03  target = inv((((y + y) + (sin(y) + (y + 0.5))) - y) +...
+                                            ((x - sin(y)) - y))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           6.510e-02  0.000e+00  target = 0.73298
+2           5.293e-02  2.070e-01  target = cos(y)
+3           4.526e-02  1.565e-01  target = sin(cos(x))
+4           3.603e-02  2.280e-01  target = inv(x + 0.92265)
+5           1.902e-02  6.389e-01  target = cos(y) * cos(x)
+6           6.641e-13  2.408e+01  target = inv((x + y) + 0.5)
+20          6.601e-13  4.398e-04  target = inv((((y + y) + (sin(y) + (y + 0.5))) - y) +...
+                                            ((x - sin(y)) - y))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260618_214151_X9eq6I/hall_of_fame.csv

@@ -1,0 +1,72 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Airy (noise_pct=0.0) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Airy:
+exp(-x - y)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 1.140e+05
+Progress: 524 / 1500 total iterations (34.933%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.943e-02  0.000e+00  target = 0.40175
+4           1.533e-02  2.174e-01  target = 0.63384 / exp(y)
+5           1.005e-13  2.575e+01  target = inv(exp(x + y))
+7           9.881e-14  8.528e-03  target = inv(exp(x + y) + 3.3692e-07)
+9           9.716e-14  8.380e-03  target = inv(exp((y + x) + 3.6307e-07)) + 1.5705e-07
+11          9.689e-14  1.399e-03  target = (inv(exp(y + x) / -4.4767) + -2.3346e-07) * ...
+                                           -0.22338
+13          9.681e-14  4.103e-04  target = inv(exp(((x + y) - 0.045075) + 0.39965) / -3...
+                                           .4702) * -0.4108
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 1.490e+05
+Progress: 1240 / 1500 total iterations (82.667%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.943e-02  0.000e+00  target = 0.40175
+4           1.533e-02  2.174e-01  target = 0.63384 / exp(y)
+5           1.005e-13  2.575e+01  target = inv(exp(x + y))
+6           9.977e-14  7.375e-03  target = 1 / exp(x + y)
+7           9.881e-14  9.681e-03  target = inv(exp(x + y) + 3.3692e-07)
+8           9.803e-14  7.912e-03  target = 0.88788 / exp((y + x) + -0.11892)
+9           9.619e-14  1.897e-02  target = inv(exp(y + (x + 2.075e-07))) + 4.3011e-08
+11          9.600e-14  9.714e-04  target = inv(exp((x + y) + -6.2675e-08) / -4.4767) * ...
+                                           -0.22338
+13          9.501e-14  5.196e-03  target = (inv(exp((x + y) + -6.125e-08) / -4.4767) + ...
+                                           -1.1303e-07) * -0.22338
+15          9.466e-14  1.835e-03  target = (inv(exp((x + (y + -4.7106e-09)) + -6.125e-0...
+                                           8) / -4.4767) + -1.1303e-07) * -0.22338
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.943e-02  0.000e+00  target = 0.40175
+4           1.533e-02  2.174e-01  target = 0.63384 / exp(y)
+5           1.005e-13  2.575e+01  target = inv(exp(x + y))
+6           9.977e-14  7.375e-03  target = 1 / exp(x + y)
+7           9.881e-14  9.681e-03  target = inv(exp(x + y) + 3.3692e-07)
+8           9.803e-14  7.912e-03  target = 0.88788 / exp((y + x) + -0.11892)
+9           9.619e-14  1.897e-02  target = inv(exp(y + (x + 2.075e-07))) + 4.3011e-08
+11          9.600e-14  9.714e-04  target = inv(exp((x + y) + -6.2675e-08) / -4.4767) * ...
+                                           -0.22338
+13          9.501e-14  5.196e-03  target = (inv(exp((x + y) + -6.125e-08) / -4.4767) + ...
+                                           -1.1303e-07) * -0.22338
+15          9.466e-14  1.835e-03  target = (inv(exp((x + (y + -4.7106e-09)) + -6.125e-0...
+                                           8) / -4.4767) + -1.1303e-07) * -0.22338
+19          9.459e-14  1.917e-04  target = ((y + (-1.1377e-07 - y)) + inv(exp((x + (y +...
+                                            -7.2478e-09)) + -6.3685e-08) / -4.4767)) * -0.22338
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_220634_FlkxLA/hall_of_fame.csv

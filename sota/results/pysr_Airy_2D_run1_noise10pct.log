@@ -1,0 +1,92 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Airy (noise_pct=0.1) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Airy:
+exp(-x - y)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 1.210e+05
+Progress: 532 / 1500 total iterations (35.467%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.974e-02  0.000e+00  target = 0.40112
+4           1.559e-02  2.154e-01  target = exp(-0.4575 - x)
+5           2.808e-04  4.016e+00  target = inv(exp(y + x))
+6           2.805e-04  1.131e-03  target = exp((x + y) / -0.99832)
+7           2.805e-04  1.305e-05  target = inv(exp(y + (x / 0.99452)))
+8           2.803e-04  8.075e-04  target = exp((x + y) / -1.0076) + -0.0031637
+11          2.799e-04  4.292e-04  target = exp((x + y) / sin((y * -0.17366) + -7.7894))
+12          2.796e-04  9.955e-04  target = exp((x + y) / sin(tanh(y + 1.2258) * -1.7073...
+                                           ))
+15          2.794e-04  2.632e-04  target = exp((x + y) / sin(tanh((y + 0.5452) + cos(x)...
+                                           ) * -1.6823))
+17          2.791e-04  5.380e-04  target = exp((x + y) / sin(tanh(cos(x - 0.49515) + (y...
+                                            + 0.22759)) * -1.7193))
+19          2.787e-04  7.038e-04  target = exp((x + y) / sin(tanh(cos((x * x) + -0.2794...
+                                           5) + (y + 0.2955)) * -1.6984))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 1.330e+05
+Progress: 1140 / 1500 total iterations (76.000%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.974e-02  0.000e+00  target = 0.40112
+4           1.559e-02  2.154e-01  target = exp(-0.45723 - x)
+5           2.808e-04  4.016e+00  target = inv(exp(y + x))
+6           2.805e-04  1.131e-03  target = exp((x + y) / -0.99832)
+7           2.805e-04  1.305e-05  target = inv(exp(y + (x / 0.99452)))
+8           2.803e-04  8.100e-04  target = exp((y + x) / -1.0073) + -0.0030516
+11          2.797e-04  7.061e-04  target = exp((x + y) / sin((y * 0.21989) + -1.6739))
+12          2.796e-04  1.620e-04  target = exp((x + y) / sin(tanh(y + 1.2258) * -1.7073...
+                                           ))
+14          2.796e-04  1.794e-05  target = exp((y + x) / sin(tanh((y + 1.3848) * 0.8517...
+                                           7) * -1.7376))
+15          2.794e-04  7.537e-04  target = exp((x + y) / sin(tanh((y + 0.5452) + cos(x)...
+                                           ) * -1.6823))
+17          2.783e-04  2.092e-03  target = exp((y + x) / sin(tanh(cos(x) * (x + (y + 0....
+                                           9265))) * -1.7376))
+18          2.783e-04  1.788e-06  target = exp((y + x) / sin(tanh(cos(x) * ((x + y) + c...
+                                           os(0.37798))) * -1.7376))
+20          2.782e-04  1.385e-04  target = exp((x + y) / sin(tanh((cos(x + -0.4737) + (...
+                                           y + x)) * cos(x)) * -1.7376))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.974e-02  0.000e+00  target = 0.40112
+4           1.559e-02  2.154e-01  target = exp(-0.45723 - x)
+5           2.808e-04  4.016e+00  target = inv(exp(y + x))
+6           2.805e-04  1.131e-03  target = exp((x + y) / -0.99832)
+7           2.805e-04  1.305e-05  target = inv(exp(y + (x / 0.99452)))
+8           2.803e-04  8.100e-04  target = exp((y + x) / -1.0073) + -0.0030516
+11          2.797e-04  7.061e-04  target = exp((x + y) / sin((y * 0.21989) + -1.6739))
+12          2.796e-04  1.620e-04  target = exp((x + y) / sin(tanh(y + 1.2258) * -1.7073...
+                                           ))
+14          2.796e-04  1.794e-05  target = exp((y + x) / sin(tanh((y + 1.3848) * 0.8517...
+                                           7) * -1.7376))
+15          2.794e-04  7.537e-04  target = exp((x + y) / sin(tanh((y + 0.5452) + cos(x)...
+                                           ) * -1.6823))
+16          2.794e-04  2.606e-04  target = exp((y + x) / sin(tanh(((y + x) + y) + 0.883...
+                                           29) * -1.6631))
+17          2.783e-04  3.924e-03  target = exp((y + x) / sin(tanh(cos(x) * (x + (y + 0....
+                                           9265))) * -1.7376))
+18          2.783e-04  1.788e-06  target = exp((y + x) / sin(tanh(cos(x) * ((x + y) + c...
+                                           os(0.37798))) * -1.7376))
+19          2.781e-04  6.568e-04  target = exp((y + x) / sin(tanh(cos(x * x) * ((y + x)...
+                                            + 0.92211)) * -1.719))
+20          2.780e-04  1.792e-04  target = exp((y + x) / sin(tanh(cos(x * x) * ((y + si...
+                                           n(x)) + 0.92211)) * -1.719))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_220751_nqwWZG/hall_of_fame.csv

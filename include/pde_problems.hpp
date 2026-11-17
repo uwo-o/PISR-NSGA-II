@@ -7,7 +7,7 @@
 #include "common.hpp"
 #include "dimensions.hpp"
 #include <vector>
-#include <functional>
+#include <random>
 
 class Node;
 
@@ -15,58 +15,33 @@ class Node;
 // Declarado antes de PDEProblem para que este pueda cachear su propio resultado
 // (ver campo `priors` más abajo) y así llegar hasta PIIndividual::evaluate sin
 // tener que agregar un parámetro nuevo a esa función en todos sus call sites.
+// PRINCIPIO: los priors pueden SESGAR la busqueda (inicializacion, eleccion de
+// esqueletos), nunca EXCLUIR candidatos. Que el operador tenga una propiedad
+// (separabilidad, simetria) no implica que la solucion la tenga: depende de la
+// frontera, del forzamiento y, en problemas no lineales, de posibles rupturas
+// de simetria. Por eso ningun prior se usa como restriccion de factibilidad.
 struct PDEPriors {
     bool autonomous_x = false;
     bool autonomous_y = false;
     bool autonomous_t = false;    // el residuo no depende explícitamente de t
-    bool pole_at_origin = false;
+    bool pole_at_origin = false;  // solo sesgo de esqueletos (random_tree_special); la formulacion del borde la declara el problema
     bool even_parity_x = false;
 
-    // Ansatz de frontera de UN SOLO LADO: U = u0 + x*N(x) (1D) o
-    // U = u0 + r*N(x,y) (2D, r=sqrt(x^2+y^2)), anclando SOLO el origen (u0,
-    // el valor real de la condicion de frontera ahi) en vez de un segundo
-    // punto/arista inventado. Derivado de pole_at_origin (no un sondeo
-    // aparte): un operador con un termino que diverge en el origen (ej.
-    // 2/x en Lane-Emden, 1/sqrt(r) en Thomas-Fermi) tipicamente viene de
-    // una EDO planteada en un dominio semi-infinito [0,inf) truncado a
-    // [0,1] solo por conveniencia computacional — el origen tiene una
-    // condicion genuina (regularidad/valor inicial de la EDO real), pero el
-    // otro extremo del dominio truncado NO es un dato del problema, es un
-    // corte artificial. Usar un ansatz de dos lados ahi obliga a inventar un
-    // valor de frontera en el corte — si ese valor sale de tablas/solucion
-    // numerica de la EDO real (como pasaba antes con Thomas-Fermi, ver
-    // historial), es fuga de informacion: se le regala al modelo la
-    // respuesta en un punto interior de la fisica real. Ver
-    // apply_boundary_ansatz en pi_solver.cpp. Verificado contra la suite
-    // actual: coincide exactamente con Lane-Emden y Thomas-Fermi, ambas EDOs
-    // genuinamente semi-infinitas truncadas — no se sondea por nombre de EDP
-    // en ningun lado.
-    bool one_sided_boundary = false;
-
-    // Simetría especular x <-> 1-x (resp. y <-> 1-y), la relevante para el
-    // dominio real [0,1] — a diferencia de even_parity_x (que compara contra
-    // x=-1, fuera del dominio). Sólo se marca true si TANTO el operador COMO
-    // la condición de frontera son invariantes bajo la reflexión: si sólo el
-    // operador lo es pero la frontera no, la solución real no tiene por qué
-    // ser simétrica, y forzarla sería una restricción falsa (peor que no
-    // tener el prior). Con ambos invariantes, la solución sí está obligada a
-    // serlo (unicidad: aplicar la reflexión a una solución de un problema con
-    // operador+frontera simétricos da otra solución del mismo problema).
+    // Simetría especular x <-> 1-x (resp. y <-> 1-y). Se marca si el operador
+    // es invariante bajo la reflexion Y los datos de borde (evaluados SOLO en
+    // la frontera, nunca en el interior) tambien lo son. Uso: una fraccion de
+    // la poblacion inicial arranca simetrica. No es restriccion.
     bool mirror_symmetric_x = false;
     bool mirror_symmetric_y = false;
 
     // Priors de Nivel Superior
     bool scale_invariant = false; // Invarianza de escala (Auto-similaridad)
     int  max_deriv_order = 0;     // ADN Diferencial (Orden máximo de derivación)
-    bool is_conservative = false; // Leyes de conservación (Divergencia nula)
 
-    // Separabilidad de variables (solo 2D): si el OPERADOR de la EDP (no la
-    // solucion — eso seria fuga de informacion, ver comentario en
-    // probe_priors()) es consistente con u(x,y)=f(x)+g(y) o u(x,y)=f(x)g(y),
-    // toda la poblacion inicial se construye directamente en esa forma en vez
-    // de arboles genericos — inspirado en el metodo clasico de separacion de
-    // variables. Mutuamente excluyentes en la practica (se prioriza aditiva
-    // si ambas dieran positivo, poco probable).
+    // Separabilidad del OPERADOR (sondeada con funciones genericas, nunca con
+    // la solucion): u(x,y)=f(x)+g(y) o u(x,y)=f(x)g(y). Uso: una fraccion de la
+    // poblacion inicial arranca con esa forma. No es restriccion: la solucion
+    // puede no ser separable aunque el operador si lo sea.
     bool additive_separable = false;
     bool multiplicative_separable = false;
 
@@ -95,6 +70,14 @@ struct PDEPriors {
     // no solo un eje. Ver skeleton_rotated en tree_node.cpp.
     bool rotation_invariant = false;
 
+    // Operador lineal homogeneo (R(a u + b v) = a R(u) + b R(v), R(0) = 0) y
+    // sin dependencia explicita de las variables: las exponenciales
+    // e^{lambda x + mu y + nu t} (lambda complejo) son autofunciones del
+    // operador. Sondeado con jets genericos, nunca con la solucion. Uso: una
+    // fraccion de la poblacion inicial arranca como suma de 1-2 modos
+    // exponenciales con exponentes al azar. No es restriccion.
+    bool exponential_modes = false;
+
     // Termino de amortiguamiento lineal en la primera derivada (du/dx o
     // du/dy) mas alla de lo que ya aporta el Laplaciano — la firma
     // caracteristica de un oscilador amortiguado (u''+2*zeta*omega*u'+
@@ -107,13 +90,26 @@ struct PDEPriors {
 // ─── Problema PDE ─────────────────────────────────────────────────────────────
 struct PDEProblem {
     PDE    type;
-    int    dim = 2;    // 1 o 2 dimensiones
-    double k2 = 0.0;   // coeficiente k² en Helmholtz: ∇²u + k²u = f
-    bool   is_numerical = false; // Indica si requiere validación vía NumericalSolver
-    bool   is_unsteady = false;  // Indica si depende del tiempo
-    std::vector<Complex> numerical_truth; // Malla de referencia pre-calculada
-    PDEPriors priors; // Cacheado por PISolver al construirse (probe_priors), usado
-                       // por PIIndividual::evaluate para exigir simetrías detectadas.
+    int    dim = 2;    // 1 o 2 dimensiones espaciales
+    double k2 = 0.0;   // parametro escalar del operador (k² en Helmholtz/Schrodinger, nu en Navier-Stokes, a en la ecuacion ad-hoc)
+    bool   is_numerical = false; // la referencia no tiene forma cerrada: se calcula con NumericalSolver::reference
+    bool   is_unsteady = false;  // depende del tiempo (dominio en (x[,y],t) con t in [0,1])
+    std::vector<Complex> numerical_truth; // Malla de la referencia numerica (ver NumericalSolver::reference)
+    int    truth_n = 0;                   // nodos por eje de numerical_truth
+    PDEPriors priors; // Cacheado por PISolver al construirse (probe_priors). Solo sesgo, nunca restriccion.
+
+    // ── Definicion del problema bien planteado (datos, no heuristicas) ──
+    BCKind bc_kind = BCKind::DIRICHLET;
+    Complex ivp_u0 = 0.0, ivp_du0 = 0.0;  // IVP_LEFT: u(0), u'(0). ANCHOR_LEFT: solo ivp_u0.
+    // Campo incognita complejo (Schrodinger). Si es false, el campo es real:
+    // lo complejo del arbol es solo representacion, y residuo, frontera y
+    // reporte se calculan sobre Re(U) (ver project_real en common.hpp).
+    bool complex_field = false;
+    // Orden maximo de las derivadas espaciales del operador. Con orden 4
+    // (Navier-Stokes en funcion de corriente) un problema de Dirichlet bien
+    // planteado necesita u Y du/dn en la frontera; ademas el ansatz (que solo
+    // esta implementado hasta segundo orden) no aplica.
+    int spatial_order = 2;
 
     // Dimensiones para coherencia física
     Dimension dim_u = Units::None;
@@ -121,30 +117,41 @@ struct PDEProblem {
     Dimension dim_y = Units::Length;
     Dimension dim_t = Units::Time;
 
-    // Puntos de colocación interior (rejilla uniforme)
-    std::vector<Point> domain_points(int n) const;
-
-    // Puntos de condición de frontera (Dirichlet sobre ∂Ω)
+    // Grilla FIJA y densa de validacion en el interior del dominio. Distinta de
+    // los puntos de entrenamiento (que se muestrean al azar en PISolver).
+    std::vector<Point> validation_points() const;
+    // Puntos de frontera deterministas y densos (validacion) / un punto de
+    // frontera al azar (entrenamiento). Ambos describen el MISMO conjunto de
+    // datos de borde del problema: frontera espacial (para todo t si es no
+    // estacionario) y, si es no estacionario, condicion inicial en t=0.
     std::vector<Point> boundary_points(int n) const;
+    Point sample_boundary_point(std::mt19937& rng) const;
 
-    // Solución exacta conocida u*(x,y,t)
-    virtual Complex exact(double x, double y, double t = 0.0) const;
+    // Desajuste cuadratico de los datos de borde en el punto p, dado el jet
+    // (ya proyectado) del candidato en p. Unica fuente de verdad de "que
+    // significa cumplir la frontera" para este problema (valor; derivada
+    // normal si spatial_order>2; u'(0) si IVP_LEFT).
+    double boundary_mismatch_sq(const AD& jet, const Point& p) const;
+
+    // Solución exacta conocida u*(x,y,t) (solo tiene sentido si !is_numerical,
+    // o como dato de borde via bc()).
+    Complex exact(double x, double y, double t = 0.0) const;
+    // Referencia numerica interpolada (cubica) de numerical_truth.
     Complex numerical_exact(double x, double y, double t = 0.0) const;
-    Complex pde_second_derivative(double x, Complex u) const;
+    // Referencia para EVALUAR resultados (nunca para buscar): exacta si
+    // existe, numerica si no.
+    Complex reference(double x, double y, double t = 0.0) const;
 
     // Término fuente f(x,y,t) del lado derecho
-    virtual Complex source(double x, double y, double t = 0.0) const;
+    Complex source(double x, double y, double t = 0.0) const;
 
-    // Condición de frontera (valor de u en ∂Ω a tiempo t)
-    virtual Complex bc(double x, double y, double t = 0.0) const;
+    // Dato de borde: valor de u en la frontera (o en t=0). Solo debe
+    // evaluarse sobre la frontera/condicion inicial.
+    Complex bc(double x, double y, double t = 0.0) const;
 
-    // Cálculo unificado del residuo (incluye AD o Híbrido AD-FDM)
-    virtual Complex compute_residual(const Node* tree, const Point& p) const;
-
-    // Cálculo unificado del error de frontera (Dirichlet, Neumann, etc.)
-    virtual double compute_boundary_error(const Node* tree, const std::vector<Point>& bnd) const;
-
-    // Residuo del PDE usando AD (para método propuesto)
+    // Residuo del operador sobre un jet. Unica fuente de verdad de la
+    // ecuacion: la usan la busqueda, la validacion, los priors y el solver de
+    // referencia. Para spatial_order>2 el jet debe venir de ad_eval_ext_t.
     Complex pde_residual_ad(const AD& ad, double x, double y, double t = 0.0) const;
 
     // Nombre legible
@@ -158,6 +165,7 @@ PDEProblem make_laplace(int dim = 2);
 PDEProblem make_poisson(int dim = 2);
 PDEProblem make_helmholtz(int dim = 2, double k = 1.0);
 PDEProblem make_schrodinger(int dim = 2);
+PDEProblem make_schrodinger_unsteady(int dim = 2);
 PDEProblem make_nonlinear_poisson();
 PDEProblem make_liouville();
 PDEProblem make_sine_gordon();
@@ -168,6 +176,21 @@ PDEProblem make_navier_stokes_unsteady();
 PDEProblem make_fisher(int dim);
 PDEProblem make_duffing(int dim);
 PDEProblem make_thomas_fermi(int dim);
+
+// Corrida ad-hoc, NO parte de la suite de benchmarks (ver
+// custom_runs/thesis_eq.cpp): -u'' + 3f'/f u' + a*u = u^3, con f(x)=cosh(x)
+// como placeholder (no especificado por el problema original) y a libre.
+PDEProblem make_custom_thesis_eq(double a);
+
+// La suite de benchmarks (unica fuente: la usan main.cpp y los tests).
+std::vector<PDEProblem> benchmark_suite();
+// Etiqueta "Nombre_1D" / "Nombre_2D".
+std::string problem_label(const PDEProblem& p);
+
+// Funcion de Airy Ai(z) por su serie de Maclaurin (converge para todo z; con
+// |z|<=2 bastan ~20 terminos para precision de maquina). Referencia exacta de
+// los benchmarks de Airy.
+double airy_ai(double z);
 PDEProblem make_bratu();
 PDEProblem make_allen_cahn();
 PDEProblem make_lane_emden();

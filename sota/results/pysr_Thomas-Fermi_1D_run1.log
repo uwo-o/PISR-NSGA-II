@@ -1,0 +1,49 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Thomas-Fermi ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Thomas-Fermi:
+1/(x + 0.50000006)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 1.440e+05
+Progress: 571 / 1500 total iterations (38.067%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           1.301e-01  0.000e+00  y = 1.101
+2           1.296e-01  4.449e-03  y = cos(x)
+3           1.320e-02  2.284e+00  y = 1.601 - x
+4           3.328e-12  2.210e+01  y = inv(x + 0.5)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           1.301e-01  0.000e+00  y = 1.101
+2           1.296e-01  4.449e-03  y = cos(x)
+3           1.320e-02  2.284e+00  y = 1.601 - x
+4           3.328e-12  2.210e+01  y = inv(x + 0.5)
+6           3.273e-12  8.383e-03  y = inv((x + 0.5) * 1)
+11          3.267e-12  3.787e-04  y = inv((x + 0.5) * cos((x + 0.24742) * 0.00078021))
+12          3.213e-12  1.659e-02  y = inv((exp(exp((x + 1.5169) * -9.8083)) - 0.5) + x)
+13          3.200e-12  4.037e-03  y = inv(x + (exp(exp((exp(x) + 0.52018) * -9.8083)) - 0.5)...
+                                      )
+14          3.188e-12  3.612e-03  y = inv((0.5 * cos(sin((x / -0.077545) * -0.86691) * 0.001...
+                                      5604)) + x)
+15          3.143e-12  1.420e-02  y = inv(cos(0.0015604 * tanh(sin((x / -0.077545) * 0.94525...
+                                      ))) * (x + 0.5))
+17          3.132e-12  1.833e-03  y = inv(cos(tanh(tanh(sin((x / -0.077545) * cos(x))) * 0.0...
+                                      015604)) * (x + 0.5))
+18          3.113e-12  5.982e-03  y = inv((x + 0.5) * cos(sin(-0.077545 / ((-0.0015066 - (x ...
+                                      + x)) * -0.003446)) * 0.0013907))
+19          2.939e-12  5.749e-02  y = inv((x + 0.5) * cos(-0.0015066 * sin(-0.077545 / (-0.0...
+                                      03446 * (0.71793 + tanh(x - 0.71793))))))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260820_205855_xFpQRs/hall_of_fame.csv

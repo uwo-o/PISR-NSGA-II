@@ -1,0 +1,64 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Fisher ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Fisher:
+sin((x + y + 1.652747)*0.34147164)*0.9288274
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 8.430e+04
+Progress: 366 / 1500 total iterations (24.400%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           6.771e-03  0.000e+00  target = 0.72336
+4           3.992e-03  1.761e-01  target = cos(sin(cos(y)))
+5           3.425e-03  1.533e-01  target = (y * 0.19402) - -0.62635
+6           1.908e-04  2.887e+00  target = cos(cos(tanh(y + x)))
+7           1.646e-04  1.479e-01  target = cos(cos(tanh(sin(x) + y)))
+8           9.810e-05  5.175e-01  target = cos(cos(tanh((x + y) * 0.94201)))
+10          4.418e-05  3.988e-01  target = sin(cos(cos(((x + 0.3206) + y) * 0.69712)))
+12          4.417e-05  1.168e-04  target = sin(cos(cos(((y + (x + 0.32051)) * 1.2108) /...
+                                            1.7376)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 1.120e+05
+Progress: 992 / 1500 total iterations (66.133%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           6.771e-03  0.000e+00  target = 0.72336
+4           3.992e-03  1.761e-01  target = cos(sin(cos(y)))
+5           3.425e-03  1.533e-01  target = (y * 0.19402) - -0.62635
+6           1.908e-04  2.887e+00  target = cos(cos(tanh(y + x)))
+7           1.646e-04  1.479e-01  target = cos(cos(tanh(sin(x) + y)))
+8           9.810e-05  5.175e-01  target = cos(cos(tanh((x + y) * 0.94201)))
+10          4.417e-05  3.990e-01  target = sin(cos(cos((y + (x + 0.32047)) * 0.6969)))
+11          9.321e-06  1.556e+00  target = cos(cos((x + (y + 1.0647)) * 0.48791)) - 0.1...
+                                           3042
+14          3.071e-06  3.700e-01  target = sin((cos(cos(((y + 1.1669) + x) * 0.41484)) ...
+                                           - 0.29396) * 1.5807)
+15          4.221e-07  1.985e+00  target = sin(sin(cos(cos(((x + y) + 2.0987) * 0.29098...
+                                           )) - 0.4577) * 2.3524)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           6.771e-03  0.000e+00  target = 0.72336
+4           3.992e-03  1.761e-01  target = cos(sin(cos(y)))
+5           3.425e-03  1.533e-01  target = (y * 0.19401) + 0.62635
+6           1.908e-04  2.887e+00  target = cos(cos(tanh(y + x)))
+7           7.899e-05  8.821e-01  target = ((x + y) + 2.7283) * 0.19402
+8           7.175e-06  2.399e+00  target = sin(((y + x) + 1.8464) * 0.28682)
+10          1.201e-07  2.045e+00  target = sin((x + (y + 1.6527)) * 0.34147) * 0.92883
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260618_214450_LDWmqn/hall_of_fame.csv

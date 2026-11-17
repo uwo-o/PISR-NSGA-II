@@ -1,0 +1,44 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Fisher ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Fisher:
+sin(x*0.639279 - 1*(-0.037846047))*0.39243948 + 0.48511916
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 2.070e+05
+Progress: 1030 / 1500 total iterations (68.667%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           4.602e-03  0.000e+00  y = 0.62006
+3           2.973e-03  2.185e-01  y = cos(cos(x))
+4           2.087e-04  2.656e+00  y = cos(cos(tanh(x)))
+5           4.576e-06  3.820e+00  y = (x * 0.23258) + 0.50378
+6           5.815e-08  4.366e+00  y = sin((x * 0.29784) + 0.5229)
+8           2.123e-09  1.655e+00  y = (sin(x * 0.6744) * 0.36973) + 0.5001
+10          2.676e-10  1.036e+00  y = (sin((x * 0.63926) - -0.037787) * 0.39244) + 0.48514
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           4.602e-03  0.000e+00  y = 0.62006
+3           2.973e-03  2.185e-01  y = cos(cos(x))
+4           2.087e-04  2.656e+00  y = cos(cos(tanh(x)))
+5           4.576e-06  3.820e+00  y = (x * 0.23258) + 0.50378
+6           5.815e-08  4.366e+00  y = sin((x * 0.29784) + 0.5229)
+8           2.123e-09  1.655e+00  y = (sin(x * 0.6744) * 0.36973) + 0.5001
+10          2.675e-10  1.036e+00  y = 0.48512 + (sin((x * 0.63928) - -0.037846) * 0.39244)
+14          2.674e-10  1.058e-04  y = ((sin((x * 0.63926) - -0.037788) * 0.39244) + (x + 0.4...
+                                      8514)) - x
+18          2.669e-10  4.334e-04  y = ((sin((x * 0.63926) - -0.037788) * 0.39244) + (((x + 0...
+                                      .48514) + x) - x)) - x
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260820_210217_uTL0YX/hall_of_fame.csv

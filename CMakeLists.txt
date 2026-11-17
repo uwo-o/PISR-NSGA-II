@@ -19,20 +19,27 @@ find_package(OpenMP)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # ─── Fuentes ──────────────────────────────────────────────────────────────────
-set(SOURCES
+set(CORE_SOURCES
     src/tree_node.cpp
     src/pde_problems.cpp
     src/numerical_solver.cpp
     src/pi_solver.cpp
     src/optimizer_nelder_mead.cpp
     src/optimizer_de.cpp
-    main.cpp
+    src/oracle.cpp
 )
+add_library(pisr_core STATIC ${CORE_SOURCES})
+target_link_libraries(pisr_core m stdc++fs -fopenmp)
 
 # ─── Ejecutable principal ─────────────────────────────────────────────────────
-add_executable(PISR-NSGA-II ${SOURCES})
+add_executable(PISR-NSGA-II main.cpp)
+target_link_libraries(PISR-NSGA-II pisr_core)
 
-target_link_libraries(PISR-NSGA-II m stdc++fs -fopenmp)
+# ─── Tests (correr antes de cada experimento: ./run_tests.sh) ────────────────
+add_executable(oracle_test tests/oracle_test.cpp)
+target_link_libraries(oracle_test pisr_core)
+add_executable(gradient_test tests/gradient_test.cpp)
+target_link_libraries(gradient_test pisr_core)
 
 # ─── Información de compilación ───────────────────────────────────────────────
 message(STATUS "Build type : ${CMAKE_BUILD_TYPE}")

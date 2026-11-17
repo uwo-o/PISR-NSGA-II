@@ -1,0 +1,65 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Ginzburg-Landau ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Ginzburg-Landau:
+tanh(x)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 2.480e+05
+Progress: 958 / 1500 total iterations (63.867%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           9.529e-03  0.000e+00  y = x
+2           7.231e-14  2.560e+01  y = tanh(x)
+4           6.861e-14  2.629e-02  y = tanh(x) * 1
+6           6.748e-14  8.273e-03  y = tanh(x + 7.7822e-08) + -1.2526e-07
+9           6.686e-14  3.071e-03  y = (-5.2178e-08 * exp(x)) + tanh(x + 4.6737e-08)
+10          6.681e-14  7.731e-04  y = ((x + 1.609) * -5.3715e-08) + tanh(x - -5.5793e-08)
+11          6.669e-14  1.856e-03  y = tanh(x - -6.2449e-08) + (exp(cos(cos(x))) * -5.7418e-0...
+                                      8)
+12          6.619e-14  7.533e-03  y = (exp(sin(exp(exp(0.26278 + x)))) * -5.9524e-08) + tanh...
+                                      (x)
+13          6.592e-14  4.041e-03  y = tanh(x - -7.7863e-08) + (-5.6473e-08 * exp(cos(cos(x /...
+                                       0.32077))))
+14          6.269e-14  5.022e-02  y = (exp(sin(exp(exp(x + (x - -0.31011))))) * -5.9524e-08)...
+                                       + tanh(x)
+17          6.205e-14  3.415e-03  y = ((sin(exp(exp(x + (x - -0.31011))) + 0.25214) + 0.6454...
+                                      2) * -1.1089e-07) + tanh(x)
+18          6.192e-14  2.056e-03  y = tanh(x) + ((sin(exp(exp((x + x) - -0.31011)) + 0.18884...
+                                      ) + cos(0.86922)) * -1.1089e-07)
+19          6.123e-14  1.118e-02  y = tanh(x) + ((x + sin((0.69935 - x) + exp(exp((x + x) - ...
+                                      -0.31011)))) * -1.1089e-07)
+20          6.085e-14  6.267e-03  y = tanh(x) + ((sin(exp(exp((x + x) - -0.31011)) + (0.6993...
+                                      5 - x)) + tanh(x)) * -1.1089e-07)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           9.529e-03  0.000e+00  y = x
+2           7.231e-14  2.560e+01  y = tanh(x)
+4           6.861e-14  2.629e-02  y = tanh(x) * 1
+6           6.744e-14  8.576e-03  y = tanh(x + 7.7821e-08) + -1.0699e-07
+9           6.686e-14  2.868e-03  y = (-5.2178e-08 * exp(x)) + tanh(x + 4.6737e-08)
+10          6.681e-14  7.755e-04  y = ((x + 1.6038) * -5.3715e-08) + tanh(x - -5.5793e-08)
+11          6.569e-14  1.689e-02  y = (sin(exp(exp(x + 0.87342))) * -1.0971e-07) + tanh(x)
+12          6.485e-14  1.284e-02  y = (exp(sin(exp(exp(x + 0.2569)))) * -5.9373e-08) + tanh(...
+                                      x)
+14          6.207e-14  2.188e-02  y = tanh(x) + (exp(sin(exp(exp((x + x) - -0.31011)))) * -6...
+                                      .5262e-08)
+17          6.189e-14  1.000e-03  y = ((sin(exp(exp((x + x) - -0.31011)) + 0.17754) + 0.6514...
+                                      5) * -1.0971e-07) + tanh(x)
+19          6.123e-14  5.315e-03  y = tanh(x) + ((x + sin((0.69935 - x) + exp(exp((x + x) - ...
+                                      -0.31011)))) * -1.1089e-07)
+20          6.085e-14  6.267e-03  y = tanh(x) + ((sin(exp(exp((x + x) - -0.31011)) + (0.6993...
+                                      5 - x)) + tanh(x)) * -1.1089e-07)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260618_214531_9X83ve/hall_of_fame.csv

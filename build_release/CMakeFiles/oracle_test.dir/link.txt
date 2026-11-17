@@ -1,0 +1,1 @@
+/usr/bin/c++  -fopenmp -O3 -march=native -DNDEBUG -Wl,--dependency-file=CMakeFiles/oracle_test.dir/link.d CMakeFiles/oracle_test.dir/tests/oracle_test.cpp.o -o oracle_test  libpisr_core.a -lm -lstdc++fs -fopenmp

@@ -1,0 +1,60 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Laplace (noise_pct=0.05) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Laplace:
+x - 0.0052969893*cos(x/0.016358823)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 1.920e+05
+Progress: 889 / 1500 total iterations (59.267%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           1.843e-04  0.000e+00  y = x
+3           1.839e-04  9.477e-04  y = x / 0.99898
+5           1.825e-04  3.884e-03  y = (x * 1.0046) + -0.0023629
+7           1.825e-04  8.941e-08  y = ((x * 1.1924) + -0.0028163) * 0.8425
+8           1.628e-04  1.139e-01  y = x - (cos(x / 0.01636) * 0.005297)
+14          1.509e-04  1.272e-02  y = x - (cos(cos(x * exp(exp(exp(x)))) * 2.3575) * -0.0092...
+                                      563)
+15          1.475e-04  2.243e-02  y = x - (cos(exp(cos(x * exp(exp(exp(x))))) * -2.6592) * 0...
+                                      .0088724)
+16          1.434e-04  2.821e-02  y = x - (cos(exp(tanh(cos(x * exp(exp(exp(x)))))) * -2.822...
+                                      3) * 0.0098284)
+18          1.402e-04  1.120e-02  y = (x - (cos(exp(sin(cos(x * exp(exp(exp(x)))))) * 2.7815...
+                                      ) * 0.00974)) / 0.99646
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           1.843e-04  0.000e+00  y = x
+3           1.839e-04  9.477e-04  y = x / 0.99898
+5           1.825e-04  3.884e-03  y = (x * 1.0046) + -0.0023629
+7           1.825e-04  2.682e-07  y = -1.2592 + ((x * 1.0046) - -1.2568)
+8           1.628e-04  1.141e-01  y = x - (cos(x / 0.016359) * 0.005297)
+9           1.604e-04  1.482e-02  y = x - (tanh(cos(x / 0.01636)) * 0.0080433)
+11          1.546e-04  1.847e-02  y = x - (tanh(cos(x / 0.01636) / 0.01636) * 0.005297)
+13          1.537e-04  2.760e-03  y = x - (tanh((x / 0.01636) * cos(x / 0.01636)) * 0.005297...
+                                      )
+14          1.509e-04  1.887e-02  y = x - (cos(cos(x * exp(exp(exp(x)))) * 2.3575) * -0.0092...
+                                      563)
+15          1.474e-04  2.311e-02  y = x - (cos(exp(cos(x * exp(exp(exp(x))))) * -2.6592) * 0...
+                                      .0093611)
+16          1.434e-04  2.761e-02  y = x - (cos(exp(tanh(cos(exp(exp(exp(x))) * x))) * -2.807...
+                                      4) * 0.0099228)
+17          1.421e-04  9.061e-03  y = (x * 1.0044) - (cos(exp(cos(x * exp(exp(exp(x))))) * -...
+                                      2.5798) * 0.010065)
+18          1.402e-04  1.331e-02  y = (x - (cos(exp(sin(cos(exp(exp(exp(x))) * x))) * 2.7815...
+                                      ) * 0.0098333)) / 0.99636
+20          1.386e-04  5.993e-03  y = (x - (cos(exp(sin(cos((x * exp(exp(exp(x)))) + 0.04637...
+                                      6))) * 2.7821) * 0.010018)) / 0.99607
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_215524_I61Wuk/hall_of_fame.csv

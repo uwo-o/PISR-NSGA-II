@@ -1,0 +1,61 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Airy ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Airy:
+exp(-x - y)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 8.930e+04
+Progress: 420 / 1500 total iterations (28.000%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.943e-02  0.000e+00  target = 0.40175
+4           1.533e-02  2.174e-01  target = exp(-0.45596 - x)
+6           9.922e-14  1.288e+01  target = exp((-1.3547e-07 - y) - x)
+8           9.829e-14  4.745e-03  target = exp(((7.4726e-10 - y) - x) - 6.7006e-08)
+15          9.770e-14  8.475e-04  target = exp((((y - y) - y) - x) - (sin(x + y) * 1.51...
+                                           33e-07))
+18          9.675e-14  3.260e-03  target = exp((-8.1461e-10 - y) - (x - ((((x * y) - 0....
+                                           38719) * 7.8218e-07) * (x + y))))
+19          9.658e-14  1.812e-03  target = exp((-8.1461e-10 - y) - (x - (tanh((y + x) *...
+                                            ((y * x) - 0.40849)) * 7.8218e-07)))
+20          9.648e-14  1.058e-03  target = exp((-8.1461e-10 - y) - (x - (((y + x) * ((y...
+                                            * x) - sin(tanh(0.40849)))) * 7.8218e-07)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 1.270e+05
+Progress: 1072 / 1500 total iterations (71.467%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.943e-02  0.000e+00  target = 0.40175
+4           1.533e-02  2.174e-01  target = exp(-0.45596 - x)
+6           9.922e-14  1.288e+01  target = exp((-1.3547e-07 - y) - x)
+8           9.630e-14  1.495e-02  target = exp((-1.5974e-07 - y) - x) + 4.7674e-08
+10          9.348e-14  1.485e-02  target = (exp((-1.5974e-07 - y) - x) + 1.1586e-07) * ...
+                                           1
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.943e-02  0.000e+00  target = 0.40175
+4           1.533e-02  2.174e-01  target = exp(-0.45596 - x)
+5           1.005e-13  2.575e+01  target = inv(exp(x + y))
+6           9.922e-14  1.284e-02  target = exp((-1.3547e-07 - y) - x)
+7           9.884e-14  3.906e-03  target = inv(exp((x + y) + 1.6567e-07))
+8           9.630e-14  2.600e-02  target = exp((-1.5974e-07 - y) - x) + 4.7674e-08
+10          9.348e-14  1.485e-02  target = (exp((-1.5974e-07 - y) - x) + 1.1586e-07) * ...
+                                           1
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260618_213917_Z4pJLy/hall_of_fame.csv

@@ -82,7 +82,41 @@ static void calculate_crowding_distance(std::vector<PIIndividual>& pop, const st
     assign_dist([](const PIIndividual& ind) { return static_cast<double>(ind.tree_size); });
 }
 
+// Eliminacion de duplicados (estandar en NSGA-II con representacion discreta):
+// individuos con el mismo vector de objetivos no se dominan entre si, asi que
+// un atractor trivial (p. ej. N=0, tamaño 1) puede clonarse hasta llenar el
+// frente 1 y congelar la busqueda. Las copias repetidas pasan al final y solo
+// entran si faltan individuos unicos. No excluye ninguna expresion: la
+// primera copia compite normalmente. Devuelve las copias retiradas de `pop`.
+static std::vector<PIIndividual> split_duplicates(std::vector<PIIndividual>& pop) {
+    auto same = [](double a, double b) { return std::abs(a - b) <= 1e-12 * std::max(1.0, std::abs(a)); };
+    std::vector<int> idx(pop.size());
+    std::iota(idx.begin(), idx.end(), 0);
+    std::sort(idx.begin(), idx.end(), [&](int a, int b) {
+        if (pop[a].tree_size != pop[b].tree_size) return pop[a].tree_size < pop[b].tree_size;
+        if (pop[a].mse_domain != pop[b].mse_domain) return pop[a].mse_domain < pop[b].mse_domain;
+        return pop[a].mse_boundary < pop[b].mse_boundary;
+    });
+    std::vector<char> dup(pop.size(), 0);
+    for (size_t k = 1; k < idx.size(); ++k) {
+        const PIIndividual& p = pop[idx[k - 1]];
+        const PIIndividual& q = pop[idx[k]];
+        if (p.tree_size == q.tree_size && p.is_feasible == q.is_feasible &&
+            same(p.mse_domain, q.mse_domain) && same(p.mse_boundary, q.mse_boundary)) dup[idx[k]] = 1;
+    }
+    std::vector<PIIndividual> uniq, rest;
+    for (size_t i = 0; i < pop.size(); ++i) (dup[i] ? rest : uniq).push_back(std::move(pop[i]));
+    pop = std::move(uniq);
+    return rest;
+}
+
 std::vector<PIIndividual> nsga2_select_next(std::vector<PIIndividual> combined, int pop_size, bool use_boundary = true) {
+    std::vector<PIIndividual> dups = split_duplicates(combined);
+    if (combined.size() < static_cast<size_t>(pop_size)) {
+        // Faltan unicos: se completa con copias (quedan al final por rango).
+        for (size_t i = 0; combined.size() < static_cast<size_t>(pop_size) && i < dups.size(); ++i)
+            combined.push_back(std::move(dups[i]));
+    }
     fast_non_dominated_sort(combined, use_boundary);
     std::vector<PIIndividual> next_pop; int rank = 1;
     while (next_pop.size() < static_cast<size_t>(pop_size)) {
@@ -144,489 +178,406 @@ namespace Config {
     double RAR_RANDOM_RATIO   = 0.40;
     bool   GENERAL_MODE       = false;
     bool   USE_ANSATZ         = true;
+    bool   HYBRID_REPR        = true;
     int    CORES              = 1;
     bool   IS_SINGULAR        = false; // Detectado dinamicamente
 }
 
-// ─── Ansatz de frontera exacta (helper compartido) ───────────────────────────
-// U(x,y) = L(x,y) + B(x,y)*N(x,y), donde N es el arbol evaluado y L,B cumplen
-// la condicion de frontera de forma EXACTA (B se anula en el borde, L la
-// interpola) — asi el error de frontera es cero por construccion y el
-// algoritmo solo tiene que aprender el residuo interior, no dos objetivos.
-// Usado desde evaluate(), get_validation_mse() y el gradiente complex-step
-// para que los tres midan exactamente la misma funcion U(x,y).
-static bool ansatz_applies(const PDEProblem& prob, size_t bnd_size) {
+// ─── Ansatz de frontera exacta ────────────────────────────────────────────────
+// U = L + B*N, donde N es el arbol y L, B cumplen los datos de borde por
+// construccion (B se anula donde hay dato, L lo interpola). Aplicabilidad por
+// PROPIEDADES del problema, no por nombre de EDP:
+//  - no estacionario: el ansatz es espacial y no conoce t (datos de borde que
+//    cambian en el tiempo y la condicion inicial no quedarian impuestos);
+//  - orden espacial > 2: solo esta implementado hasta segundas derivadas, y el
+//    problema necesita tambien du/dn en la frontera.
+// En esos casos la frontera es un objetivo medido (boundary_error) en NSGA-II.
+static bool ansatz_applies(const PDEProblem& prob) {
     if (Config::GENERAL_MODE || !Config::USE_ANSATZ) return false;
-    if (bnd_size < 2) return false;
-    if (prob.dim == 1) return true;
-    // 2D: excluye solo Navier-Stokes (condicion de frontera sobre funcion de
-    // corriente, no Dirichlet simple — no calza con NINGUNA de las dos formas
-    // de ansatz de abajo). Para priors.one_sided_boundary (ver comentario en
-    // pde_problems.hpp) el ansatz SI aplica, solo que apply_boundary_ansatz
-    // usa la forma radial de un solo lado en vez de la interpolacion
-    // transfinita de 4 aristas — sigue siendo exacto por construccion, solo
-    // ancla el punto con dato real (el origen) en vez de inventar el resto.
-    if (prob.dim == 2) return prob.type != PDE::NAVIER_STOKES && prob.type != PDE::NAVIER_STOKES_UNSTEADY;
-    return false;
+    if (prob.is_unsteady) return false;
+    if (prob.spatial_order > 2) return false;
+    return true;
 }
+// El individuo usa el ansatz si aplica al problema y su arbol no es U directo.
+static bool uses_ansatz(const PDEProblem& prob, bool raw) { return !raw && ansatz_applies(prob); }
+// Representacion hibrida activa: hay individuos de ambos tipos en la poblacion.
+static bool hybrid_active(const PDEProblem& prob) { return Config::HYBRID_REPR && ansatz_applies(prob); }
 
-// Aplica el ansatz a un AD ya evaluado del arbol (N, con sus derivadas). Se
-// preserva el valor COMPLEJO completo (sin truncar a .real()) para que la
-// composición siga siendo holomorfa en las constantes ERC — lo necesita la
-// diferenciación por complex-step (ver gradient_descent_constants). Para
-// constantes reales (uso normal) el resultado es idéntico a antes: la parte
-// imaginaria ya es 0.
+// Factor del ansatz por N en el valor de U. EXACTAMENTE en la frontera el
+// factor es 0 y U vale el dato de borde aunque N no se pueda evaluar ahi
+// (p. ej. N = (u - L)/B da 0/0): es el limite que garantiza el ansatz cuando
+// N esta acotada cerca del borde, y eso lo verifica ansatz_border_check.
+static Complex ansatz_term(double factor, Complex n) { return factor == 0.0 ? Complex(0.0) : factor * n; }
+
 static AD apply_boundary_ansatz(const PDEProblem& prob, const AD& ad, double x, double y) {
+    AD U;
     if (prob.dim == 1) {
-        // priors.one_sided_boundary (ver pde_problems.hpp): ansatz de UN SOLO
-        // LADO, U(x) = u0 + x*N(x). Detectado genericamente via pole_at_origin
-        // — un termino que diverge en el origen (2/x en Lane-Emden, 1/sqrt(r)
-        // en Thomas-Fermi) tipicamente viene de una EDO semi-infinita
-        // [0,inf) truncada a [0,1] solo por conveniencia computacional: el
-        // origen tiene una condicion genuina (u0=bc(0)), pero x=1 NO es un
-        // dato del problema — es un corte artificial. Anclarlo ahi a un valor
-        // que requiere haber resuelto la EDO real (como se hacia antes para
-        // Thomas-Fermi, ver historial) es fuga de informacion: se le regala
-        // al modelo la respuesta en un punto interior de la fisica real, algo
-        // que ningun otro metodo de comparacion recibe. B(x)=x se anula SOLO
-        // en x=0 (el unico punto con dato real), dejando x=1 completamente
-        // libre — el residuo de la EDP es la unica señal ahi.
-        if (prob.priors.one_sided_boundary) {
-            double u0 = prob.bc(0.0, 0.0, 0.0).real();
-            AD U;
-            U.v = u0 + x * ad.v;
-            U.dx = ad.v + x * ad.dx;
-            U.dxx = 2.0 * ad.dx + x * ad.dxx;
-            U.dy = U.dt = U.dyy = U.dtt = 0.0;
+        if (prob.bc_kind == BCKind::IVP_LEFT) {
+            // U = u0 + u0' x + x^2 N: impone u(0)=u0 y u'(0)=u0' a la vez.
+            Complex u0 = prob.ivp_u0, du0 = prob.ivp_du0;
+            U.v = u0 + du0 * x + ansatz_term(x * x, ad.v);
+            U.dx = du0 + 2.0 * x * ad.v + x * x * ad.dx;
+            U.dxx = 2.0 * ad.v + 4.0 * x * ad.dx + x * x * ad.dxx;
             return U;
         }
-        double u0 = prob.bc(0.0, 0.0, 0.0).real();
-        double u1 = prob.bc(1.0, 0.0, 0.0).real();
-        double L = u0 + x * (u1 - u0);
-        double dL = (u1 - u0);
-        double B = x * (x - 1.0);
-        double dB = 2.0 * x - 1.0;
-        double d2B = 2.0;
-
-        AD U;
-        U.v = L + B * ad.v;
+        if (prob.bc_kind == BCKind::ANCHOR_LEFT) {
+            // Solo u(0) dado: U = u0 + x N.
+            Complex u0 = prob.ivp_u0;
+            U.v = u0 + ansatz_term(x, ad.v);
+            U.dx = ad.v + x * ad.dx;
+            U.dxx = 2.0 * ad.dx + x * ad.dxx;
+            return U;
+        }
+        Complex u0 = prob.bc(0.0, 0.0, 0.0), u1 = prob.bc(1.0, 0.0, 0.0);
+        Complex L = u0 + x * (u1 - u0), dL = u1 - u0;
+        double B = x * (x - 1.0), dB = 2.0 * x - 1.0, d2B = 2.0;
+        U.v = L + ansatz_term(B, ad.v);
         U.dx = dL + dB * ad.v + B * ad.dx;
         U.dxx = d2B * ad.v + 2.0 * dB * ad.dx + B * ad.dxx;
-        U.dy = U.dt = U.dyy = U.dtt = 0.0;
         return U;
     }
 
-    if (prob.priors.one_sided_boundary) {
-        // Version radial del ansatz de un solo lado (ver comentario extenso
-        // en el caso dim==1): U(x,y) = u0 + r*N(x,y), r=sqrt(x^2+y^2), ancla
-        // SOLO el origen — el unico punto con dato de frontera real para una
-        // EDO semi-infinita truncada a [0,1]^2 (detectado via
-        // priors.one_sided_boundary/pole_at_origin, no por nombre de EDP).
-        // r_x=x/r y r_y=y/r estan acotados en [-1,1] siempre; r_xx=y^2/r^3 y
-        // r_yy=x^2/r^3 SI divergen en el limite r->0 — r_eps evita la
-        // division exacta por cero (los puntos de dominio muestreados nunca
-        // caen exactamente en el origen, pero pueden acercarse mucho, ver los
-        // anillos log-espaciados cerca del origen que usa Thomas-Fermi).
-        double u0 = prob.bc(0.0, 0.0, 0.0).real();
-        double r = std::sqrt(x*x + y*y);
-        double r_eps = std::max(r, 1e-6);
-        double r_x = x / r_eps, r_y = y / r_eps;
-        double r_xx = (y*y) / (r_eps*r_eps*r_eps);
-        double r_yy = (x*x) / (r_eps*r_eps*r_eps);
+    // 2D: interpolacion transfinita (Coons) de los datos en las 4 aristas.
+    // Las derivadas de los datos a lo largo de cada arista se toman por
+    // diferencias centradas sobre bc() evaluado EN la arista.
+    const double hfd = 1e-4;
+    Complex g0 = prob.bc(0.0, y), g1 = prob.bc(1.0, y);
+    Complex h0 = prob.bc(x, 0.0), h1 = prob.bc(x, 1.0);
+    Complex c00 = prob.bc(0.0, 0.0), c10 = prob.bc(1.0, 0.0);
+    Complex c01 = prob.bc(0.0, 1.0), c11 = prob.bc(1.0, 1.0);
+    Complex g0_yp = prob.bc(0.0, y + hfd), g0_ym = prob.bc(0.0, y - hfd);
+    Complex g1_yp = prob.bc(1.0, y + hfd), g1_ym = prob.bc(1.0, y - hfd);
+    Complex h0_xp = prob.bc(x + hfd, 0.0), h0_xm = prob.bc(x - hfd, 0.0);
+    Complex h1_xp = prob.bc(x + hfd, 1.0), h1_xm = prob.bc(x - hfd, 1.0);
+    Complex g0_y = (g0_yp - g0_ym) / (2.0 * hfd), g0_yy = (g0_yp - 2.0 * g0 + g0_ym) / (hfd * hfd);
+    Complex g1_y = (g1_yp - g1_ym) / (2.0 * hfd), g1_yy = (g1_yp - 2.0 * g1 + g1_ym) / (hfd * hfd);
+    Complex h0_x = (h0_xp - h0_xm) / (2.0 * hfd), h0_xx = (h0_xp - 2.0 * h0 + h0_xm) / (hfd * hfd);
+    Complex h1_x = (h1_xp - h1_xm) / (2.0 * hfd), h1_xx = (h1_xp - 2.0 * h1 + h1_xm) / (hfd * hfd);
 
-        AD U;
-        U.v = u0 + r * ad.v;
-        U.dx = r_x * ad.v + r * ad.dx;
-        U.dxx = r_xx * ad.v + 2.0 * r_x * ad.dx + r * ad.dxx;
-        U.dy = r_y * ad.v + r * ad.dy;
-        U.dyy = r_yy * ad.v + 2.0 * r_y * ad.dy + r * ad.dyy;
-        U.dt = ad.dt; U.dtt = ad.dtt;
-        return U;
-    }
-
-    // dim == 2: interpolación transfinita (Coons patch) sobre [0,1]². B se anula
-    // en las 4 aristas, L reproduce bc() exacto en cada arista (cancelación de
-    // esquinas verificada a mano). g0,g1,h0,h1 (bc a lo largo de cada arista) y
-    // sus derivadas se obtienen con diferencias finitas centradas sobre bc()
-    // (h=1e-4) — es una función fija y barata (no parte de la optimización), no
-    // hace falta AD ahí, sólo en la parte del árbol (ad.v/ad.dx/ad.dy/...).
-    double hfd = 1e-4;
-    double g0 = prob.bc(0.0, y, 0.0).real(),  g1 = prob.bc(1.0, y, 0.0).real();
-    double h0 = prob.bc(x, 0.0, 0.0).real(),  h1 = prob.bc(x, 1.0, 0.0).real();
-    double c00 = prob.bc(0.0, 0.0, 0.0).real(), c10 = prob.bc(1.0, 0.0, 0.0).real();
-    double c01 = prob.bc(0.0, 1.0, 0.0).real(), c11 = prob.bc(1.0, 1.0, 0.0).real();
-
-    double g0_yp = prob.bc(0.0, y + hfd, 0.0).real(), g0_ym = prob.bc(0.0, y - hfd, 0.0).real();
-    double g1_yp = prob.bc(1.0, y + hfd, 0.0).real(), g1_ym = prob.bc(1.0, y - hfd, 0.0).real();
-    double h0_xp = prob.bc(x + hfd, 0.0, 0.0).real(), h0_xm = prob.bc(x - hfd, 0.0, 0.0).real();
-    double h1_xp = prob.bc(x + hfd, 1.0, 0.0).real(), h1_xm = prob.bc(x - hfd, 1.0, 0.0).real();
-
-    double g0_y = (g0_yp - g0_ym) / (2.0 * hfd);
-    double g0_yy = (g0_yp - 2.0 * g0 + g0_ym) / (hfd * hfd);
-    double g1_y = (g1_yp - g1_ym) / (2.0 * hfd);
-    double g1_yy = (g1_yp - 2.0 * g1 + g1_ym) / (hfd * hfd);
-    double h0_x = (h0_xp - h0_xm) / (2.0 * hfd);
-    double h0_xx = (h0_xp - 2.0 * h0 + h0_xm) / (hfd * hfd);
-    double h1_x = (h1_xp - h1_xm) / (2.0 * hfd);
-    double h1_xx = (h1_xp - 2.0 * h1 + h1_xm) / (hfd * hfd);
-
-    double L = (1.0 - x) * g0 + x * g1 + (1.0 - y) * h0 + y * h1
-             - (1.0 - x) * (1.0 - y) * c00 - x * (1.0 - y) * c10
-             - (1.0 - x) * y * c01 - x * y * c11;
-    double L_x = -g0 + g1 + (1.0 - y) * h0_x + y * h1_x
+    Complex L = (1.0 - x) * g0 + x * g1 + (1.0 - y) * h0 + y * h1
+              - (1.0 - x) * (1.0 - y) * c00 - x * (1.0 - y) * c10
+              - (1.0 - x) * y * c01 - x * y * c11;
+    Complex L_x = -g0 + g1 + (1.0 - y) * h0_x + y * h1_x
                 + (1.0 - y) * c00 - (1.0 - y) * c10 + y * c01 - y * c11;
-    double L_xx = (1.0 - y) * h0_xx + y * h1_xx;
-    double L_y = (1.0 - x) * g0_y + x * g1_y - h0 + h1
+    Complex L_xx = (1.0 - y) * h0_xx + y * h1_xx;
+    Complex L_y = (1.0 - x) * g0_y + x * g1_y - h0 + h1
                 + (1.0 - x) * c00 + x * c10 - (1.0 - x) * c01 - x * c11;
-    double L_yy = (1.0 - x) * g0_yy + x * g1_yy;
+    Complex L_yy = (1.0 - x) * g0_yy + x * g1_yy;
 
     double B = x * (1.0 - x) * y * (1.0 - y);
-    double B_x = (1.0 - 2.0 * x) * y * (1.0 - y);
-    double B_xx = -2.0 * y * (1.0 - y);
-    double B_y = x * (1.0 - x) * (1.0 - 2.0 * y);
-    double B_yy = -2.0 * x * (1.0 - x);
+    double B_x = (1.0 - 2.0 * x) * y * (1.0 - y), B_xx = -2.0 * y * (1.0 - y);
+    double B_y = x * (1.0 - x) * (1.0 - 2.0 * y), B_yy = -2.0 * x * (1.0 - x);
 
-    AD U;
-    U.v = L + B * ad.v;
+    U.v = L + ansatz_term(B, ad.v);
     U.dx = L_x + B_x * ad.v + B * ad.dx;
     U.dxx = L_xx + B_xx * ad.v + 2.0 * B_x * ad.dx + B * ad.dxx;
     U.dy = L_y + B_y * ad.v + B * ad.dy;
     U.dyy = L_yy + B_yy * ad.v + 2.0 * B_y * ad.dy + B * ad.dyy;
-    U.dt = ad.dt; U.dtt = ad.dtt; // problemas 2D en el ansatz son estacionarios
     return U;
 }
+
+// ─── Unica cadena de evaluacion de la solucion ────────────────────────────────
+// arbol -> jet (orden 4 si el operador lo pide) -> ansatz (si aplica) ->
+// parte real (si el campo es real). La usan entrenamiento, validacion, RAR,
+// pesos por punto, gradiente de constantes, reporte y oraculo.
+static AD tree_jet(const PDEProblem& prob, const Node* tree, double x, double y, double t) {
+    return (prob.spatial_order > 2) ? tree->ad_eval_ext_t(x, y, t, prob.dim)
+                                    : tree->ad_eval_t(x, y, t, prob.dim);
+}
+
+static AD solution_jet(const PDEProblem& prob, const Node* tree, double x, double y, double t, bool use_ansatz) {
+    AD a = tree_jet(prob, tree, x, y, t);
+    if (use_ansatz) a = apply_boundary_ansatz(prob, a, x, y);
+    return prob.complex_field ? a : project_real(a);
+}
+
+static Complex residual_at(const PDEProblem& prob, const Node* tree, const Point& p, bool use_ansatz) {
+    return prob.pde_residual_ad(solution_jet(prob, tree, p.x, p.y, p.t, use_ansatz), p.x, p.y, p.t);
+}
+
+// Error de frontera medido. Con ansatz es 0 por construccion (la verificacion
+// de que la construccion realmente funciona es ansatz_border_check).
+// Combinacion lineal de jets completos (para extrapolar valor y derivadas).
+static AD ad_lincomb3(double a, const AD& A, double b, const AD& B, double c, const AD& C) {
+    AD r;
+    auto f = [&](Complex AD::*m) { r.*m = a * (A.*m) + b * (B.*m) + c * (C.*m); };
+    for (Complex AD::*m : {&AD::v, &AD::dx, &AD::dy, &AD::dt, &AD::dxx, &AD::dyy, &AD::dtt,
+                           &AD::dxy, &AD::dxt, &AD::dyt, &AD::dxxx, &AD::dxxy, &AD::dxyy, &AD::dyyy,
+                           &AD::dxxt, &AD::dyyt, &AD::dxxxx, &AD::dxxyy, &AD::dyyyy}) f(m);
+    return r;
+}
+
+// Direccion hacia el interior del dominio desde un punto de frontera.
+static Point inward_dir(const PDEProblem& prob, const Point& p) {
+    Point n{0.0, 0.0, 0.0};
+    if (p.x == 0.0) n.x = 1.0; else if (p.x == 1.0) n.x = -1.0;
+    if (prob.dim == 2) { if (p.y == 0.0) n.y = 1.0; else if (p.y == 1.0) n.y = -1.0; }
+    if (n.x == 0.0 && n.y == 0.0 && prob.is_unsteady && p.t == 0.0) n.t = 1.0;
+    return n;
+}
+
+// Sin ansatz (U directo) la condicion de borde se exige como LIMITE lateral,
+// no solo en el punto: si no, un pico exp(-(x/eps)^2) con eps -> 0 fija U(0)
+// exactamente mientras el interior resuelve otra solucion (u(0+) != dato) y
+// ningun punto de colocacion cae dentro del pico. El limite se estima por
+// extrapolacion cubica 3U(d)-3U(2d)+U(3d) a dos escalas (1e-3 y 1e-5; entre
+// ambas cubren cualquier ancho de pico que el residuo no vea). Sesgo para
+// soluciones suaves O(d^3); para la singularidad x^{3/2} de Thomas-Fermi ~1e-5.
+static double boundary_error(const PDEProblem& prob, const Node* tree, const std::vector<Point>& bnd, bool use_ansatz) {
+    if (use_ansatz || bnd.empty()) return 0.0;
+    double s = 0.0;
+    for (auto& p : bnd) {
+        double e = prob.boundary_mismatch_sq(solution_jet(prob, tree, p.x, p.y, p.t, false), p);
+        Point n = inward_dir(prob, p);
+        if (n.x != 0.0 || n.y != 0.0 || n.t != 0.0) {
+            for (double d : {1e-3, 1e-5}) {
+                auto at = [&](double k) {
+                    return solution_jet(prob, tree, p.x + k * d * n.x, p.y + k * d * n.y, p.t + k * d * n.t, false);
+                };
+                AD lim = ad_lincomb3(3.0, at(1), -3.0, at(2), 1.0, at(3));
+                double el = prob.boundary_mismatch_sq(lim, p);
+                e = std::isfinite(el) ? std::max(e, el) : el;
+            }
+        }
+        s += std::isfinite(e) ? std::min(e, 1e4) : 1e4;
+    }
+    return s / bnd.size();
+}
+
+// Verificacion del ansatz en el borde: U debe tender al dato de borde. La
+// garantia de U=L+B*N solo vale si N no diverge cerca del borde; un N ~ C/x
+// deja B*N -> C != 0 y rompe la condicion sin que el residuo lo note. Se
+// evalua U muy cerca de cada parte de la frontera con dato y se compara con el
+// dato EN la frontera.
+struct BorderCheck { bool finite = true; double max_gap = 0.0; double sum_sq = 0.0; };
+
+// U debe estar definida EXACTAMENTE en la frontera (dominio cerrado), no solo
+// cerca: una singularidad removible (0/x, x log x sin limite evaluable) pasa
+// el chequeo a distancia 1e-6 pero deja NaN en x=0 en la solucion exportada.
+// Aplica con y sin ansatz.
+static bool finite_on_boundary(const PDEProblem& prob, const Node* tree, bool use_ansatz) {
+    std::vector<double> ts = prob.is_unsteady ? std::vector<double>{0.0, 0.5, 1.0} : std::vector<double>{0.0};
+    auto ok = [&](double x, double y, double t) {
+        Complex v = solution_jet(prob, tree, x, y, t, use_ansatz).v;
+        return std::isfinite(v.real()) && std::isfinite(v.imag());
+    };
+    for (double t : ts) {
+        if (prob.dim == 1) {
+            if (!ok(0.0, 0.0, t) || !ok(1.0, 0.0, t)) return false;
+            continue;
+        }
+        for (double s : {0.0, 0.25, 0.5, 0.75, 1.0})
+            if (!ok(0.0, s, t) || !ok(1.0, s, t) || !ok(s, 0.0, t) || !ok(s, 1.0, t)) return false;
+    }
+    return true;
+}
+static BorderCheck ansatz_border_check(const PDEProblem& prob, const Node* tree) {
+    constexpr double E = 1e-6;
+    BorderCheck bc;
+    auto add = [&](Complex gap) {
+        double g = std::abs(gap);
+        if (!std::isfinite(g)) { bc.finite = false; return; }
+        bc.max_gap = std::max(bc.max_gap, g);
+        bc.sum_sq += g * g;
+    };
+    if (prob.dim == 1) {
+        AD a = solution_jet(prob, tree, E, 0.0, 0.0, true);
+        if (prob.bc_kind == BCKind::IVP_LEFT) {
+            add(a.v - prob.ivp_u0);
+            add(a.dx - prob.ivp_du0);
+        } else if (prob.bc_kind == BCKind::ANCHOR_LEFT) {
+            add(a.v - prob.ivp_u0);
+        } else {
+            add(a.v - prob.bc(0.0, 0.0, 0.0));
+            AD b = solution_jet(prob, tree, 1.0 - E, 0.0, 0.0, true);
+            add(b.v - prob.bc(1.0, 0.0, 0.0));
+        }
+        return bc;
+    }
+    for (double s : {0.25, 0.5, 0.75}) {
+        add(solution_jet(prob, tree, E, s, 0.0, true).v - prob.bc(0.0, s));
+        add(solution_jet(prob, tree, 1.0 - E, s, 0.0, true).v - prob.bc(1.0, s));
+        add(solution_jet(prob, tree, s, E, 0.0, true).v - prob.bc(s, 0.0));
+        add(solution_jet(prob, tree, s, 1.0 - E, 0.0, true).v - prob.bc(s, 1.0));
+    }
+    return bc;
+}
+
+// Perdidas de entrenamiento (sin chequeos de factibilidad). Unica definicion,
+// usada por evaluate() y por el gradiente de constantes.
+static void compute_losses(const PDEProblem& prob, const Node* tree,
+                           const std::vector<Point>& dom, const std::vector<Point>& bnd,
+                           const std::vector<double>* dom_weights, bool use_ansatz,
+                           double& mse_dom, double& mse_bnd, bool& finite) {
+    finite = true;
+    double s = 0.0, wsum = 0.0;
+    for (size_t k = 0; k < dom.size(); ++k) {
+        Complex res = residual_at(prob, tree, dom[k], use_ansatz);
+        if (!std::isfinite(res.real()) || !std::isfinite(res.imag())) { finite = false; mse_dom = mse_bnd = 1e18; return; }
+        // Recorte por punto: un outlier finito pero astronomico (p. ej. cerca
+        // de una singularidad) no debe dominar el promedio.
+        double w = (dom_weights && k < dom_weights->size()) ? (*dom_weights)[k] : 1.0;
+        s += w * std::min(std::norm(res), 1e4);
+        wsum += w;
+    }
+    mse_dom = (wsum > 0.0) ? s / wsum : 0.0;
+    mse_bnd = Config::GENERAL_MODE ? 0.0 : boundary_error(prob, tree, bnd, use_ansatz);
+}
+
+Complex eval_solution(const PDEProblem& prob, const Node* tree, double x, double y, double t, bool raw) {
+    return solution_jet(prob, tree, x, y, t, uses_ansatz(prob, raw)).v;
+}
+
+bool solution_uses_ansatz(const PDEProblem& prob, bool raw) { return uses_ansatz(prob, raw); }
+
+double physics_loss(const PDEProblem& prob, const Node* tree,
+                    const std::vector<Point>& dom, const std::vector<Point>& bnd, bool raw) {
+    double d, b; bool fin;
+    compute_losses(prob, tree, dom, bnd, nullptr, uses_ansatz(prob, raw), d, b, fin);
+    return fin ? d + b : 1e18;
+}
+
+// Gradiente de la perdida respecto de cada constante por diferencias
+// centradas. Correcto aunque el arbol sea complejo (CONST_I, rotaciones de
+// fase), aunque haya proyeccion a parte real o |.| en el operador, y aunque
+// la perdida sum|R|^2 no sea holomorfa: se perturba la constante REAL y se
+// mide la perdida real. (El paso complejo anterior, Im f(c+ih)/h, solo es
+// valido si f es real para c real; con e^{i theta} o i en el arbol producia
+// gradientes espurios ~1/h.)
+std::vector<double> constant_gradient(const PDEProblem& prob, Node* tree,
+                                      const std::vector<Point>& dom, const std::vector<Point>& bnd,
+                                      double h_rel, bool raw) {
+    std::vector<Complex*> ercs; tree->collect_ercs(ercs);
+    std::vector<double> g(ercs.size(), 0.0);
+    bool use_ansatz = uses_ansatz(prob, raw);
+    for (size_t k = 0; k < ercs.size(); ++k) {
+        Complex orig = *ercs[k];
+        double h = h_rel * std::max(1.0, std::abs(orig.real()));
+        double dp, bp, dm, bm; bool fp, fm;
+        *ercs[k] = Complex(orig.real() + h, orig.imag());
+        compute_losses(prob, tree, dom, bnd, nullptr, use_ansatz, dp, bp, fp);
+        *ercs[k] = Complex(orig.real() - h, orig.imag());
+        compute_losses(prob, tree, dom, bnd, nullptr, use_ansatz, dm, bm, fm);
+        *ercs[k] = orig;
+        g[k] = (fp && fm) ? ((dp + bp) - (dm + bm)) / (2.0 * h) : 0.0;
+        if (!std::isfinite(g[k])) g[k] = 0.0;
+    }
+    return g;
+}
+
+thread_local std::vector<std::string>* PIIndividual::violation_log = nullptr;
 
 void PIIndividual::evaluate(const PDEProblem& prob,
                             const std::vector<Point>& dom,
                             const std::vector<Point>& bnd,
-                            int current_gen,
+                            int /*current_gen*/,
                             const std::vector<double>* dom_weights)
 {
-    if (!tree) { 
+    if (!tree) {
         is_feasible = false; constraint_violation = 1.0;
-        mse_domain = 1e18; mse_boundary = 1e18; return; 
+        mse_domain = 1e18; mse_boundary = 1e18; return;
     }
 
     is_feasible = true;
     constraint_violation = 0.0;
+    auto violate = [&](double w, const char* why) {
+        is_feasible = false; constraint_violation += w;
+        if (violation_log) violation_log->push_back(why);
+    };
 
-    if (!is_physically_complete(prob)) {
-        is_feasible = false;
-        constraint_violation += 10.0;
-    }
+    // ── Factibilidad: solo validez de la expresion y gramatica del lenguaje
+    // de busqueda. Ningun prior del operador (simetria, separabilidad) excluye
+    // candidatos: los priors solo sesgan la inicializacion. Tambien se
+    // eliminaron la restriccion anti-plano (excluia la solucion exacta de
+    // Laplace 1D, u=x), max_grad>15 (hiperparametro dependiente del problema)
+    // y la varianza minima: con ansatz o con frontera medida, un plano o una
+    // constante que no es la solucion ya falla la frontera o el residuo.
+    if (!is_physically_complete(prob)) violate(10.0, "no usa todas las variables independientes");
 
     if (!(prob.dim_u == Units::None)) {
-        // El bypass "si el arbol tiene un ERC en cualquier parte, saltate el
-        // chequeo" parecia demasiado amplio, pero al sacarlo (probado
-        // empiricamente) la poblacion entera queda 100% infactible siempre:
-        // las ERC son numeros puros sin unidades propias, y MUL/DIV combinan
-        // dimensiones sumando/restando (correcto dimensionalmente) — asi que
-        // NINGUN arbol construido desde variables (dim_x=Length, etc.) puede
-        // alcanzar una dimension distinta como Energy sin una constante que
-        // cargue la diferencia. El motor no modela "constantes con unidades
-        // propias" (ej. una g=9.8 m/s^2 ajustada empiricamente), asi que
-        // exigir coincidencia exacta es estructuralmente imposible de
-        // cumplir, no un criterio util. Se mantiene el bypass por ERC (sigue
-        // siendo la unica forma de que el chequeo no bloquee al 100% de la
-        // poblacion), pero se corrige el gap real que si encontramos: la
-        // excepcion `!prob.is_numerical` dejaba a Duffing (dim_u=Acceleration,
-        // is_numerical=true) fuera del chequeo aunque si tiene unidades
-        // asignadas — sin motivo para excluirlo.
+        // Las ERC son numeros puros: sin una constante que cargue unidades,
+        // ningun arbol hecho solo de variables alcanza otra dimension. El
+        // chequeo aplica solo a arboles sin ERC.
         auto d_opt = tree->get_dimension(prob);
         bool has_erc = tree->contains_erc();
-        if (!has_erc && (!d_opt.has_value() || *d_opt != prob.dim_u)) {
-            is_feasible = false;
-            constraint_violation += 5.0;
-        }
+        if (!has_erc && (!d_opt.has_value() || *d_opt != prob.dim_u)) violate(5.0, "dimension inconsistente");
     }
+    if (tree->get_unary_depth() > 3) violate(1.0, "profundidad unaria > 3");
+    if (tree->get_depth() > Config::MAX_TREE_DEPTH) violate(1.0, "profundidad > MAX_TREE_DEPTH");
+    if (tree->has_nested_trig()) violate(1.0, "trigonometrica anidada");
+    if (tree->has_non_affine_trig_arg()) violate(1.0, "argumento trigonometrico no afin");
+    if (tree->has_nested_polynomial()) violate(1.0, "polinomio anidado");
+    if (tree->has_nested_exp()) violate(1.0, "exponencial anidada");
+    if (tree->has_invalid_polynomial_degree()) violate(1.0, "grado de polinomio invalido");
 
-    if (tree->get_unary_depth() > 3) {
-        is_feasible = false;
-        constraint_violation += 1.0;
+    bool use_ansatz = uses_ansatz(prob, raw);
+    if (use_ansatz) {
+        BorderCheck b = ansatz_border_check(prob, tree.get());
+        if (!b.finite || b.max_gap > 0.05) violate(1.0, "el ansatz no alcanza el dato de borde (N diverge en el borde)");
     }
+    if (!finite_on_boundary(prob, tree.get(), use_ansatz)) violate(1.0, "la solucion no esta definida en la frontera (NaN/inf)");
 
-    if (tree->get_depth() > Config::MAX_TREE_DEPTH) {
-        is_feasible = false;
-        constraint_violation += 1.0;
-    }
-
-    if (tree->has_nested_trig()) {
-        is_feasible = false;
-        constraint_violation += 1.0;
-    }
-
-    if (tree->has_non_affine_trig_arg()) {
-        is_feasible = false;
-        constraint_violation += 1.0;
-    }
-
-    if (tree->has_nested_polynomial()) {
-        is_feasible = false;
-        constraint_violation += 1.0;
-    }
-
-    if (tree->has_nested_exp()) {
-        is_feasible = false;
-        constraint_violation += 1.0;
-    }
-
-    if (tree->has_invalid_polynomial_degree()) {
-        is_feasible = false;
-        constraint_violation += 1.0;
-    }
-
-    double pde_mse = 0.0;
-    std::vector<double> sample_values;
-    std::vector<double> grad_magnitudes;
-    sample_dom_variance = 0.0;
-    double max_grad = 0.0;
-
-    bool use_ansatz = ansatz_applies(prob, bnd.size());
-
-    // Restricción de simetría: si probe_priors detectó que TANTO el operador
-    // COMO la condición de frontera son invariantes ante x<->1-x (o y<->1-y en
-    // 2D) — ver PDEPriors::mirror_symmetric_x/y — la solución real está
-    // matemáticamente obligada a respetar esa reflexión (unicidad). Un
-    // candidato que no la respeta no puede ser la solución, sin importar qué
-    // tan bajo sea su residuo — se marca infactible, mismo patrón que el resto
-    // de las restricciones de esta función.
-    if (prob.priors.mirror_symmetric_x || (prob.dim == 2 && prob.priors.mirror_symmetric_y)) {
-        auto eval_u = [&](double x, double y) -> Complex {
-            AD a = tree->ad_eval_t(x, y, 0.0, prob.dim);
-            if (use_ansatz) a = apply_boundary_ansatz(prob, a, x, y);
-            return a.v;
-        };
-        constexpr double SYM_TOL = 0.05; // 5% de discrepancia relativa tolerada
-        if (prob.priors.mirror_symmetric_x) {
-            Complex ua = eval_u(0.25, 0.5), ub = eval_u(0.75, 0.5);
-            double scale = std::max({std::abs(ua), std::abs(ub), 1e-6});
-            if (!std::isfinite(ua.real()) || !std::isfinite(ub.real()) || std::abs(ua - ub) > SYM_TOL * scale) {
-                is_feasible = false;
-                constraint_violation += 1.0;
-            }
-        }
-        if (prob.dim == 2 && prob.priors.mirror_symmetric_y) {
-            Complex ua = eval_u(0.5, 0.25), ub = eval_u(0.5, 0.75);
-            double scale = std::max({std::abs(ua), std::abs(ub), 1e-6});
-            if (!std::isfinite(ua.real()) || !std::isfinite(ub.real()) || std::abs(ua - ub) > SYM_TOL * scale) {
-                is_feasible = false;
-                constraint_violation += 1.0;
-            }
-        }
-    }
-
-    // Restricción de separabilidad: antes solo se usaba para SEMBRAR la
-    // población inicial (ver random_separable_tree/random_triple_separable_tree
-    // en PISolver::run) — nada impedía que mutación/cruzamiento la destruyeran
-    // despues, ya que solo era un punto de partida, no una restricción activa
-    // (a diferencia de la simetría especular arriba, que sí se re-chequea en
-    // cada evaluate()). Se agrega el mismo tratamiento: si el operador es
-    // separable, cualquier candidato que NO respete esa estructura en su
-    // propia salida se marca infactible — sin importar qué tan bajo sea su
-    // residuo, no puede ser la solución real si el operador exige separación.
-    // Aditiva: f(x1)+g(y1) + f(x2)+g(y2) = f(x1)+g(y2) + f(x2)+g(y1) (identidad
-    // algebraica que se cumple para CUALQUIER función aditivamente separable).
-    // Multiplicativa: U(x1,y1)U(x2,y2) = U(x1,y2)U(x2,y1) (identidad analoga
-    // para productos). Triple: la multiplicativa aplicada a cada par de
-    // variables por separado, con la tercera fija.
-    if (prob.priors.additive_separable || prob.priors.multiplicative_separable || prob.priors.triple_separable) {
-        auto eval_u3 = [&](double x, double y, double t) -> Complex {
-            AD a = tree->ad_eval_t(x, y, t, prob.dim);
-            if (use_ansatz) a = apply_boundary_ansatz(prob, a, x, y);
-            return a.v;
-        };
-        constexpr double SEP_TOL = 0.05;
-        auto check_additive = [&](Complex u11, Complex u22, Complex u12, Complex u21) {
-            Complex lhs = u11 + u22, rhs = u12 + u21;
-            double scale = std::max({std::abs(u11), std::abs(u22), std::abs(u12), std::abs(u21), 1e-6});
-            return std::isfinite(lhs.real()) && std::isfinite(rhs.real()) && std::abs(lhs - rhs) <= SEP_TOL * scale;
-        };
-        auto check_mult = [&](Complex u11, Complex u22, Complex u12, Complex u21) {
-            Complex lhs = u11 * u22, rhs = u12 * u21;
-            double scale = std::max({std::abs(lhs), std::abs(rhs), 1e-6});
-            return std::isfinite(lhs.real()) && std::isfinite(rhs.real()) && std::abs(lhs - rhs) <= SEP_TOL * scale;
-        };
-        if (prob.priors.additive_separable) {
-            Complex u11 = eval_u3(0.25, 0.25, 0.0), u22 = eval_u3(0.75, 0.75, 0.0);
-            Complex u12 = eval_u3(0.25, 0.75, 0.0), u21 = eval_u3(0.75, 0.25, 0.0);
-            if (!check_additive(u11, u22, u12, u21)) { is_feasible = false; constraint_violation += 1.0; }
-        }
-        if (prob.priors.multiplicative_separable) {
-            Complex u11 = eval_u3(0.25, 0.25, 0.0), u22 = eval_u3(0.75, 0.75, 0.0);
-            Complex u12 = eval_u3(0.25, 0.75, 0.0), u21 = eval_u3(0.75, 0.25, 0.0);
-            if (!check_mult(u11, u22, u12, u21)) { is_feasible = false; constraint_violation += 1.0; }
-        }
-        if (prob.priors.triple_separable) {
-            Complex a11 = eval_u3(0.25, 0.25, 0.5), a22 = eval_u3(0.75, 0.75, 0.5);
-            Complex a12 = eval_u3(0.25, 0.75, 0.5), a21 = eval_u3(0.75, 0.25, 0.5);
-            if (!check_mult(a11, a22, a12, a21)) { is_feasible = false; constraint_violation += 1.0; }
-            Complex b11 = eval_u3(0.25, 0.5, 0.25), b22 = eval_u3(0.75, 0.5, 0.75);
-            Complex b12 = eval_u3(0.25, 0.5, 0.75), b21 = eval_u3(0.75, 0.5, 0.25);
-            if (!check_mult(b11, b22, b12, b21)) { is_feasible = false; constraint_violation += 1.0; }
-            Complex c11 = eval_u3(0.5, 0.25, 0.25), c22 = eval_u3(0.5, 0.75, 0.75);
-            Complex c12 = eval_u3(0.5, 0.25, 0.75), c21 = eval_u3(0.5, 0.75, 0.25);
-            if (!check_mult(c11, c22, c12, c21)) { is_feasible = false; constraint_violation += 1.0; }
-        }
-    }
-
-    double weight_sum = 0.0;
-    for (size_t pt_idx = 0; pt_idx < dom.size(); ++pt_idx) {
-        const Point& p = dom[pt_idx];
-        AD ad = tree->ad_eval_t(p.x, p.y, p.t, prob.dim);
-
-        if (use_ansatz) ad = apply_boundary_ansatz(prob, ad, p.x, p.y);
-
-        sample_values.push_back(ad.v.real());
-        
-        double g_mag = std::abs(ad.dx.real()) + std::abs(ad.dy.real()) + std::abs(ad.dt.real());
-        grad_magnitudes.push_back(g_mag);
-        max_grad = std::max(max_grad, g_mag);
-
-        // Pasamos null como tree porque la evaluación ya está en ad, y cambiamos prob.compute_residual 
-        // para que use pde_residual_ad directamente si le mandamos un proxy.
-        // Pero compute_residual llama a tree->ad_eval_t. Así que necesitamos usar pde_residual_ad directamente!
-        Complex res = prob.pde_residual_ad(ad, p.x, p.y, p.t);
-        
-        if (!std::isfinite(res.real()) || !std::isfinite(res.imag())) {
-            is_feasible = false; constraint_violation += 10.0;
-            mse_domain = 1e18; mse_boundary = 1e18; return;
-        }
-        // Recorte universal del residuo por punto (antes sólo para PDEs marcados
-        // IS_SINGULAR, ver Lane-Emden/Thomas-Fermi: un único punto con residuo
-        // finito pero astronómico cerca de una singularidad podía dominar el
-        // promedio y hacer saltar mse_domain ordenes de magnitud sin relación con
-        // la calidad real del resto del dominio). El mismo riesgo — un outlier
-        // numérico arruinando el promedio — existe en cualquier PDE, no sólo los
-        // marcados como singulares, así que el cap aplica siempre. Para
-        // individuos bien comportados (la inmensa mayoría) el residuo normal
-        // está muy por debajo de 1e4, así que esto no cambia nada en la práctica
-        // salvo proteger contra outliers.
-        double point_err = std::min(std::norm(res), 1e4);
-        double w = (dom_weights && pt_idx < dom_weights->size()) ? (*dom_weights)[pt_idx] : 1.0;
-        pde_mse += w * point_err;
-        weight_sum += w;
-    }
-    if (weight_sum > 0.0) pde_mse /= weight_sum;
-
-    if (max_grad > 15.0) { is_feasible = false; constraint_violation += 5.0; }
-    
-    // Varianza de la función
-    if (!sample_values.empty()) {
-        double sum = std::accumulate(sample_values.begin(), sample_values.end(), 0.0);
-        double mean = sum / sample_values.size();
-        double sq_sum = std::inner_product(sample_values.begin(), sample_values.end(), sample_values.begin(), 0.0);
-        sample_dom_variance = std::abs((sq_sum / sample_values.size()) - (mean * mean));
-        if (sample_dom_variance < (1e-12 * mean * mean + 1e-15)) { is_feasible = false; constraint_violation += 1.0; }
-    }
-
-    // Curvatura Estructural (Anti-Aproximación Lineal)
-    // Exigimos que el gradiente NO sea constante (varianza del gradiente > 0)
-    if (!grad_magnitudes.empty()) {
-        double g_sum = std::accumulate(grad_magnitudes.begin(), grad_magnitudes.end(), 0.0);
-        double g_mean = g_sum / grad_magnitudes.size();
-        double g_sq_sum = std::inner_product(grad_magnitudes.begin(), grad_magnitudes.end(), grad_magnitudes.begin(), 0.0);
-        double g_var = std::abs((g_sq_sum / grad_magnitudes.size()) - (g_mean * g_mean));
-        
-        // Si el gradiente es constante (varianza < 1e-10) y la función no es plana (g_mean > 1e-5),
-        // significa que es un plano lineal (u = cx + dy). Eso no resuelve una PDE de 2do orden.
-        if (g_var < 1e-10 && g_mean > 1e-5) { 
-            is_feasible = false; 
-            constraint_violation += 1.0; 
-        }
-    }
-
-    // ─── Error de Frontera ───
-    double raw_bc_mse = 0.0;
-    if (Config::GENERAL_MODE) {
-        raw_bc_mse = 0.0;
-    } else if (use_ansatz) {
-        raw_bc_mse = 0.0; // El Ansatz cumple las condiciones de frontera de manera exacta!
-    } else {
-        raw_bc_mse = prob.compute_boundary_error(tree.get(), bnd);
-    }
+    bool finite;
+    compute_losses(prob, tree.get(), dom, bnd, dom_weights, use_ansatz, mse_domain, mse_boundary, finite);
+    if (!finite) violate(10.0, "residuo no finito");
 
     tree_size = tree->count_nodes();
     root_type = tree->get_type();
-    mse_domain = pde_mse; mse_boundary = raw_bc_mse; 
 }
 
-double PIIndividual::get_validation_mse(const PDEProblem& prob,
-                                        const std::vector<Point>& val_dom,
-                                        const std::vector<Point>& val_bnd)
+// Puntaje de validacion: SOLO informacion de la EDP (residuo en una grilla fija
+// y densa del interior, distinta de los puntos de entrenamiento; frontera
+// medida en una grilla fija; y, con ansatz, la verificacion en el borde). Lo
+// usan el Hall of Fame y el early-stop. La referencia nunca entra aqui.
+double PIIndividual::validation_score(const PDEProblem& prob,
+                                      const std::vector<Point>& val_dom,
+                                      const std::vector<Point>& val_bnd)
 {
     if (!tree) return 1e18;
-    double sum_sq_err = 0.0; int n_pts = 0;
-    // Mismo ansatz U(x,y) = L+B·N que aplica evaluate() durante el entrenamiento
-    // (apply_boundary_ansatz, definido más arriba) — una sola fuente de verdad
-    // para las tres rutas (numérica 1D/2D, no-numérica) en vez de reimplementar
-    // el desenvuelto en cada una por separado. Antes, cada rama tenía su propia
-    // copia (o ninguna, para el caso numérico 2D) y podían divergir en silencio
-    // — exactamente la causa de que val_mse quedara pegado en Airy/Fisher_2D/etc
-    // pese a mejoras reales en el resto de la población.
-    bool use_ansatz = ansatz_applies(prob, val_bnd.size());
-
-    if (prob.is_numerical && !prob.numerical_truth.empty()) {
-        if (prob.dim == 1) {
-            for (auto& pt : val_dom) {
-                AD ad = tree->ad_eval_t(pt.x, pt.y, pt.t, prob.dim);
-                if (use_ansatz) ad = apply_boundary_ansatz(prob, ad, pt.x, pt.y);
-                Complex u_exact = prob.numerical_exact(pt.x, pt.y, pt.t);
-                if (!std::isfinite(ad.v.real())) continue;
-                sum_sq_err += std::norm(ad.v - u_exact); ++n_pts;
-            }
-        } else {
-            int N = (int)std::sqrt(prob.numerical_truth.size());
-            for (int i = 0; i < N; ++i) {
-                for (int j = 0; j < N; ++j) {
-                    double x = i / (double)(N - 1), y = j / (double)(N - 1);
-                    AD ad = tree->ad_eval_t(x, y, 0.0, prob.dim);
-                    if (use_ansatz) ad = apply_boundary_ansatz(prob, ad, x, y);
-                    if (!std::isfinite(ad.v.real())) continue;
-                    sum_sq_err += std::norm(ad.v - prob.numerical_truth[i * N + j]); ++n_pts;
-                }
-            }
-        }
-    } else {
-        for (auto& pt : val_dom) {
-            AD ad = tree->ad_eval_t(pt.x, pt.y, pt.t, prob.dim);
-            if (use_ansatz) ad = apply_boundary_ansatz(prob, ad, pt.x, pt.y);
-            Complex u_exact = prob.exact(pt.x, pt.y, pt.t);
-            if (!std::isfinite(ad.v.real())) continue;
-            sum_sq_err += std::norm(ad.v - u_exact); ++n_pts;
-        }
+    bool use_ansatz = uses_ansatz(prob, raw);
+    if (!finite_on_boundary(prob, tree.get(), use_ansatz)) return 1e18;
+    double d, b; bool fin;
+    compute_losses(prob, tree.get(), val_dom, val_bnd, nullptr, use_ansatz, d, b, fin);
+    if (!fin) return 1e18;
+    double border = 0.0;
+    if (use_ansatz) {
+        BorderCheck bc = ansatz_border_check(prob, tree.get());
+        if (!bc.finite) return 1e18;
+        border = bc.sum_sq;
     }
-    double domain_val_mse = (n_pts > 0) ? sum_sq_err / n_pts : 1e18;
-    if (use_ansatz || domain_val_mse >= 1e18) return domain_val_mse;
+    return d + b + border;
+}
 
-    // Cuando el ansatz exacto no aplica (Navier-Stokes, o Thomas-Fermi 2D
-    // desde hoy — ver ansatz_applies), la frontera deja de ser 0 por
-    // construccion y esta funcion la ignoraba por completo: update_hall_of_fame()
-    // solo compara get_validation_mse() entre candidatos, asi que un individuo
-    // podia ganar el Hall of Fame con excelente ajuste de dominio pero
-    // violando la condicion de frontera sin ninguna penalizacion (confirmado
-    // en Thomas-Fermi_2D: el campeon exportado tenia u(0,0)=0.22 en vez de
-    // 1.0, el unico dato de frontera real del problema). Se suma el mismo
-    // error de frontera que ya usa el entrenamiento (compute_boundary_error,
-    // que para Thomas-Fermi 2D ya esta acotado al origen — ver ese archivo)
-    // para que el campeon elegido tenga que respetar tambien la frontera, no
-    // solo el residuo interior.
-    double bnd_val_mse = prob.compute_boundary_error(tree.get(), val_bnd);
-    return domain_val_mse + bnd_val_mse;
+// Error contra la referencia (exacta o numerica) en los puntos dados. SOLO
+// para evaluar resultados: lo llaman main.cpp (despues de la busqueda), el
+// registro de convergencia (solo escritura) y el oraculo. Ninguna decision del
+// algoritmo lo lee.
+double PIIndividual::reference_error(const PDEProblem& prob, const std::vector<Point>& pts) const
+{
+    if (!tree || pts.empty()) return 1e18;
+    double s = 0.0; int n = 0;
+    for (auto& p : pts) {
+        Complex u = eval_solution(prob, tree.get(), p.x, p.y, p.t, raw);
+        Complex r = prob.reference(p.x, p.y, p.t);
+        double e = std::norm(u - r);
+        if (!std::isfinite(e)) return 1e18;
+        s += e; ++n;
+    }
+    return s / n;
 }
 
 PISolver::PISolver(const PDEProblem& prob, unsigned seed) : prob_(prob), gen_(seed) {
     priors_ = probe_priors(prob_);
-    prob_.priors = priors_; // cacheado en el propio PDEProblem para que evaluate()
-                             // pueda exigir las simetrías detectadas sin necesitar
-                             // un parámetro nuevo en cada call site.
-    int n_val = (prob.dim == 1) ? 200 : 400;
-    val_dom_pts_ = prob_.domain_points(n_val);
-    val_bnd_pts_ = prob_.boundary_points(n_val / 2);
+    prob_.priors = priors_; // solo sesgo de inicializacion/esqueletos
+    // Grillas FIJAS de validacion (densas, deterministas), distintas de los
+    // puntos de entrenamiento (muestreados al azar en run()).
+    val_dom_pts_ = prob_.validation_points();
+    val_bnd_pts_ = prob_.boundary_points(0);
 
     // --- Detector A-Priori de Singularidad ---
     auto dummy_tree = make_binary(NodeType::ADD, make_var('x'), make_erc(1.0));
-    Complex r_center = prob_.compute_residual(dummy_tree.get(), {0.5, 0.5, 0.0});
-    Complex r_edge = prob_.compute_residual(dummy_tree.get(), {1e-5, 1e-5, 0.0});
+    Complex r_center = residual_at(prob_, dummy_tree.get(), {0.5, 0.5, 0.0}, false);
+    Complex r_edge = residual_at(prob_, dummy_tree.get(), {1e-5, 1e-5, 0.0}, false);
     if (std::isfinite(r_center.real()) && std::isfinite(r_edge.real())) {
         if (std::norm(r_edge) > std::norm(r_center) * 1000.0) {
             Config::IS_SINGULAR = true;
@@ -669,9 +620,9 @@ PIIndividual PISolver::make_offspring(const PIIndividual& a, const PIIndividual&
     double aggressiveness = MIN_AGGRESSIVENESS + (1.0 - MIN_AGGRESSIVENESS) * (1.0 - progress);
     if (p_dist(gen_) < Config::CROSSOVER_PROB) {
         auto [c1, c2] = tree_crossover(a.tree, b.tree, gen_);
-        child.tree = std::move(c1);
+        child.tree = std::move(c1); child.raw = a.raw;
     } else {
-        child.tree = a.tree->clone();
+        child.tree = a.tree->clone(); child.raw = a.raw;
     }
     if (is_elite) {
         if (p_dist(gen_) < 0.7) child.tree->mutate_erc(gen_, Config::ERC_SIGMA * 0.5);
@@ -680,6 +631,8 @@ PIIndividual PISolver::make_offspring(const PIIndividual& a, const PIIndividual&
         if (p_dist(gen_) < Config::MUTATION_PROB) child.tree = tree_mutate(child.tree, gen_, prob_, aggressiveness);
         if (p_dist(gen_) < 0.4) child.tree->mutate_erc(gen_, Config::ERC_SIGMA);
     }
+    // Cambio de representacion (N <-> U directo): mismo arbol, otro significado.
+    if (hybrid_active(prob_) && p_dist(gen_) < 0.05) child.raw = !child.raw;
     return child;
 }
 
@@ -697,20 +650,19 @@ void PISolver::update_hall_of_fame() {
     }
     if (!best_candidate) return;
 
-    // Paso 2: decidir si reemplaza al campeon comparando AMBOS en la misma grilla
-    // fija de validacion (get_validation_mse), no el mini-batch ruidoso y distinto
-    // de cada generacion. Antes se comparaba ind.mse_domain (batch de esta gen)
-    // contra best_ever_.mse_domain (quedaba stale, del batch de otra generacion) —
-    // apples-to-oranges que podia bloquear al campeon real o admitir uno con
-    // suerte de batch facil.
-    double candidate_val = best_candidate->get_validation_mse(prob_, val_dom_pts_, val_bnd_pts_);
-    double incumbent_val = has_best_ever_ ? best_ever_.get_validation_mse(prob_, val_dom_pts_, val_bnd_pts_) : 1e18;
+    // Paso 2: decidir si reemplaza al campeon comparando AMBOS con el puntaje de
+    // validacion en las grillas fijas (no el mini-batch, distinto en cada
+    // generacion). El puntaje es solo fisica (residuo + frontera + borde del
+    // ansatz): antes esta comparacion era contra la solucion de referencia, lo
+    // que metia la referencia en la seleccion del campeon.
+    double candidate_val = best_candidate->validation_score(prob_, val_dom_pts_, val_bnd_pts_);
+    double incumbent_val = has_best_ever_ ? best_ever_.validation_score(prob_, val_dom_pts_, val_bnd_pts_) : 1e18;
 
     if (!has_best_ever_ || candidate_val < incumbent_val) {
         best_ever_.mse_domain = best_candidate->mse_domain; best_ever_.mse_boundary = best_candidate->mse_boundary;
         best_ever_.rank = best_candidate->rank; best_ever_.crowding = best_candidate->crowding;
         best_ever_.tree_size = best_candidate->tree_size; best_ever_.root_type = best_candidate->root_type;
-        if (best_candidate->tree) best_ever_.tree = best_candidate->tree->clone();
+        if (best_candidate->tree) best_ever_.tree = best_candidate->tree->clone(); best_ever_.raw = best_candidate->raw;
         has_best_ever_ = true;
     }
 }
@@ -746,10 +698,13 @@ void PISolver::update_point_weights(const std::vector<Point>& pts) {
     }
     if (committee.empty()) return;
     std::vector<double> raw(pts.size(), 0.0);
+    // Residuo de U (con ansatz y proyeccion), no del arbol crudo N: antes los
+    // pesos se calculaban sobre N, una cantidad sin significado fisico cuando
+    // el ansatz aplica.
     for (size_t i = 0; i < pts.size(); ++i) {
         double sum_err = 0.0; int n = 0;
         for (auto* ind : committee) {
-            Complex res = prob_.compute_residual(ind->tree.get(), pts[i]);
+            Complex res = residual_at(prob_, ind->tree.get(), pts[i], uses_ansatz(prob_, ind->raw));
             double e = std::norm(res);
             if (std::isfinite(e)) { sum_err += std::min(e, 1e4); n++; }
         }
@@ -782,14 +737,13 @@ void PISolver::apply_committee_rar() {
         std::uniform_real_distribution<double> ud(0, 1);
         #pragma omp for schedule(static)
         for (int i = 0; i < pool_size; ++i) {
-            double tx = ud(thread_gen), ty = ud(thread_gen);
+            double tx = ud(thread_gen), ty = (prob_.dim == 2) ? ud(thread_gen) : 0.0;
             double tt = (prob_.is_unsteady) ? ud(thread_gen) : 0.0;
             Point p = {tx, ty, tt};
             double sum_error = 0.0; int valid_count = 0;
             for (auto* ind : committee) {
                 if (!ind->tree) continue;
-                AD ad = ind->tree->ad_eval_t(p.x, p.y, p.t, prob_.dim);
-                Complex res = prob_.compute_residual(ind->tree.get(), p);
+                Complex res = residual_at(prob_, ind->tree.get(), p, uses_ansatz(prob_, ind->raw));
                 double err = std::norm(res);
                 if (std::isfinite(err)) { sum_error += err; valid_count++; }
             }
@@ -815,48 +769,71 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
     population_.clear(); has_best_ever_ = false; population_archive_.clear();
     dom_pts_.clear(); bnd_pts_.clear();
     for (int i = 0; i < Config::N_DOMAIN; ++i) dom_pts_.push_back(generate_random_point());
-    for (int i = 0; i < Config::N_BOUNDARY; ++i) {
-        Point p = generate_random_point();
-        if (prob_.dim == 1) p.x = (i%2 == 0) ? 0.0 : 1.0;
-        else {
-            double s = (double)i / Config::N_BOUNDARY;
-            if (i%4 == 0) { p.x=0; p.y=s; } else if (i%4==1) { p.x=1; p.y=s; }
-            else if (i%4==2) { p.x=s; p.y=0; } else { p.x=s; p.y=1; }
-        }
-        bnd_pts_.push_back(p);
-    }
-    use_boundary_objective_ = !ansatz_applies(prob_, bnd_pts_.size());
-    // Si probe_priors() detecto que el OPERADOR de la EDP es consistente con
-    // separacion de variables (f(x)+g(y) o f(x)*g(y) — sondeado sobre una
-    // funcion generica, no la solucion real, ver probe_priors), TODA la
-    // poblacion inicial se construye directamente en esa forma en vez de la
-    // mezcla habitual random_tree_special/random_tree — inspirado en el
-    // metodo clasico de separacion de variables (a pedido explicito, es
-    // experimental: fuerza la estructura desde el arranque en vez de dejar
-    // que emerja).
-    bool force_separable = priors_.additive_separable || priors_.multiplicative_separable;
+    // Datos de borde de entrenamiento: muestras al azar del MISMO conjunto que
+    // describe la validacion (prob_.boundary_points), incluida la condicion
+    // inicial si el problema es no estacionario. Antes se armaban aca a mano
+    // y no incluian ni la condicion inicial ni la frontera para t>0 en 1D.
+    for (int i = 0; i < Config::N_BOUNDARY; ++i) bnd_pts_.push_back(prob_.sample_boundary_point(gen_));
+    // Con representacion hibrida conviven individuos con frontera exacta (0) y
+    // con frontera medida: el objetivo de frontera vuelve a tener informacion.
+    use_boundary_objective_ = !ansatz_applies(prob_) || hybrid_active(prob_);
+    // Priors como SESGO de inicializacion, nunca como restriccion: hasta un
+    // tercio de la poblacion arranca con las estructuras que sugiere el
+    // operador (separable, suma modal, simetrica), repartido entre los priors
+    // activos; el resto es la mezcla habitual de esqueletos y arboles al azar.
+    // Antes, si el operador era separable, TODA la poblacion arrancaba
+    // separable y ademas una restriccion de factibilidad descartaba cualquier
+    // candidato no separable, aunque la solucion no lo fuera.
+    enum class Bias { SEPARABLE, MODAL, MIRROR, EXP_MODES };
+    std::vector<Bias> biases;
+    if (priors_.exponential_modes) biases.push_back(Bias::EXP_MODES);
+    if (priors_.triple_separable || priors_.additive_separable || priors_.multiplicative_separable) biases.push_back(Bias::SEPARABLE);
+    if (priors_.modal_sum_separable) biases.push_back(Bias::MODAL);
+    if (priors_.mirror_symmetric_x || priors_.mirror_symmetric_y) biases.push_back(Bias::MIRROR);
+    const int n_biased = biases.empty() ? 0 : pop_size / 3;
     for (int i = 0; i < pop_size; ++i) {
         PIIndividual ind;
-        if (priors_.triple_separable) {
-            ind.tree = random_triple_separable_tree(Config::MAX_TREE_DEPTH, gen_, prob_);
-        } else if (force_separable) {
-            ind.tree = random_separable_tree(Config::MAX_TREE_DEPTH, gen_, prob_, priors_.multiplicative_separable);
-        } else if (priors_.modal_sum_separable && i % 3 == 0) {
-            // Solo cuando additive/multiplicative_separable no aplican (mas
-            // especificos, se prefieren si calzan exacto) — modal_sum es
-            // estrictamente mas general/caro de buscar, se inyecta en un
-            // tercio de la poblacion para diversidad sin comprometerla entera
-            // a esa estructura. Ver PDEPriors::modal_sum_separable.
-            ind.tree = random_modal_sum_tree(Config::MAX_TREE_DEPTH, gen_, prob_);
-        } else if (i < pop_size/2) {
-            // random_tree_special ya incluye skeleton_rotated (choice 14)
-            // cuando priors_.rotation_invariant, ponderado junto a los demas
-            // skeletons — no necesita un branch dedicado aca, a diferencia de
-            // modal_sum (que reemplaza la estructura entera del arbol raiz).
+        if (i < n_biased) {
+            switch (biases[i % biases.size()]) {
+                case Bias::SEPARABLE:
+                    ind.tree = priors_.triple_separable
+                        ? random_triple_separable_tree(Config::MAX_TREE_DEPTH, gen_, prob_)
+                        : random_separable_tree(Config::MAX_TREE_DEPTH, gen_, prob_, priors_.multiplicative_separable);
+                    break;
+                case Bias::MODAL:
+                    ind.tree = random_modal_sum_tree(Config::MAX_TREE_DEPTH, gen_, prob_);
+                    break;
+                case Bias::MIRROR: {
+                    // N(x(1-x)) es simetrico ante x <-> 1-x (idem en y). Con
+                    // datos de borde simetricos, U = L + B*N tambien lo es.
+                    NodePtr t = random_tree_special(Config::MAX_TREE_DEPTH - 1, gen_, prob_, priors_);
+                    if (priors_.mirror_symmetric_x) {
+                        auto sx = make_binary(NodeType::MUL, make_var('x'), make_binary(NodeType::SUB, make_erc(1.0), make_var('x')));
+                        t = substitute_variable(t.get(), NodeType::VAR_X, sx.get());
+                    }
+                    if (prob_.dim == 2 && priors_.mirror_symmetric_y) {
+                        auto sy = make_binary(NodeType::MUL, make_var('y'), make_binary(NodeType::SUB, make_erc(1.0), make_var('y')));
+                        t = substitute_variable(t.get(), NodeType::VAR_Y, sy.get());
+                    }
+                    ind.tree = std::move(t);
+                    break;
+                }
+                case Bias::EXP_MODES:
+                    // Los modos describen U, no N: van como U directo si hay
+                    // representacion hibrida.
+                    ind.tree = random_exponential_modes_tree(Config::MAX_TREE_DEPTH, gen_, prob_);
+                    ind.raw = hybrid_active(prob_);
+                    break;
+            }
+        } else if (i < n_biased + (pop_size - n_biased) / 2) {
+            // random_tree_special incluye los esqueletos sesgados por los
+            // priors restantes (rotacion, amortiguamiento, polo, escala).
             ind.tree = random_tree_special(Config::MAX_TREE_DEPTH, gen_, prob_, priors_);
         } else {
             ind.tree = random_tree(Config::MAX_TREE_DEPTH, gen_, prob_);
         }
+        // Un tercio de los no sesgados arranca como U directo (hibrido).
+        if (i >= n_biased && hybrid_active(prob_) && (i - n_biased) % 3 == 2) ind.raw = true;
         if (ind.tree) ind.tree = ind.tree->simplify();
         ind.evaluate(prob_, dom_pts_, bnd_pts_, 0);
         population_.push_back(std::move(ind));
@@ -900,8 +877,10 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
         // tiempo de premiar mejoras genuinas en vez de ruido de muestreo.
         constexpr int RESAMPLE_INTERVAL = 8;
         auto resample_batch = [&]() {
-            int n_dom = (int)(dom_pts_.size() * 0.8);
-            int n_bnd = (int)(bnd_pts_.size() * 0.8);
+            // max(1, .): con pocos puntos el truncado a int podia dejar el
+            // batch vacio (con 1 punto de frontera, 0.8 -> 0).
+            int n_dom = std::max(1, (int)(dom_pts_.size() * 0.8));
+            int n_bnd = std::max(1, (int)(bnd_pts_.size() * 0.8));
             curr_dom.clear(); curr_bnd.clear();
             std::sample(dom_pts_.begin(), dom_pts_.end(), std::back_inserter(curr_dom), n_dom, gen_);
             std::sample(bnd_pts_.begin(), bnd_pts_.end(), std::back_inserter(curr_bnd), n_bnd, gen_);
@@ -962,7 +941,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
                 c.mse_domain = best_ever_.mse_domain; c.mse_boundary = best_ever_.mse_boundary;
                 c.rank = best_ever_.rank; c.crowding = best_ever_.crowding; c.tree_size = best_ever_.tree_size;
                 c.is_feasible = best_ever_.is_feasible; c.constraint_violation = best_ever_.constraint_violation;
-                if (best_ever_.tree) c.tree = best_ever_.tree->clone();
+                if (best_ever_.tree) c.tree = best_ever_.tree->clone(); c.raw = best_ever_.raw;
                 return c;
             };
             auto clone_ind_local = [](const PIIndividual& ind) {
@@ -970,7 +949,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
                 c.mse_domain = ind.mse_domain; c.mse_boundary = ind.mse_boundary;
                 c.rank = ind.rank; c.crowding = ind.crowding; c.tree_size = ind.tree_size;
                 c.is_feasible = ind.is_feasible; c.constraint_violation = ind.constraint_violation;
-                if (ind.tree) c.tree = ind.tree->clone();
+                if (ind.tree) c.tree = ind.tree->clone(); c.raw = ind.raw;
                 return c;
             };
             if (train_err < threshold) {
@@ -985,9 +964,11 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
                     return final_pop;
                 }
 
-                double val_err = best_ever_.get_validation_mse(prob_, val_dom_pts_, val_bnd_pts_);
+                // Confirmacion en la grilla fija de validacion, con informacion
+                // de la EDP solamente (antes: error contra la referencia).
+                double val_err = best_ever_.validation_score(prob_, val_dom_pts_, val_bnd_pts_);
                 if (val_err < threshold * 10.0) {
-                    std::cout << "[INFO] Early stopping en gen=" << g << " (Ley Fisica Descubierta, MSE < " << threshold << ")" << std::endl;
+                    std::cout << "[INFO] Early stopping en gen=" << g << " (residuo + frontera de validacion < " << threshold * 10.0 << ")" << std::endl;
                     unpolished_snapshot_.clear();
                     for (auto& ind : population_) unpolished_snapshot_.push_back(clone_ind_local(ind));
                     std::vector<PIIndividual> final_pop; final_pop.push_back(clone_champion());
@@ -1003,7 +984,7 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
             c.mse_domain = ind.mse_domain; c.mse_boundary = ind.mse_boundary;
             c.rank = ind.rank; c.crowding = ind.crowding; c.tree_size = ind.tree_size;
             c.is_feasible = ind.is_feasible; c.constraint_violation = ind.constraint_violation;
-            if (ind.tree) c.tree = ind.tree->clone();
+            if (ind.tree) c.tree = ind.tree->clone(); c.raw = ind.raw;
             return c;
         };
 
@@ -1068,20 +1049,32 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
         {
             double b_dom = 1e18, b_bnd = 1e18;
             for (auto& ind : population_) if (ind.rank == 1) { b_dom = std::min(b_dom, ind.mse_domain); b_bnd = std::min(b_bnd, ind.mse_boundary); }
-            // MSE real del Hall of Fame contra la solucion exacta en grilla fija —
-            // a diferencia de b_dom/b_bnd (mini-batch estocastico, distinto cada
-            // generacion), esta si es comparable generacion a generacion.
-            double val_mse = has_best_ever_ ? best_ever_.get_validation_mse(prob_, val_dom_pts_, val_bnd_pts_) : 1e18;
-            history_.push_back({g, b_dom, b_bnd, b_dom + b_bnd, val_mse});
-            if (g % 25 == 0) {
+            // Puntaje de validacion del campeon (fisica, grilla fija): comparable
+            // generacion a generacion, a diferencia de b_dom/b_bnd (mini-batch).
+            double val_score = has_best_ever_ ? best_ever_.validation_score(prob_, val_dom_pts_, val_bnd_pts_) : 1e18;
+            // Error contra la referencia: SOLO REGISTRO para analizar la
+            // convergencia despues. Se escribe en history_ y nada lo lee
+            // dentro de la busqueda.
+            double ref_err = has_best_ever_ ? best_ever_.reference_error(prob_, val_dom_pts_) : 1e18;
+            history_.push_back({g, b_dom, b_bnd, b_dom + b_bnd, val_score, ref_err});
+            // Antes imprimia cada 25 generaciones: a pop=500 (pulido de
+            // constantes de TODA la poblacion cada gen, ver comentario mas
+            // arriba) eso son minutos de silencio entre lineas -- se ve
+            // identico a un cuelgue aunque la CPU siga al 100% trabajando
+            // (confirmado: sin este cambio, un corrida real se reporto como
+            // "bugueada" estando solo lenta). Cada 5 generaciones + flush
+            // explicito (antes el buffer de cout no se vaciaba solo al
+            // redirigir a archivo/tee, agravando la apariencia de cuelgue).
+            if (g % 5 == 0) {
                 int n_infeasible = 0, front1 = 0;
                 for (auto& ind : population_) { if (!ind.is_feasible) n_infeasible++; if (ind.rank == 1) front1++; }
                 std::cout << "  [PI/" << prob_.name() << "] gen=" << g
                           << "  best_dom(batch)=" << std::scientific << b_dom
                           << "  best_bnd(batch)=" << b_bnd
-                          << "  val_mse(hof)=" << val_mse << std::defaultfloat
+                          << "  val_score(hof)=" << val_score
+                          << "  ref_err(solo registro)=" << ref_err << std::defaultfloat
                           << "  infeasible=" << n_infeasible << "/" << population_.size()
-                          << "  front1=" << front1 << "\n";
+                          << "  front1=" << front1 << std::endl;
             }
         }
     }
@@ -1089,56 +1082,17 @@ std::vector<PIIndividual> PISolver::run(int pop_size, int max_gen) {
         PIIndividual champ;
         champ.mse_domain = best_ever_.mse_domain; champ.mse_boundary = best_ever_.mse_boundary;
         champ.rank = 1; champ.is_feasible = true;
-        if (best_ever_.tree) champ.tree = best_ever_.tree->clone();
+        if (best_ever_.tree) champ.tree = best_ever_.tree->clone(); champ.raw = best_ever_.raw;
         population_.push_back(std::move(champ));
         fast_non_dominated_sort(population_, use_boundary_objective_);
     }
     return std::move(population_);
 }
 
-// Gradiente de mse_domain respecto a cada constante ERC por differenciacion de
-// paso complejo (complex-step): perturbar la constante en la direccion
-// imaginaria (c + i*h) y evaluar UNA vez da la derivada del residuo con
-// precision ~exacta (sin cancelacion por resta ni error de truncamiento de
-// diferencias finitas), la mitad de evaluaciones que el esquema anterior
-// (1 base + K perturbadas, contra 2K+1). Válido porque el arbol se evalúa en
-// Complex de punta a punta y el residuo es holomorfo en la constante para
-// todos los PDEs activos salvo Thomas-Fermi (usa abs(.real()) a propósito, ver
-// pde_residual_ad) — ese sigue con diferencias finitas (ver caller).
-// Sólo se usa cuando el ansatz de frontera aplica (mse_boundary ≡ 0), así el
-// residuo de dominio es la única pieza a diferenciar — ver ansatz_applies().
-static void compute_domain_gradient_complex_step(const PDEProblem& prob,
-                                                   const std::vector<Point>& dom,
-                                                   const Node* tree,
-                                                   const std::vector<Complex*>& ercs,
-                                                   double h,
-                                                   std::vector<double>& grads_out)
-{
-    size_t N = dom.size();
-    std::vector<double> res_base(N, 0.0);
-    for (size_t p = 0; p < N; ++p) {
-        AD ad = tree->ad_eval_t(dom[p].x, dom[p].y, dom[p].t, prob.dim);
-        ad = apply_boundary_ansatz(prob, ad, dom[p].x, dom[p].y);
-        res_base[p] = prob.pde_residual_ad(ad, dom[p].x, dom[p].y, dom[p].t).real();
-    }
-    for (size_t k = 0; k < ercs.size(); ++k) {
-        Complex orig = *ercs[k];
-        *ercs[k] = orig + Complex(0.0, h);
-        double grad_sum = 0.0;
-        for (size_t p = 0; p < N; ++p) {
-            double r = res_base[p];
-            if (r * r > 1e4) continue; // punto recortado (item 3): región plana, sin gradiente
-            AD ad = tree->ad_eval_t(dom[p].x, dom[p].y, dom[p].t, prob.dim);
-            ad = apply_boundary_ansatz(prob, ad, dom[p].x, dom[p].y);
-            double res_im = prob.pde_residual_ad(ad, dom[p].x, dom[p].y, dom[p].t).imag();
-            double dres_dc = res_im / h;
-            grad_sum += r * dres_dc;
-        }
-        *ercs[k] = orig;
-        grads_out[k] = N > 0 ? (2.0 * grad_sum / (double)N) : 0.0;
-    }
-}
-
+// Descenso por gradiente sobre las constantes del arbol. El gradiente es el de
+// la perdida fisica de entrenamiento (residuo + frontera medida) por
+// diferencias centradas (constant_gradient), valido para cualquier arbol,
+// incluidos los complejos; mismo metodo para todas las EDPs.
 void PISolver::gradient_descent_constants(PIIndividual& ind, int iterations,
                                            const std::vector<Point>* dom_arg,
                                            const std::vector<Point>* bnd_arg) {
@@ -1146,73 +1100,37 @@ void PISolver::gradient_descent_constants(PIIndividual& ind, int iterations,
     std::vector<Complex*> ercs; ind.tree->collect_ercs(ercs);
     if (ercs.empty()) return;
 
-    // Por defecto opera sobre el mini-batch de entrenamiento (uso in-loop,
-    // pulido de toda la poblacion cada generacion). polish_constants() del
-    // campeon final pasa val_dom_pts_/val_bnd_pts_ explicitamente para no
-    // reintroducir el overfitting al ultimo mini-batch que el Hall of Fame
-    // (grilla fija) esta diseñado a evitar.
+    // Por defecto opera sobre los puntos de entrenamiento (uso in-loop, pulido
+    // de toda la poblacion cada generacion). polish_constants() del campeon
+    // final pasa las grillas de validacion explicitamente.
     const std::vector<Point>& dom = dom_arg ? *dom_arg : dom_pts_;
     const std::vector<Point>& bnd = bnd_arg ? *bnd_arg : bnd_pts_;
 
-    bool use_complex_step = (prob_.type != PDE::THOMAS_FERMI) && ansatz_applies(prob_, bnd.size());
-
     double lr = 0.05;
-    double h = use_complex_step ? 1e-8 : 1e-6;
     for (int iter = 0; iter < iterations; ++iter) {
-        std::vector<double> grads(ercs.size(), 0.0);
         ind.evaluate(prob_, dom, bnd, current_gen_);
         if (!ind.is_feasible) return;
         double current_loss = ind.mse_domain + ind.mse_boundary;
 
-        if (use_complex_step) {
-            compute_domain_gradient_complex_step(prob_, dom, ind.tree.get(), ercs, h, grads);
-            for (size_t i = 0; i < ercs.size(); ++i) {
-                if (!std::isfinite(grads[i])) grads[i] = 0.0;
-            }
-        } else {
-            for (size_t i = 0; i < ercs.size(); ++i) {
-                double orig = ercs[i]->real();
-                *ercs[i] = Complex(orig + h, ercs[i]->imag());
-                ind.evaluate(prob_, dom, bnd, current_gen_);
-                double loss_plus = ind.mse_domain + ind.mse_boundary;
+        std::vector<double> grads = constant_gradient(prob_, ind.tree.get(), dom, bnd, 1e-6, ind.raw);
 
-                *ercs[i] = Complex(orig - h, ercs[i]->imag());
-                ind.evaluate(prob_, dom, bnd, current_gen_);
-                double loss_minus = ind.mse_domain + ind.mse_boundary;
-
-                *ercs[i] = Complex(orig, ercs[i]->imag());
-                grads[i] = (loss_plus - loss_minus) / (2.0 * h);
-
-                // Si el gradiente es inestable o la evaluación fue infactible, lo anulamos
-                if (!std::isfinite(grads[i])) grads[i] = 0.0;
-            }
-        }
-
-        // Gradient Clipping para PDEs Singulares
+        // Recorte del gradiente en EDPs singulares
         if (Config::IS_SINGULAR) {
-            for (size_t i = 0; i < ercs.size(); ++i) {
-                if (grads[i] > 50.0) grads[i] = 50.0;
-                else if (grads[i] < -50.0) grads[i] = -50.0;
-            }
+            for (auto& g : grads) g = std::clamp(g, -50.0, 50.0);
         }
 
-        for (size_t i = 0; i < ercs.size(); ++i) {
-            *ercs[i] -= Complex(lr * grads[i], 0);
-        }
-        
+        for (size_t i = 0; i < ercs.size(); ++i) *ercs[i] -= Complex(lr * grads[i], 0);
+
         ind.evaluate(prob_, dom, bnd, current_gen_);
         if (!ind.is_feasible || (ind.mse_domain + ind.mse_boundary >= current_loss)) {
-            // Revertir y reducir learning rate
-            for (size_t i = 0; i < ercs.size(); ++i) {
-                *ercs[i] += Complex(lr * grads[i], 0);
-            }
+            // Revertir y reducir el paso
+            for (size_t i = 0; i < ercs.size(); ++i) *ercs[i] += Complex(lr * grads[i], 0);
             lr *= 0.5;
             ind.evaluate(prob_, dom, bnd, current_gen_);
         } else {
-            lr *= 1.1; // Acelerar si vamos en buena dirección
+            lr *= 1.1;
         }
-        
-        if (lr < 1e-7) break; // Convergencia temprana
+        if (lr < 1e-7) break;
     }
 }
 
@@ -1265,7 +1183,7 @@ std::vector<PIIndividual> PISolver::pareto_front() const {
         if (ind.rank == 1 && ind.is_feasible && ind.is_physically_complete(prob_)) {
             PIIndividual copy; copy.mse_domain = ind.mse_domain; copy.mse_boundary = ind.mse_boundary;
             copy.rank = ind.rank; copy.tree_size = ind.tree_size;
-            if (ind.tree) copy.tree = ind.tree->clone();
+            if (ind.tree) copy.tree = ind.tree->clone(); copy.raw = ind.raw;
             front.push_back(std::move(copy));
         }
     }

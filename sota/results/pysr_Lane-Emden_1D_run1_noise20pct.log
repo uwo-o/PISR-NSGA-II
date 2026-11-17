@@ -1,0 +1,60 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Lane-Emden (noise_pct=0.2) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Lane-Emden:
+cos(x*0.7543675)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 2.200e+05
+Progress: 893 / 1500 total iterations (59.533%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           7.965e-03  0.000e+00  y = 0.91206
+3           1.224e-03  9.364e-01  y = cos(tanh(x))
+4           3.413e-04  1.277e+00  y = cos(x * 0.75437)
+5           2.793e-04  2.003e-01  y = cos(sin(x + -0.14136))
+7           2.746e-04  8.584e-03  y = cos(sin(x + -0.13354)) * 1.0037
+9           2.723e-04  4.138e-03  y = exp(((0.22076 - x) * sin(x)) * 0.48092)
+11          2.717e-04  1.132e-03  y = exp(((sin(x) * 0.49252) + -0.011426) * (0.21551 - x))
+13          2.710e-04  1.377e-03  y = exp((sin((0.2273 - x) / tanh(exp(x))) * 0.44905) * x)
+14          2.707e-04  1.148e-03  y = exp((0.22237 - x) * tanh(sin((x * 0.4473) / tanh(exp(x...
+                                      )))))
+15          2.701e-04  2.197e-03  y = exp(tanh((0.23012 - x) * sin((0.44368 / cos(0.96212 - ...
+                                      x)) * x)))
+17          2.682e-04  3.399e-03  y = exp((sin((0.22603 - x) * x) * 0.44885) / tanh(exp(-0.4...
+                                      8382 - (x * -2.2126))))
+18          2.681e-04  6.009e-04  y = exp((sin(x * (0.22603 - x)) * 0.44885) / tanh(exp(tanh...
+                                      (-0.74245) - (x * -2.2126))))
+19          2.678e-04  8.761e-04  y = exp(sin((0.22762 - x) * tanh((x * 0.45213) / tanh(exp(...
+                                      (x * exp(x)) + -0.39912)))))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           7.965e-03  0.000e+00  y = 0.91206
+3           1.224e-03  9.364e-01  y = cos(tanh(x))
+4           3.413e-04  1.277e+00  y = cos(x * 0.75437)
+5           2.793e-04  2.003e-01  y = cos(sin(x + -0.14136))
+7           2.741e-04  9.560e-03  y = cos(sin(x + -0.13154)) - -0.0039527
+9           2.723e-04  3.161e-03  y = exp(((0.22076 - x) * 0.48092) * sin(x))
+11          2.717e-04  1.132e-03  y = exp(((sin(x) * 0.49252) + -0.011426) * (0.21551 - x))
+12          2.705e-04  4.386e-03  y = exp((x * (0.22867 - x)) / exp(tanh(x + 0.40628)))
+14          2.688e-04  3.112e-03  y = exp(((0.2321 - x) * (x - 0.019731)) / exp(tanh(0.32936...
+                                       + x)))
+17          2.679e-04  1.166e-03  y = exp(sin(x * ((0.2321 - x) / tanh(exp(-2.4687 * (0.3249...
+                                      1 - x))))) * 0.45171)
+18          2.677e-04  7.397e-04  y = exp(sin((x * (0.22762 - x)) / tanh(exp(sin(-1.0455 - (...
+                                      -3.1145 * x))))) * 0.44792)
+19          2.664e-04  4.823e-03  y = exp(sin((x * (0.23222 - x)) / tanh(exp(x * ((0.24709 -...
+                                       x) * -3.5597)))) * 0.45406)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_224829_63yyP4/hall_of_fame.csv

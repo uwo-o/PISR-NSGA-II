@@ -1,25 +1,35 @@
 #!/bin/bash
+# Genera report/results.pdf a partir de results/. No corre el algoritmo.
+# La suite, el orden y la agrupacion salen de report/benchmarks.py.
+set -e
+cd "$(dirname "$0")"
 
-./.venv/bin/python3 scripts/plot_pareto.py
-# plot_pareto.py nombra "{EDP}_pareto_pairs.pdf"; generate_report.py espera
-# "pareto_pairs_{EDP}.pdf" — se renombra al copiar.
-for f in results/*_pareto_pairs.pdf; do
-    [ -e "$f" ] || continue
-    base=$(basename "$f" "_pareto_pairs.pdf")
-    cp "$f" "report/figures/pareto_pairs_${base}.pdf"
-done
-./.venv/bin/python3 scripts/plot_solutions.py
-./.venv/bin/python3 scripts/stats_analysis.py
-./.venv/bin/python3 report/data_efficiency_comparison.py
-./.venv/bin/python3 scripts/plot_extra_report_figures.py
+PY=./.venv/bin/python3
+if [ ! -x "$PY" ]; then
+    echo ">>> Creando .venv (pandas, numpy, matplotlib, scipy, sympy)"
+    python3 -m venv .venv
+    ./.venv/bin/pip install -q pandas numpy matplotlib scipy sympy
+fi
 
-echo ">>> Step 4: Report Generation"
-./.venv/bin/python3 report/generate_report.py
-./.venv/bin/python3 report/generate_formulas_table.py
+echo ">>> 1/4 Consolidando resultados"
+$PY scripts/consolidate_runs.py
 
+echo ">>> 2/4 Figuras"
+$PY scripts/plot_solutions.py
+$PY scripts/plot_pareto.py
+$PY scripts/plot_extra_report_figures.py
 
-echo ">>> Step 5: LaTeX Compilation"
+echo ">>> 3/4 Simplificacion simbolica, tablas y documento"
+$PY report/simplify_expressions.py
+$PY report/extrapolation.py
+$PY report/physics_checks.py
+$PY report/generate_report.py
+$PY report/generate_formulas_table.py
+
+echo ">>> 4/4 Compilando LaTeX"
 cd report
-pdflatex -interaction=nonstopmode results.tex > /dev/null
-pdflatex -interaction=nonstopmode results.tex > /dev/null
-cd ..
+for i in 1 2 3; do
+    pdflatex -interaction=nonstopmode -halt-on-error results.tex > results.build.log 2>&1 || {
+        echo "[ERROR] pdflatex fallo; ver report/results.build.log"; tail -30 results.build.log; exit 1; }
+done
+echo ">>> Listo: report/results.pdf"

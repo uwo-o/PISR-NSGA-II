@@ -1,0 +1,42 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Painleve-I ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Painleve-I:
+x*0.5*x
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 2.160e+05
+Progress: 977 / 1500 total iterations (65.133%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.269e-02  0.000e+00  y = 0.1675
+3           3.172e-03  9.840e-01  y = x * 0.37687
+5           1.118e-16  1.549e+01  y = (x * 0.5) * x
+9           1.024e-16  2.182e-02  y = x * ((x * -6.2131e-08) - (x * -0.5))
+13          1.024e-16  8.385e-05  y = x * ((((x - -3.136) * x) * -1.5863e-08) - (x * -0.5))
+18          9.482e-17  1.539e-02  y = x * ((x * (-1.3409e-08 * (x - ((-1.112 - exp(x)) - x))...
+                                      )) - (x * -0.5))
+19          9.427e-17  5.813e-03  y = ((((x - ((-0.95836 - exp(x)) - tanh(x))) * -1.4279e-08...
+                                      ) * x) - (x * -0.5)) * x
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.269e-02  0.000e+00  y = 0.1675
+3           3.172e-03  9.840e-01  y = x * 0.37687
+5           1.118e-16  1.549e+01  y = (x * 0.5) * x
+9           1.024e-16  2.182e-02  y = x * ((x * -6.2131e-08) - (x * -0.5))
+13          1.024e-16  8.385e-05  y = x * ((((x - -3.136) * x) * -1.5863e-08) - (x * -0.5))
+16          9.427e-17  2.760e-02  y = x * ((x * ((x - (-0.91194 - exp(x))) * -1.6923e-08)) -...
+                                       (x * -0.5))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260618_214341_JJHPVN/hall_of_fame.csv

@@ -2,80 +2,112 @@
 \providecommand\hyper@newdestlabel[2]{}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
-\@writefile{toc}{\contentsline {section}{\numberline {1}Performance Metrics}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Data Efficiency vs. State-of-the-Art}{1}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {3}Robustness to Measurement Noise}{1}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Global Parsimony \& Complexity}{1}{section.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Performance Comparison: Numerical (RK4/FDM), Neural (DeepXDE), and Symbolic (PISR-NSGA-II) Methods (Total MSE).}}{2}{table.caption.1}\protected@file@percent }
+\providecommand \oddpage@label [2]{}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Overview}{2}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Goal.}{2}{paragraph*.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{External baselines.}{2}{paragraph*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Notation and glossary}{2}{section.2}\protected@file@percent }
+\gdef \LT@i {\LT@entry 
+    {1}{105.18951pt}\LT@entry 
+    {1}{172.58568pt}\LT@entry 
+    {1}{111.18951pt}\LT@entry 
+    {1}{95.74118pt}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Benchmark suite}{4}{section.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Benchmark suite. Every problem is posed on $[0,1]^d$ (and $t\in [0,1]$ when unsteady). Problems marked \emph  {numerical} have no closed form; their reference is a high-resolution numerical solution of exactly the same boundary-value problem.}}{4}{table.1}\protected@file@percent }
+\newlabel{tab:suite}{{1}{4}{Benchmark suite. Every problem is posed on $[0,1]^d$ (and $t\in [0,1]$ when unsteady). Problems marked \emph {numerical} have no closed form; their reference is a high-resolution numerical solution of exactly the same boundary-value problem}{table.1}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results}{6}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Accuracy of PISR-NSGA-II}{6}{subsection.4.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces PISR-NSGA-II results (one run). \emph  {Solution MSE} is measured against the reference after the search; the search itself only uses the PDE residual and the boundary data. Status: \textcolor {good}{\textbullet }\ $<10^{-6}$, \textcolor {fair}{\textbullet }\ $<10^{-3}$, \textcolor {poor}{\textbullet }\ $\geq 10^{-3}$.}}{6}{table.caption.3}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{tab:global_comp_stats}{{1}{2}{Performance Comparison: Numerical (RK4/FDM), Neural (DeepXDE), and Symbolic (PISR-NSGA-II) Methods (Total MSE)}{table.caption.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Execution Time Comparison (seconds).}}{3}{table.caption.2}\protected@file@percent }
-\newlabel{tab:runtime_stats}{{2}{3}{Execution Time Comparison (seconds)}{table.caption.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces PISR-NSGA-II Performance Metrics (Mean $\pm $ Std).}}{4}{table.caption.3}\protected@file@percent }
-\newlabel{tab:symbolic_stats}{{3}{4}{PISR-NSGA-II Performance Metrics (Mean $\pm $ Std)}{table.caption.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Data Efficiency: Labeled Solution Points Required vs. Final MSE. PISR-NSGA-II never sees the true solution — only PDE collocation points; PySR requires labeled $(x, u_{\mathrm  {exact}})$ pairs to train.}}{5}{table.caption.4}\protected@file@percent }
-\newlabel{tab:data_efficiency}{{4}{5}{Data Efficiency: Labeled Solution Points Required vs. Final MSE. PISR-NSGA-II never sees the true solution — only PDE collocation points; PySR requires labeled $(x, u_{\mathrm {exact}})$ pairs to train}{table.caption.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Robustness to Measurement Noise: Total MSE vs.\ Gaussian noise level (fraction of signal std) added to the labeled training data given to PySR/PySINDy. PISR-NSGA-II uses zero labeled data and is unaffected by construction — included only as a fixed reference line.}}{6}{table.caption.5}\protected@file@percent }
-\newlabel{tab:noise_robustness}{{5}{6}{Robustness to Measurement Noise: Total MSE vs.\ Gaussian noise level (fraction of signal std) added to the labeled training data given to PySR/PySINDy. PISR-NSGA-II uses zero labeled data and is unaffected by construction — included only as a fixed reference line}{table.caption.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Total MSE (vs. clean ground truth) as a function of Gaussian noise added to the training data seen by PySR/PySINDy.}}{7}{figure.caption.6}\protected@file@percent }
-\newlabel{fig:noise_robustness}{{1}{7}{Total MSE (vs. clean ground truth) as a function of Gaussian noise added to the training data seen by PySR/PySINDy}{figure.caption.6}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Parsimony Pressure: Trade-off between PDE Accuracy and Expression Complexity (Total node count). Complexity represents the number of mathematical elements (operators, variables, and constants) in the symbolic tree.}}{8}{figure.caption.7}\protected@file@percent }
-\newlabel{fig:parsimony}{{2}{8}{Parsimony Pressure: Trade-off between PDE Accuracy and Expression Complexity (Total node count). Complexity represents the number of mathematical elements (operators, variables, and constants) in the symbolic tree}{figure.caption.7}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces 3D Pareto Fronts: Physics vs. Boundary vs. Complexity. Dominated solutions are shown in transparent gray.}}{9}{figure.caption.8}\protected@file@percent }
-\newlabel{fig:pareto3d}{{3}{9}{3D Pareto Fronts: Physics vs. Boundary vs. Complexity. Dominated solutions are shown in transparent gray}{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Detailed PDE Analysis}{10}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Laplace\_1D Visualization}{10}{subsection.5.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Symbolic vs Numerical solution for Laplace\_1D.}}{10}{figure.caption.9}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Pairwise Pareto Trade-offs for Laplace\_1D.}}{11}{figure.caption.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Poisson\_1D Visualization}{12}{subsection.5.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Symbolic vs Numerical solution for Poisson\_1D.}}{12}{figure.caption.11}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Pairwise Pareto Trade-offs for Poisson\_1D.}}{13}{figure.caption.12}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}HarmonicOscillator\_1D Visualization}{14}{subsection.5.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Symbolic vs Numerical solution for HarmonicOscillator\_1D.}}{14}{figure.caption.13}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Pairwise Pareto Trade-offs for HarmonicOscillator\_1D.}}{15}{figure.caption.14}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Airy\_1D Visualization}{16}{subsection.5.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Symbolic vs Numerical solution for Airy\_1D.}}{16}{figure.caption.15}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Pairwise Pareto Trade-offs for Airy\_1D.}}{17}{figure.caption.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Airy\_2D Visualization}{18}{subsection.5.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Symbolic vs Numerical solution for Airy\_2D.}}{18}{figure.caption.17}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Pairwise Pareto Trade-offs for Airy\_2D.}}{18}{figure.caption.18}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}Fisher\_1D Visualization}{19}{subsection.5.6}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Symbolic vs Numerical solution for Fisher\_1D.}}{19}{figure.caption.19}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Pairwise Pareto Trade-offs for Fisher\_1D.}}{20}{figure.caption.20}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}Fisher\_2D Visualization}{21}{subsection.5.7}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Symbolic vs Numerical solution for Fisher\_2D.}}{21}{figure.caption.21}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Pairwise Pareto Trade-offs for Fisher\_2D.}}{21}{figure.caption.22}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Duffing\_1D Visualization}{22}{subsection.5.8}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Symbolic vs Numerical solution for Duffing\_1D.}}{22}{figure.caption.23}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces Pairwise Pareto Trade-offs for Duffing\_1D.}}{23}{figure.caption.24}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.9}Duffing\_2D Visualization}{24}{subsection.5.9}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces Symbolic vs Numerical solution for Duffing\_2D.}}{24}{figure.caption.25}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {21}{\ignorespaces Pairwise Pareto Trade-offs for Duffing\_2D.}}{24}{figure.caption.26}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.10}Thomas-Fermi\_1D Visualization}{25}{subsection.5.10}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {22}{\ignorespaces Symbolic vs Numerical solution for Thomas-Fermi\_1D.}}{25}{figure.caption.27}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {23}{\ignorespaces Pairwise Pareto Trade-offs for Thomas-Fermi\_1D.}}{26}{figure.caption.28}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.11}Thomas-Fermi\_2D Visualization}{27}{subsection.5.11}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {24}{\ignorespaces Symbolic vs Numerical solution for Thomas-Fermi\_2D.}}{27}{figure.caption.29}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {25}{\ignorespaces Pairwise Pareto Trade-offs for Thomas-Fermi\_2D.}}{27}{figure.caption.30}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.12}Navier-Stokes\_2D Visualization}{28}{subsection.5.12}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {26}{\ignorespaces Symbolic vs Numerical solution for Navier-Stokes\_2D.}}{28}{figure.caption.31}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {27}{\ignorespaces Pairwise Pareto Trade-offs for Navier-Stokes\_2D.}}{28}{figure.caption.32}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.13}Navier-Stokes-Unsteady\_2D Visualization}{29}{subsection.5.13}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {28}{\ignorespaces Symbolic vs Numerical solution for Navier-Stokes-Unsteady\_2D.}}{29}{figure.caption.33}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {29}{\ignorespaces Pairwise Pareto Trade-offs for Navier-Stokes-Unsteady\_2D.}}{29}{figure.caption.34}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.14}Lane-Emden\_1D Visualization}{30}{subsection.5.14}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {30}{\ignorespaces Symbolic vs Numerical solution for Lane-Emden\_1D.}}{30}{figure.caption.35}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {31}{\ignorespaces Pairwise Pareto Trade-offs for Lane-Emden\_1D.}}{31}{figure.caption.36}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.15}Troesch\_1D Visualization}{32}{subsection.5.15}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {32}{\ignorespaces Symbolic vs Numerical solution for Troesch\_1D.}}{32}{figure.caption.37}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {33}{\ignorespaces Pairwise Pareto Trade-offs for Troesch\_1D.}}{33}{figure.caption.38}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.16}Ginzburg-Landau\_1D Visualization}{34}{subsection.5.16}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {34}{\ignorespaces Symbolic vs Numerical solution for Ginzburg-Landau\_1D.}}{34}{figure.caption.39}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {35}{\ignorespaces Pairwise Pareto Trade-offs for Ginzburg-Landau\_1D.}}{35}{figure.caption.40}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.17}Painleve-I\_1D Visualization}{36}{subsection.5.17}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {36}{\ignorespaces Symbolic vs Numerical solution for Painleve-I\_1D.}}{36}{figure.caption.41}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {37}{\ignorespaces Pairwise Pareto Trade-offs for Painleve-I\_1D.}}{37}{figure.caption.42}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}Discovered Formulas}{38}{section.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Comparison of Symbolic Expressions (1D and 2D).}}{39}{table.caption.43}\protected@file@percent }
-\newlabel{tab:formulas}{{6}{39}{Comparison of Symbolic Expressions (1D and 2D)}{table.caption.43}{}}
-\gdef \@abspage@last{39}
+\newlabel{tab:results}{{2}{6}{PISR-NSGA-II results (one run). \emph {Solution MSE} is measured against the reference after the search; the search itself only uses the PDE residual and the boundary data. Status: \stgood \ $<10^{-6}$, \stfair \ $<10^{-3}$, \stpoor \ $\geq 10^{-3}$}{table.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Comparison with baselines}{7}{subsection.4.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Solution MSE against the reference and wall-clock time. RK4/FDM is the numerical solver of the same problem at low resolution (50 nodes per axis); it returns a grid, not a formula. Best MSE per row in bold.}}{7}{table.caption.4}\protected@file@percent }
+\newlabel{tab:comparison}{{3}{7}{Solution MSE against the reference and wall-clock time. RK4/FDM is the numerical solver of the same problem at low resolution (50 nodes per axis); it returns a grid, not a formula. Best MSE per row in bold}{table.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Hybrid representation vs.\ ansatz only}{7}{subsection.4.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Solution MSE with the hybrid representation (default) and with the ansatz only (\texttt  {--no-hybrid}). Better value in bold.}}{7}{table.caption.5}\protected@file@percent }
+\newlabel{tab:ablation_hybrid}{{4}{7}{Solution MSE with the hybrid representation (default) and with the ansatz only (\texttt {--no-hybrid}). Better value in bold}{table.caption.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Extrapolation beyond the training domain}{8}{section.5}\protected@file@percent }
+\newlabel{sec:extrapolation}{{5}{8}{Extrapolation beyond the training domain}{section.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Extrapolation beyond the domain $[0,1]$ used in the search. Maximum error relative to $\max |u|$. The Chebyshev polynomial is fitted to the reference on $[0,1]$ with the \emph  {lowest degree that matches PISR-NSGA-II's accuracy inside the domain}, so both start equally accurate; the difference outside is what knowing the equation buys. Lower error in $[1,1.5]$ in bold. $^\dagger $the reference solution blows up before $x=1.5$; the interval is truncated there.}}{8}{table.caption.6}\protected@file@percent }
+\newlabel{tab:extrapolation}{{5}{8}{Extrapolation beyond the domain $[0,1]$ used in the search. Maximum error relative to $\max |u|$. The Chebyshev polynomial is fitted to the reference on $[0,1]$ with the \emph {lowest degree that matches PISR-NSGA-II's accuracy inside the domain}, so both start equally accurate; the difference outside is what knowing the equation buys. Lower error in $[1,1.5]$ in bold. $^\dagger $the reference solution blows up before $x=1.5$; the interval is truncated there}{table.caption.6}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Champion (dashed), matched-accuracy Chebyshev polynomial (dotted) and reference (grey) on $[0,1.5]$; shaded region: outside the training domain.}}{9}{figure.caption.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Pointwise error of the champion and of the matched-accuracy Chebyshev polynomial on $[0,1.5]$.}}{9}{figure.caption.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {6}Physical consistency of the formulas}{10}{section.6}\protected@file@percent }
+\newlabel{sec:physics}{{6}{10}{Physical consistency of the formulas}{section.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Physical consistency of the discovered formulas: quantities a physicist would extract from the solution, computed \emph  {from the formula} (symbolic derivatives, roots, limits) and compared with their known values. Status by relative error: \textcolor {good}{\textbullet }\ $<1\,\%$, \textcolor {fair}{\textbullet }\ $<10\,\%$, \textcolor {poor}{\textbullet }\ $\geq 10\,\%$, \textcolor {muted}{\textbullet }\ no result. The Lane--Emden radius and the Ginzburg--Landau far field lie outside the domain $[0,1]$ used in the search.}}{10}{table.caption.9}\protected@file@percent }
+\newlabel{tab:physics}{{6}{10}{Physical consistency of the discovered formulas: quantities a physicist would extract from the solution, computed \emph {from the formula} (symbolic derivatives, roots, limits) and compared with their known values. Status by relative error: \stgood \ $<1\,\%$, \stfair \ $<10\,\%$, \stpoor \ $\geq 10\,\%$, \stnone \ no result. The Lane--Emden radius and the Ginzburg--Landau far field lie outside the domain $[0,1]$ used in the search}{table.caption.9}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Search dynamics}{11}{section.7}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Hall-of-fame champion per generation. Solid: validation score (PDE residual and boundary error on a fixed grid), the only criterion used to select the champion. Dashed: error against the reference, logged for analysis and never used by the search.}}{11}{figure.caption.10}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Best loss reached by expressions of each size in the final population (envelope), with all individuals in grey.}}{12}{figure.caption.11}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Final population in objective space; rank-1 individuals coloured by complexity, dominated ones in grey.}}{13}{figure.caption.12}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Per-problem analysis}{14}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Linear calibration problems}{14}{subsection.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.1}Laplace (1D)}{15}{subsubsection.8.1.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Laplace (1D): PISR-NSGA-II champion vs.\ reference.}}{15}{figure.caption.13}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Laplace (1D): pairwise Pareto trade-offs of the final population.}}{15}{figure.caption.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.2}Poisson (1D)}{16}{subsubsection.8.1.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Poisson (1D): PISR-NSGA-II champion vs.\ reference.}}{16}{figure.caption.15}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Poisson (1D): pairwise Pareto trade-offs of the final population.}}{16}{figure.caption.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.3}Harmonic oscillator (1D)}{17}{subsubsection.8.1.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Harmonic oscillator (1D): PISR-NSGA-II champion vs.\ reference.}}{17}{figure.caption.17}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Harmonic oscillator (1D): pairwise Pareto trade-offs of the final population.}}{17}{figure.caption.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.4}Airy (1D)}{18}{subsubsection.8.1.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Airy (1D): PISR-NSGA-II champion vs.\ reference.}}{18}{figure.caption.19}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces Airy (1D): pairwise Pareto trade-offs of the final population.}}{18}{figure.caption.20}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.1.5}Airy (2D)}{19}{subsubsection.8.1.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces Airy (2D): PISR-NSGA-II champion vs.\ reference.}}{19}{figure.caption.21}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces Airy (2D): pairwise Pareto trade-offs of the final population.}}{19}{figure.caption.22}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Nonlinear boundary-value problems}{19}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.2.1}Fisher--KPP (steady) (1D)}{20}{subsubsection.8.2.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Fisher--KPP (steady) (1D): PISR-NSGA-II champion vs.\ reference.}}{20}{figure.caption.23}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Fisher--KPP (steady) (1D): pairwise Pareto trade-offs of the final population.}}{20}{figure.caption.24}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.2.2}Fisher--KPP (steady) (2D)}{21}{subsubsection.8.2.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Fisher--KPP (steady) (2D): PISR-NSGA-II champion vs.\ reference.}}{21}{figure.caption.25}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces Fisher--KPP (steady) (2D): pairwise Pareto trade-offs of the final population.}}{21}{figure.caption.26}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.2.3}Duffing-type BVP (1D)}{22}{subsubsection.8.2.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces Duffing-type BVP (1D): PISR-NSGA-II champion vs.\ reference.}}{22}{figure.caption.27}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {21}{\ignorespaces Duffing-type BVP (1D): pairwise Pareto trade-offs of the final population.}}{22}{figure.caption.28}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.2.4}Duffing-type BVP (2D)}{23}{subsubsection.8.2.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {22}{\ignorespaces Duffing-type BVP (2D): PISR-NSGA-II champion vs.\ reference.}}{23}{figure.caption.29}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {23}{\ignorespaces Duffing-type BVP (2D): pairwise Pareto trade-offs of the final population.}}{23}{figure.caption.30}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.2.5}Thomas--Fermi (1D)}{24}{subsubsection.8.2.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {24}{\ignorespaces Thomas--Fermi (1D): PISR-NSGA-II champion vs.\ reference.}}{24}{figure.caption.31}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {25}{\ignorespaces Thomas--Fermi (1D): pairwise Pareto trade-offs of the final population.}}{24}{figure.caption.32}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.2.6}Thomas--Fermi-type (2D)}{25}{subsubsection.8.2.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {26}{\ignorespaces Thomas--Fermi-type (2D): PISR-NSGA-II champion vs.\ reference.}}{25}{figure.caption.33}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {27}{\ignorespaces Thomas--Fermi-type (2D): pairwise Pareto trade-offs of the final population.}}{25}{figure.caption.34}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Complex-valued (quantum) problems}{25}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.1}Schr\"odinger (1D)}{26}{subsubsection.8.3.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {28}{\ignorespaces Schr\"odinger (1D): PISR-NSGA-II champion vs.\ reference.}}{26}{figure.caption.35}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {29}{\ignorespaces Schr\"odinger (1D): pairwise Pareto trade-offs of the final population.}}{26}{figure.caption.36}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.2}Schr\"odinger (2D)}{27}{subsubsection.8.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {30}{\ignorespaces Schr\"odinger (2D): PISR-NSGA-II champion vs.\ reference.}}{27}{figure.caption.37}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {31}{\ignorespaces Schr\"odinger (2D): pairwise Pareto trade-offs of the final population.}}{27}{figure.caption.38}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.3}Schr\"odinger (unsteady) (1D)}{28}{subsubsection.8.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {32}{\ignorespaces Schr\"odinger (unsteady) (1D): PISR-NSGA-II champion vs.\ reference.}}{28}{figure.caption.39}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {33}{\ignorespaces Schr\"odinger (unsteady) (1D): pairwise Pareto trade-offs of the final population.}}{28}{figure.caption.40}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.3.4}Schr\"odinger (unsteady) (2D)}{29}{subsubsection.8.3.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {34}{\ignorespaces Schr\"odinger (unsteady) (2D): PISR-NSGA-II champion vs.\ reference.}}{29}{figure.caption.41}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {35}{\ignorespaces Schr\"odinger (unsteady) (2D): pairwise Pareto trade-offs of the final population.}}{29}{figure.caption.42}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Incompressible fluid dynamics}{29}{subsection.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.4.1}Navier--Stokes (Taylor--Green) (2D)}{30}{subsubsection.8.4.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {36}{\ignorespaces Navier--Stokes (Taylor--Green) (2D): PISR-NSGA-II champion vs.\ reference.}}{30}{figure.caption.43}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {37}{\ignorespaces Navier--Stokes (Taylor--Green) (2D): pairwise Pareto trade-offs of the final population.}}{30}{figure.caption.44}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.5}Singular, stiff and Painlev\'e-type problems}{30}{subsection.8.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.5.1}Lane--Emden ($n=3$) (1D)}{31}{subsubsection.8.5.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {38}{\ignorespaces Lane--Emden ($n=3$) (1D): PISR-NSGA-II champion vs.\ reference.}}{31}{figure.caption.45}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {39}{\ignorespaces Lane--Emden ($n=3$) (1D): pairwise Pareto trade-offs of the final population.}}{31}{figure.caption.46}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.5.2}Ginzburg--Landau (1D)}{32}{subsubsection.8.5.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {40}{\ignorespaces Ginzburg--Landau (1D): PISR-NSGA-II champion vs.\ reference.}}{32}{figure.caption.47}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {41}{\ignorespaces Ginzburg--Landau (1D): pairwise Pareto trade-offs of the final population.}}{32}{figure.caption.48}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {8.5.3}Painlev\'e I (1D)}{33}{subsubsection.8.5.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {42}{\ignorespaces Painlev\'e I (1D): PISR-NSGA-II champion vs.\ reference.}}{33}{figure.caption.49}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {43}{\ignorespaces Painlev\'e I (1D): pairwise Pareto trade-offs of the final population.}}{33}{figure.caption.50}\protected@file@percent }
+\gdef \LT@ii {\LT@entry 
+    {1}{95.74118pt}\LT@entry 
+    {1}{92.29283pt}\LT@entry 
+    {1}{289.39244pt}}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Discovered expressions}{34}{section.9}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Discovered closed-form solutions $\hat  u$ (hall-of-fame champion after constant polishing), simplified with SymPy and verified against the champion on its export grid (maximum relative difference below $10^{-3}$; constants to 4 significant figures). For 2D problems whose champion uses the boundary ansatz, $\mathcal  {C}[g]$ is the transfinite (Coons) interpolation of the boundary data $g$, so $\hat  u = g$ on $\partial [0,1]^2$ exactly. External symbolic baselines (PySR, PySINDy) are omitted: their runs predate the current problem definitions.}}{34}{table.7}\protected@file@percent }
+\newlabel{tab:formulas}{{7}{34}{Discovered closed-form solutions $\hat u$ (hall-of-fame champion after constant polishing), simplified with SymPy and verified against the champion on its export grid (maximum relative difference below $10^{-3}$; constants to 4 significant figures). For 2D problems whose champion uses the boundary ansatz, $\mathcal {C}[g]$ is the transfinite (Coons) interpolation of the boundary data $g$, so $\hat u = g$ on $\partial [0,1]^2$ exactly. External symbolic baselines (PySR, PySINDy) are omitted: their runs predate the current problem definitions}{table.7}{}}
+\gdef \@abspage@last{35}

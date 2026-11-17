@@ -1,0 +1,53 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Lane-Emden (noise_pct=0.05) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Lane-Emden:
+cos(sin(0.1236969 - x)) + 0.006153962
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 1.880e+05
+Progress: 937 / 1500 total iterations (62.467%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           7.879e-03  0.000e+00  y = 0.91214
+2           7.791e-03  1.122e-02  y = cos(x)
+3           9.424e-04  2.112e+00  y = cos(tanh(x))
+4           9.991e-05  2.244e+00  y = cos(x * -0.75617)
+5           3.407e-05  1.076e+00  y = cos(sin(0.13899 - x))
+7           2.164e-05  2.269e-01  y = cos(sin(x + -0.1237)) + 0.006152
+9           1.755e-05  1.047e-01  y = cos(sin(0.072541 - x) + 0.038571) + 0.0070151
+13          1.755e-05  4.917e-07  y = 0.0070169 + cos((x + 0.038572) + (sin(0.07254 - x) - x...
+                                      ))
+14          1.754e-05  4.235e-04  y = cos(x - sin((sin(0.066609 - x) + 0.044052) + x)) + 0.0...
+                                      0704
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           7.879e-03  0.000e+00  y = 0.91214
+2           7.791e-03  1.122e-02  y = cos(x)
+3           9.424e-04  2.112e+00  y = cos(tanh(x))
+4           9.991e-05  2.244e+00  y = cos(x * -0.75617)
+5           3.407e-05  1.076e+00  y = cos(sin(0.13899 - x))
+7           2.164e-05  2.269e-01  y = cos(sin(0.1237 - x)) + 0.006154
+9           1.755e-05  1.047e-01  y = cos(sin(0.072517 - x) + 0.038556) + 0.0070367
+11          1.750e-05  1.597e-03  y = cos((sin(0.052167 - x) * 1.0121) + 0.064023) / 0.99312
+16          1.744e-05  5.911e-04  y = cos(sin(0.074026 - x) + 0.040775) + (cos(sin(tanh(x + ...
+                                      x))) * 0.007304)
+18          1.738e-05  1.913e-03  y = cos(sin(0.077405 - x) + 0.039727) + (cos(sin(x + sin(x...
+                                       + x))) * 0.0078202)
+19          1.734e-05  2.212e-03  y = cos(sin(0.077885 - x) + 0.039665) + (cos(sin(sin(x + x...
+                                      ) + tanh(x))) * 0.0076656)
+20          1.698e-05  2.101e-02  y = cos(sin(0.073605 - x) + 0.039331) + (cos(tanh(inv(sin(...
+                                      exp(x + x) - -0.2481)))) * 0.010018)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_224720_Lw6v2E/hall_of_fame.csv

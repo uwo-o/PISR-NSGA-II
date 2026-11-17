@@ -1,0 +1,49 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Lane-Emden (noise_pct=0.0) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Lane-Emden:
+(cos(0.20520061 - 0.70134157*x) - 1*(-0.21063596))*sin(cos(sin(sin(x))))
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 6.880e+04
+Progress: 267 / 1500 total iterations (17.800%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           7.919e-03  0.000e+00  y = 0.91217
+2           7.745e-03  2.217e-02  y = cos(x)
+3           9.172e-04  2.134e+00  y = cos(tanh(x))
+4           8.797e-05  2.344e+00  y = cos(x * 0.75677)
+5           2.071e-05  1.446e+00  y = cos(sin(0.13821 - x))
+7           1.778e-05  7.620e-02  y = cos(0.11837 - tanh(0.25654 - x))
+11          1.275e-05  8.306e-02  y = cos(sin(sin(tanh((x * -3.2717) + 0.46172)) * x))
+15          1.266e-05  1.806e-03  y = cos(sin(sin(tanh((x * -3.6251) + tanh(sin(x - -0.38143...
+                                      )))) * x))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 6.120e+04
+Progress: 514 / 1500 total iterations (34.267%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           7.919e-03  0.000e+00  y = 0.91217
+2           7.745e-03  2.217e-02  y = cos(x)
+3           9.172e-04  2.134e+00  y = cos(tanh(x))
+4           8.797e-05  2.344e+00  y = cos(x * 0.75677)
+5           2.071e-05  1.446e+00  y = cos(sin(x - 0.13821))
+7           1.756e-05  8.259e-02  y = cos(tanh(0.26064 - x) - 0.12255)
+8           1.658e-05  5.713e-02  y = cos(tanh(x * tanh(x * 1.8729)))
+10          1.554e-05  3.239e-02  y = cos(sin(x) * tanh(x * (x + -2.4134)))
+11          1.275e-05  1.976e-01  y = cos(sin(sin(tanh((x * -3.2717) + 0.46172)) * x))
+14          4.025e-06  3.845e-01  y = cos(sin(sin(sin(x))) * (-0.32929 - tanh(x - -0.075036)...
+                                      )) - -0.008389
+20          2.376e-06  8.782e-02  y = (cos(0.24543 - sin((x - -0.16451) * sin(sin(sin(x)))

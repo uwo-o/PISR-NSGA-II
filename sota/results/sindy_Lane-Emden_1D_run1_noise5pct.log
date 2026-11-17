@@ -1,0 +1,6 @@
+--- Running PySINDy Benchmark for Lane-Emden ---
+
+Best Discovered Equation by PySINDy for Lane-Emden:
+ 52.8744 1 + -71.0385 u + -35.1234 v
+--------------------------------------------------
+

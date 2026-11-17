@@ -1,0 +1,38 @@
+\contentsline {section}{\numberline {1}Overview}{2}{section.1}%
+\contentsline {paragraph}{Goal.}{2}{paragraph*.1}%
+\contentsline {paragraph}{External baselines.}{2}{paragraph*.2}%
+\contentsline {section}{\numberline {2}Notation and glossary}{2}{section.2}%
+\contentsline {section}{\numberline {3}Benchmark suite}{4}{section.3}%
+\contentsline {section}{\numberline {4}Results}{6}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Accuracy of PISR-NSGA-II}{6}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Comparison with baselines}{7}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Hybrid representation vs.\ ansatz only}{7}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Extrapolation beyond the training domain}{8}{section.5}%
+\contentsline {section}{\numberline {6}Physical consistency of the formulas}{10}{section.6}%
+\contentsline {section}{\numberline {7}Search dynamics}{11}{section.7}%
+\contentsline {section}{\numberline {8}Per-problem analysis}{14}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Linear calibration problems}{14}{subsection.8.1}%
+\contentsline {subsubsection}{\numberline {8.1.1}Laplace (1D)}{15}{subsubsection.8.1.1}%
+\contentsline {subsubsection}{\numberline {8.1.2}Poisson (1D)}{16}{subsubsection.8.1.2}%
+\contentsline {subsubsection}{\numberline {8.1.3}Harmonic oscillator (1D)}{17}{subsubsection.8.1.3}%
+\contentsline {subsubsection}{\numberline {8.1.4}Airy (1D)}{18}{subsubsection.8.1.4}%
+\contentsline {subsubsection}{\numberline {8.1.5}Airy (2D)}{19}{subsubsection.8.1.5}%
+\contentsline {subsection}{\numberline {8.2}Nonlinear boundary-value problems}{19}{subsection.8.2}%
+\contentsline {subsubsection}{\numberline {8.2.1}Fisher--KPP (steady) (1D)}{20}{subsubsection.8.2.1}%
+\contentsline {subsubsection}{\numberline {8.2.2}Fisher--KPP (steady) (2D)}{21}{subsubsection.8.2.2}%
+\contentsline {subsubsection}{\numberline {8.2.3}Duffing-type BVP (1D)}{22}{subsubsection.8.2.3}%
+\contentsline {subsubsection}{\numberline {8.2.4}Duffing-type BVP (2D)}{23}{subsubsection.8.2.4}%
+\contentsline {subsubsection}{\numberline {8.2.5}Thomas--Fermi (1D)}{24}{subsubsection.8.2.5}%
+\contentsline {subsubsection}{\numberline {8.2.6}Thomas--Fermi-type (2D)}{25}{subsubsection.8.2.6}%
+\contentsline {subsection}{\numberline {8.3}Complex-valued (quantum) problems}{25}{subsection.8.3}%
+\contentsline {subsubsection}{\numberline {8.3.1}Schr\"odinger (1D)}{26}{subsubsection.8.3.1}%
+\contentsline {subsubsection}{\numberline {8.3.2}Schr\"odinger (2D)}{27}{subsubsection.8.3.2}%
+\contentsline {subsubsection}{\numberline {8.3.3}Schr\"odinger (unsteady) (1D)}{28}{subsubsection.8.3.3}%
+\contentsline {subsubsection}{\numberline {8.3.4}Schr\"odinger (unsteady) (2D)}{29}{subsubsection.8.3.4}%
+\contentsline {subsection}{\numberline {8.4}Incompressible fluid dynamics}{29}{subsection.8.4}%
+\contentsline {subsubsection}{\numberline {8.4.1}Navier--Stokes (Taylor--Green) (2D)}{30}{subsubsection.8.4.1}%
+\contentsline {subsection}{\numberline {8.5}Singular, stiff and Painlev\'e-type problems}{30}{subsection.8.5}%
+\contentsline {subsubsection}{\numberline {8.5.1}Lane--Emden ($n=3$) (1D)}{31}{subsubsection.8.5.1}%
+\contentsline {subsubsection}{\numberline {8.5.2}Ginzburg--Landau (1D)}{32}{subsubsection.8.5.2}%
+\contentsline {subsubsection}{\numberline {8.5.3}Painlev\'e I (1D)}{33}{subsubsection.8.5.3}%
+\contentsline {section}{\numberline {9}Discovered expressions}{34}{section.9}%

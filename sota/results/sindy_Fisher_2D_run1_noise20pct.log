@@ -1,0 +1,2 @@
+--- Running PySINDy Benchmark for Fisher ---
+[SKIP] Fisher: PySINDy solo soporta 1D en esta implementacion (reformulacion del BVP como sistema u'=v, v'=f(u,v,x)); no aplica limpiamente a EDPs 2D.

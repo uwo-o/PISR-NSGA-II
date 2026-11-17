@@ -1,0 +1,198 @@
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex)
+ restricted \write18 enabled.
+entering extended mode
+(./results.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+(/usr/share/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texmf-dist/tex/latex/base/size11.clo))
+(/usr/share/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texmf-dist/tex/latex/base/fontenc.sty)
+(/usr/share/texmf-dist/tex/latex/lm/lmodern.sty)
+(/usr/share/texmf-dist/tex/latex/microtype/microtype.sty
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty)
+(/usr/share/texmf-dist/tex/latex/etoolbox/etoolbox.sty)
+(/usr/share/texmf-dist/tex/latex/microtype/microtype-pdftex.def)
+(/usr/share/texmf-dist/tex/latex/microtype/microtype.cfg))
+(/usr/share/texmf-dist/tex/latex/geometry/geometry.sty
+(/usr/share/texmf-dist/tex/generic/iftex/ifvtex.sty
+(/usr/share/texmf-dist/tex/generic/iftex/iftex.sty)))
+(/usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texmf-dist/tex/latex/booktabs/booktabs.sty)
+(/usr/share/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/share/texmf-dist/tex/latex/adjustbox/adjustbox.sty
+(/usr/share/texmf-dist/tex/latex/xkeyval/xkeyval.sty
+(/usr/share/texmf-dist/tex/generic/xkeyval/xkeyval.tex
+(/usr/share/texmf-dist/tex/generic/xkeyval/xkvutils.tex)))
+(/usr/share/texmf-dist/tex/latex/adjustbox/adjcalc.sty)
+(/usr/share/texmf-dist/tex/latex/adjustbox/trimclip.sty
+(/usr/share/texmf-dist/tex/latex/graphics/graphicx.sty
+(/usr/share/texmf-dist/tex/latex/graphics/graphics.sty
+(/usr/share/texmf-dist/tex/latex/graphics/trig.sty)
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)
+(/usr/share/texmf-dist/tex/latex/graphics-def/pdftex.def)))
+(/usr/share/texmf-dist/tex/latex/collectbox/collectbox.sty)
+(/usr/share/texmf-dist/tex/latex/adjustbox/tc-pdftex.def))
+(/usr/share/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty)
+(/usr/share/texmf-dist/tex/latex/varwidth/varwidth.sty)
+==> First Aid for varwidth.sty applied!
+) (/usr/share/texmf-dist/tex/latex/tools/array.sty)
+(/usr/share/texmf-dist/tex/latex/float/float.sty)
+(/usr/share/texmf-dist/tex/latex/xcolor/xcolor.sty
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/color.cfg)
+(/usr/share/texmf-dist/tex/latex/graphics/mathcolor.ltx))
+(/usr/share/texmf-dist/tex/latex/colortbl/colortbl.sty)
+(/usr/share/texmf-dist/tex/latex/caption/caption.sty
+(/usr/share/texmf-dist/tex/latex/caption/caption3.sty)
+(/usr/share/texmf-dist/tex/latex/caption/ltcaption.sty))
+(/usr/share/texmf-dist/tex/latex/enumitem/enumitem.sty)
+(/usr/share/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty)
+(/usr/share/texmf-dist/tex/latex/titlesec/titlesec.sty)
+(/usr/share/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/share/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty)
+(/usr/share/texmf-dist/tex/generic/kvdefinekeys/kvdefinekeys.sty)
+(/usr/share/texmf-dist/tex/generic/pdfescape/pdfescape.sty
+(/usr/share/texmf-dist/tex/generic/ltxcmds/ltxcmds.sty)
+(/usr/share/texmf-dist/tex/generic/pdftexcmds/pdftexcmds.sty
+(/usr/share/texmf-dist/tex/generic/infwarerr/infwarerr.sty)))
+(/usr/share/texmf-dist/tex/latex/hycolor/hycolor.sty)
+(/usr/share/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/share/texmf-dist/tex/latex/refcount/refcount.sty)
+(/usr/share/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
+(/usr/share/texmf-dist/tex/latex/kvoptions/kvoptions.sty)))
+(/usr/share/texmf-dist/tex/generic/stringenc/stringenc.sty)
+(/usr/share/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/share/texmf-dist/tex/generic/intcalc/intcalc.sty)
+(/usr/share/texmf-dist/tex/latex/hyperref/puenc.def)
+(/usr/share/texmf-dist/tex/latex/url/url.sty)
+(/usr/share/texmf-dist/tex/generic/bitset/bitset.sty
+(/usr/share/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty)))
+(/usr/share/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/share/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
+(/usr/share/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty)))
+(/usr/share/texmf-dist/tex/latex/lm/t1lmr.fd)
+(/usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def) (./results.aux
+) (/usr/share/texmf-dist/tex/latex/microtype/mt-cmr.cfg)
+*geometry* driver: auto-detecting
+*geometry* detected driver: pdftex
+(/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/share/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+(/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg)) (./results.out)
+ (./results.out) (./results.toc (/usr/share/texmf-dist/tex/latex/lm/ot1lmr.fd)
+(/usr/share/texmf-dist/tex/latex/lm/omllmm.fd)
+(/usr/share/texmf-dist/tex/latex/lm/omslmsy.fd)
+(/usr/share/texmf-dist/tex/latex/lm/omxlmex.fd)
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texmf-dist/tex/latex/microtype/mt-msa.cfg)
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd)
+(/usr/share/texmf-dist/tex/latex/microtype/mt-msb.cfg)) [1{/var/lib/texmf/fonts
+/map/pdftex/updmap/pdftex.map}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ec.e
+nc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/share/texmf-di
+st/fonts/enc/dvips/lm/lm-rm.enc}] (/usr/share/texmf-dist/tex/latex/lm/ts1lmr.fd
+) [2{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/share/texmf-dist
+/fonts/enc/dvips/lm/lm-mathsy.enc}{/usr/share/texmf-dist/fonts/enc/dvips/lm/lm-
+mathex.enc}] [3] (./tables/suite_table.tex
+Overfull \hbox (12.38994pt too wide) in alignment at lines 1--4
+ [] [] [] [] 
+
+Overfull \hbox (12.38994pt too wide) in alignment at lines 4--6
+ [] [] [] [] 
+
+Overfull \hbox (12.38994pt too wide) in alignment at lines 6--8
+ [] [] [] [] 
+
+LaTeX Font Warning: Font shape `T1/lmr/bx/sc' undefined
+(Font)              using `T1/lmr/bx/n' instead on input line 9.
+
+
+Overfull \hbox (3.95067pt too wide) in paragraph at lines 31--32
+[]\OML/lmm/m/it/10.95 e[] []\OT1/lmr/m/n/10.95 (-20) (2\OML/lmm/m/it/10.95 ^^Yy
+\OT1/lmr/m/n/10.95 (-20) )\OML/lmm/m/it/10.95 ;  ^^U \OT1/lmr/m/n/10.95 (-20) =
+ 
+
+Overfull \hbox (16.50273pt too wide) in paragraph at lines 32--33
+[]|$[]\OT1/lmr/m/n/10.95 (-20) (\OML/lmm/m/it/10.95 ^^Yx\OT1/lmr/m/n/10.95 (-20
+) ) [](\OML/lmm/m/it/10.95 ^^Yy\OT1/lmr/m/n/10.95 (-20) ) \OML/lmm/m/it/10.95 e
+[]$|  
+
+Overfull \hbox (12.38994pt too wide) in alignment at lines 8--40
+ [] [] [] [] 
+ [4]) [5] (./tables/results_table.tex) (./tables/comparison_table.tex) [6]
+(/usr/share/texmf-dist/tex/latex/lm/t1lmtt.fd) [7]
+(./tables/extrapolation_table.tex) [8] [9 <./figures/extrapolation_solutions.pd
+f> <./figures/extrapolation_errors.pdf>] (./tables/physics_checks.tex) [10]
+[11 <./figures/convergence_history.pdf>] [12 <./figures/parsimony_pressure.pdf>
+] [13 <./figures/pareto_fronts_3d.pdf>] [14] [15 <./figures/solution_Laplace_1D
+.pdf> <./figures/pareto_pairs_Laplace_1D.pdf>] [16 <./figures/solution_Poisson_
+1D.pdf> <./figures/pareto_pairs_Poisson_1D.pdf>] [17 <./figures/solution_Harmon
+icOscillator_1D.pdf> <./figures/pareto_pairs_HarmonicOscillator_1D.pdf>]
+[18 <./figures/solution_Airy_1D.pdf> <./figures/pareto_pairs_Airy_1D.pdf>]
+[19 <./figures/solution_Airy_2D.pdf> <./figures/pareto_pairs_Airy_2D.pdf>]
+[20 <./figures/solution_Fisher_1D.pdf> <./figures/pareto_pairs_Fisher_1D.pdf>]
+[21 <./figures/solution_Fisher_2D.pdf> <./figures/pareto_pairs_Fisher_2D.pdf>]
+[22 <./figures/solution_Duffing_1D.pdf> <./figures/pareto_pairs_Duffing_1D.pdf>
+] [23 <./figures/solution_Duffing_2D.pdf> <./figures/pareto_pairs_Duffing_2D.pd
+f>] [24 <./figures/solution_Thomas-Fermi_1D.pdf> <./figures/pareto_pairs_Thomas
+-Fermi_1D.pdf>] [25 <./figures/solution_Thomas-Fermi_2D.pdf> <./figures/pareto_
+pairs_Thomas-Fermi_2D.pdf>] [26 <./figures/solution_Schrodinger_1D.pdf> <./figu
+res/pareto_pairs_Schrodinger_1D.pdf>] [27 <./figures/solution_Schrodinger_2D.pd
+f> <./figures/pareto_pairs_Schrodinger_2D.pdf>] [28 <./figures/solution_Schrodi
+nger-Unsteady_1D.pdf> <./figures/pareto_pairs_Schrodinger-Unsteady_1D.pdf>]
+[29 <./figures/solution_Schrodinger-Unsteady_2D.pdf> <./figures/pareto_pairs_Sc
+hrodinger-Unsteady_2D.pdf>] [30 <./figures/solution_Navier-Stokes-Unsteady_2D.p
+df> <./figures/pareto_pairs_Navier-Stokes-Unsteady_2D.pdf>]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 489.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 489.
+
+[31 <./figures/solution_Lane-Emden_1D.pdf> <./figures/pareto_pairs_Lane-Emden_1
+D.pdf>] [32 <./figures/solution_Ginzburg-Landau_1D.pdf> <./figures/pareto_pairs
+_Ginzburg-Landau_1D.pdf>] [33 <./figures/solution_Painleve-I_1D.pdf> <./figures
+/pareto_pairs_Painleve-I_1D.pdf>] (./tables/formulas_table.tex
+Overfull \hbox (5.1105pt too wide) in alignment at lines 1--6
+ [] [] [] 
+
+Overfull \hbox (5.1105pt too wide) in alignment at lines 6--10
+ [] [] [] 
+
+Overfull \hbox (5.1105pt too wide) in alignment at lines 10--12
+ [] [] [] 
+
+Overfull \hbox (5.1105pt too wide) in alignment at lines 12--81
+ [] [] [] 
+ [34]) [35] (./results.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information)</usr/share/texmf-dist/font
+s/type1/public/lm/lmbx10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmbx1
+2.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmbx7.pfb></usr/share/texmf-
+dist/fonts/type1/public/lm/lmex10.pfb></usr/share/texmf-dist/fonts/type1/public
+/lm/lmmi10.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmmi5.pfb></usr/sha
+re/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/share/texmf-dist/fonts/type
+1/public/lm/lmmi7.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></
+usr/share/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/share/texmf-dist/fon
+ts/type1/public/lm/lmr12.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmr5.
+pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/share/texmf-dis
+t/fonts/type1/public/lm/lmr7.pfb></usr/share/texmf-dist/fonts/type1/public/lm/l
+mr8.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/share/tex
+mf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/share/texmf-dist/fonts/type1/pub
+lic/lm/lmsy7.pfb></usr/share/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/s
+hare/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/share/texmf-dist/fonts/t
+ype1/public/amsfonts/symbols/msbm10.pfb>
+Output written on results.pdf (35 pages, 4135813 bytes).
+Transcript written on results.log.

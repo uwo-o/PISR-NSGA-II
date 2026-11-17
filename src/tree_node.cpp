@@ -1,5 +1,6 @@
 #include "tree_node.hpp"
 #include <iomanip>
+#include <cctype>
 #include <algorithm>
 #include <sstream>
 #include <numeric>
@@ -7,11 +8,14 @@
 extern int last_special_choice;
 
 // ─── Polinomios Ortogonales (Motor Físico) ───────────────────────────────────
-static void eval_poly_all(NodeType type, int n, double x, double& v, double& dv, double& dvv, double& dvvv, double& dvvvv);
+// Argumento y salidas complejos: la recurrencia es polinomial, vale tal cual
+// en C. Antes se evaluaba en Re(arg): P_n(x/i) daba P_n(0) en el valor
+// mientras las derivadas del jet si llevaban la parte imaginaria.
+static void eval_poly_all(NodeType type, int n, Complex x, Complex& v, Complex& dv, Complex& dvv, Complex& dvvv, Complex& dvvvv);
 // Sobrecarga original (value + 1er/2do derivada) — se mantiene intacta para no
 // tocar ningun call site existente; delega en la version extendida de abajo.
-static void eval_poly_all(NodeType type, int n, double x, double& v, double& dv, double& dvv) {
-    double dvvv, dvvvv;
+static void eval_poly_all(NodeType type, int n, Complex x, Complex& v, Complex& dv, Complex& dvv) {
+    Complex dvvv, dvvvv;
     eval_poly_all(type, n, x, v, dv, dvv, dvvv, dvvvv);
 }
 // Version extendida (value + 1ro..4to derivada w.r.t. su argumento escalar x),
@@ -24,8 +28,8 @@ static void eval_poly_all(NodeType type, int n, double x, double& v, double& dv,
 // aca, A es a lo sumo lineal en x), y B*P_{n-2} se diferencia trivial (B es
 // constante en x). Verificado a mano contra la recurrencia existente para
 // m=1,2 antes de extender a m=3,4 (coincide termino a termino).
-static void eval_poly_all(NodeType type, int n, double x, double& v, double& dv, double& dvv, double& dvvv, double& dvvvv) {
-    if (n < 0 || n > 10 || !std::isfinite(x)) { v = dv = dvv = dvvv = dvvvv = NAN; return; }
+static void eval_poly_all(NodeType type, int n, Complex x, Complex& v, Complex& dv, Complex& dvv, Complex& dvvv, Complex& dvvvv) {
+    if (n < 0 || n > 10 || !std::isfinite(x.real()) || !std::isfinite(x.imag())) { v = dv = dvv = dvvv = dvvvv = Complex(NAN, NAN); return; }
     if (n == 0) { v = 1.0; dv = dvv = dvvv = dvvvv = 0.0; return; }
     if (n == 1) {
         if (type == NodeType::HERMITE) { v = 2.0*x; dv = 2.0; }
@@ -35,20 +39,20 @@ static void eval_poly_all(NodeType type, int n, double x, double& v, double& dv,
         return;
     }
 
-    double p0 = 1.0, p1 = (type == NodeType::HERMITE) ? 2.0*x : ((type == NodeType::LAGUERRE) ? 1.0-x : x);
-    double dp0 = 0.0, dp1 = (type == NodeType::HERMITE) ? 2.0 : ((type == NodeType::LAGUERRE) ? -1.0 : 1.0);
-    double ddp0 = 0.0, ddp1 = 0.0;
-    double dddp0 = 0.0, dddp1 = 0.0;
-    double ddddp0 = 0.0, ddddp1 = 0.0;
+    Complex p0 = 1.0, p1 = (type == NodeType::HERMITE) ? 2.0*x : ((type == NodeType::LAGUERRE) ? 1.0-x : x);
+    Complex dp0 = 0.0, dp1 = (type == NodeType::HERMITE) ? 2.0 : ((type == NodeType::LAGUERRE) ? -1.0 : 1.0);
+    Complex ddp0 = 0.0, ddp1 = 0.0;
+    Complex dddp0 = 0.0, dddp1 = 0.0;
+    Complex ddddp0 = 0.0, ddddp1 = 0.0;
 
     for (int k = 1; k < n; ++k) {
-        double cur_v, cur_dv, cur_dvv, cur_dvvv, cur_dvvvv;
+        Complex cur_v, cur_dv, cur_dvv, cur_dvvv, cur_dvvvv;
         if (type == NodeType::LEGENDRE) {
-            cur_v    = ((2.0*k + 1.0)*x*p1 - k*p0) / (k + 1.0);
-            cur_dv   = ((2.0*k + 1.0)*(p1 + x*dp1) - k*dp0) / (k + 1.0);
-            cur_dvv  = ((2.0*k + 1.0)*(2.0*dp1 + x*ddp1) - k*ddp0) / (k + 1.0);
-            cur_dvvv = ((2.0*k + 1.0)*(3.0*ddp1 + x*dddp1) - k*dddp0) / (k + 1.0);
-            cur_dvvvv= ((2.0*k + 1.0)*(4.0*dddp1 + x*ddddp1) - k*ddddp0) / (k + 1.0);
+            cur_v    = ((2.0*k + 1.0)*x*p1 - double(k)*p0) / (k + 1.0);
+            cur_dv   = ((2.0*k + 1.0)*(p1 + x*dp1) - double(k)*dp0) / (k + 1.0);
+            cur_dvv  = ((2.0*k + 1.0)*(2.0*dp1 + x*ddp1) - double(k)*ddp0) / (k + 1.0);
+            cur_dvvv = ((2.0*k + 1.0)*(3.0*ddp1 + x*dddp1) - double(k)*dddp0) / (k + 1.0);
+            cur_dvvvv= ((2.0*k + 1.0)*(4.0*dddp1 + x*ddddp1) - double(k)*ddddp0) / (k + 1.0);
         } else if (type == NodeType::CHEBYSHEV) {
             cur_v    = 2.0*x*p1 - p0;
             cur_dv   = 2.0*(p1 + x*dp1) - dp0;
@@ -62,11 +66,11 @@ static void eval_poly_all(NodeType type, int n, double x, double& v, double& dv,
             cur_dvvv = 2.0*(3.0*ddp1 + x*dddp1) - 2.0*k*dddp0;
             cur_dvvvv= 2.0*(4.0*dddp1 + x*ddddp1) - 2.0*k*ddddp0;
         } else { // LAGUERRE
-            cur_v    = ((2.0*k + 1.0 - x)*p1 - k*p0) / (k + 1.0);
-            cur_dv   = ((2.0*k + 1.0 - x)*dp1 - p1 - k*dp0) / (k + 1.0);
-            cur_dvv  = ((2.0*k + 1.0 - x)*ddp1 - 2.0*dp1 - k*ddp0) / (k + 1.0);
-            cur_dvvv = ((2.0*k + 1.0 - x)*dddp1 - 3.0*ddp1 - k*dddp0) / (k + 1.0);
-            cur_dvvvv= ((2.0*k + 1.0 - x)*ddddp1 - 4.0*dddp1 - k*ddddp0) / (k + 1.0);
+            cur_v    = ((2.0*k + 1.0 - x)*p1 - double(k)*p0) / (k + 1.0);
+            cur_dv   = ((2.0*k + 1.0 - x)*dp1 - p1 - double(k)*dp0) / (k + 1.0);
+            cur_dvv  = ((2.0*k + 1.0 - x)*ddp1 - 2.0*dp1 - double(k)*ddp0) / (k + 1.0);
+            cur_dvvv = ((2.0*k + 1.0 - x)*dddp1 - 3.0*ddp1 - double(k)*dddp0) / (k + 1.0);
+            cur_dvvvv= ((2.0*k + 1.0 - x)*ddddp1 - 4.0*dddp1 - double(k)*ddddp0) / (k + 1.0);
         }
         p0 = p1; p1 = cur_v; dp0 = dp1; dp1 = cur_dv; ddp0 = ddp1; ddp1 = cur_dvv;
         dddp0 = dddp1; dddp1 = cur_dvvv; ddddp0 = ddddp1; ddddp1 = cur_dvvvv;
@@ -252,13 +256,13 @@ AD apply_unary_ad_ext(NodeType type, const AD& C) {
 Complex apply_binary(NodeType type, Complex lv, Complex rv) {
     if (type == NodeType::ADD) return lv+rv; if (type == NodeType::SUB) return lv-rv;
     if (type == NodeType::MUL) return lv*rv; 
-    if (type == NodeType::DIV) return (std::abs(rv.real()) < 1e-12) ? Complex(NAN, NAN) : lv / rv;
+    if (type == NodeType::DIV) return (std::abs(rv) < 1e-12) ? Complex(NAN, NAN) : lv / rv;
     if (type == NodeType::POW) return (lv.real() < 0.0) ? Complex(NAN, NAN) : std::pow(lv, rv);
     
     if (!std::isfinite(rv.real())) return Complex(NAN, NAN);
-    double pv, pdv, pdvv; int n = std::clamp((int)std::round(rv.real()), 0, 10);
-    eval_poly_all(type, n, lv.real(), pv, pdv, pdvv);
-    return Complex(pv, 0.0);
+    Complex pv, pdv, pdvv; int n = std::clamp((int)std::round(rv.real()), 0, 10);
+    eval_poly_all(type, n, lv, pv, pdv, pdvv);
+    return pv;
 }
 
 // ─── Version RAPIDA (solo v,dx,dy,dt,dxx,dyy,dtt) — identica a la formula
@@ -275,7 +279,7 @@ AD apply_binary_ad(NodeType type, const AD& L, const AD& R) {
         r.dxx = L.dxx*R.v + 2.0*L.dx*R.dx + L.v*R.dxx;
         r.dyy = L.dyy*R.v + 2.0*L.dy*R.dy + L.v*R.dyy;
     } else if (type == NodeType::DIV) {
-        if (std::abs(R.v.real()) < 1e-12) { r.v = NAN; return r; }
+        if (std::abs(R.v) < 1e-12) { r.v = NAN; return r; }
         Complex inv = 1.0/R.v, inv2 = inv*inv, inv3 = inv2*inv;
         r.v = L.v*inv;
         r.dx = (L.dx*R.v - L.v*R.dx)*inv2; r.dy = (L.dy*R.v - L.v*R.dy)*inv2;
@@ -291,8 +295,8 @@ AD apply_binary_ad(NodeType type, const AD& L, const AD& R) {
         r.dyy = dd_base * L.dy * L.dy + d_base * L.dyy;
     } else { // Polinomios Ortogonales
         if (!std::isfinite(R.v.real())) { r.v = NAN; return r; }
-        double pv, pdv, pdvv; int n = std::clamp((int)std::round(R.v.real()), 0, 10);
-        eval_poly_all(type, n, L.v.real(), pv, pdv, pdvv);
+        Complex pv, pdv, pdvv; int n = std::clamp((int)std::round(R.v.real()), 0, 10);
+        eval_poly_all(type, n, L.v, pv, pdv, pdvv);
         r.v = pv; r.dx = pdv*L.dx; r.dy = pdv*L.dy; r.dt = pdv*L.dt;
         r.dxx = pdvv*L.dx*L.dx + pdv*L.dxx; r.dyy = pdvv*L.dy*L.dy + pdv*L.dyy; r.dtt = pdvv*L.dt*L.dt + pdv*L.dtt;
     }
@@ -325,7 +329,7 @@ AD apply_binary_ad_ext(NodeType type, const AD& L, const AD& R) {
         // f''=2/u^3, f'''=-6/u^4, f''''=24/u^5), luego producto via
         // apply_mul_ad — reusa las dos reglas ya verificadas en vez de derivar
         // el cociente por separado.
-        if (std::abs(R.v.real()) < 1e-12) { r.v = NAN; return r; }
+        if (std::abs(R.v) < 1e-12) { r.v = NAN; return r; }
         Complex inv = 1.0/R.v, inv2 = inv*inv, inv3 = inv2*inv, inv4 = inv3*inv, inv5 = inv4*inv;
         AD Rinv = apply_composition(inv, -inv2, 2.0*inv3, -6.0*inv4, 24.0*inv5, R);
         r = apply_mul_ad(L, Rinv);
@@ -347,8 +351,8 @@ AD apply_binary_ad_ext(NodeType type, const AD& L, const AD& R) {
              // de una variable (el polinomio) con L — misma maquinaria que
              // SIN/EXP/etc, usando value+1ro..4to derivada de eval_poly_all.
         if (!std::isfinite(R.v.real())) { r.v = NAN; return r; }
-        double pv, pdv, pdvv, pdvvv, pdvvvv; int n = std::clamp((int)std::round(R.v.real()), 0, 10);
-        eval_poly_all(type, n, L.v.real(), pv, pdv, pdvv, pdvvv, pdvvvv);
+        Complex pv, pdv, pdvv, pdvvv, pdvvvv; int n = std::clamp((int)std::round(R.v.real()), 0, 10);
+        eval_poly_all(type, n, L.v, pv, pdv, pdvv, pdvvv, pdvvvv);
         r = apply_composition(pv, pdv, pdvv, pdvvv, pdvvvv, L);
     }
     return r;
@@ -386,21 +390,42 @@ Complex TerminalNode::eval_t(double x, double y, double t) const {
     if (type == NodeType::CONST_EPS0) return 8.8541878e-12;
     return 0.0;
 }
+// Constante con parte imaginaria: antes se imprimia solo la parte real, asi que
+// la formula exportada de un campo complejo (Schrodinger) no era la evaluada.
+static void print_complex_erc(std::ostream& os, Complex v) {
+    os << std::fixed << std::setprecision(3);
+    if (std::abs(v.imag()) < 5e-4) { os << v.real(); return; }
+    if (std::abs(v.real()) < 5e-4) { os << v.imag() << "i"; return; }
+    os << "(" << v.real() << (v.imag() < 0 ? " - " : " + ") << std::abs(v.imag()) << "i)";
+}
 void TerminalNode::print(std::ostream& os) const {
     if (type == NodeType::VAR_X) os << "x"; else if (type == NodeType::VAR_Y) os << "y";
     else if (type == NodeType::VAR_T) os << "t"; else if (type == NodeType::VAR_Z) os << "z";
     else if (type == NodeType::VAR_N) os << "n";
-    else if (type == NodeType::ERC) os << std::fixed << std::setprecision(3) << erc_val.real();
+    else if (type == NodeType::ERC) print_complex_erc(os, erc_val);
     else if (type == NodeType::CONST_I) os << "i"; else if (type == NodeType::CONST_PI) os << "pi";
     else if (type == NodeType::CONST_E) os << "e";
+    // Constantes fisicas: antes imprimian "" (todas iguales para print_str,
+    // asi que simplify() podia cancelar G - c como si fueran el mismo nodo).
+    else if (type == NodeType::CONST_G) os << "G";
+    else if (type == NodeType::CONST_C) os << "c";
+    else if (type == NodeType::CONST_HBAR) os << "hbar";
+    else if (type == NodeType::CONST_KB) os << "kB";
+    else if (type == NodeType::CONST_EPS0) os << "eps0";
 }
 void TerminalNode::print_latex(std::ostream& os) const {
     if (type == NodeType::VAR_X) os << "x"; else if (type == NodeType::VAR_Y) os << "y";
     else if (type == NodeType::VAR_T) os << "t"; else if (type == NodeType::VAR_Z) os << "z";
     else if (type == NodeType::VAR_N) os << "n";
-    else if (type == NodeType::ERC) os << std::fixed << std::setprecision(3) << erc_val.real();
+    else if (type == NodeType::ERC) print_complex_erc(os, erc_val);
     else if (type == NodeType::CONST_I) os << "i"; else if (type == NodeType::CONST_PI) os << "\\pi";
     else if (type == NodeType::CONST_E) os << "e";
+    // Constantes fisicas: antes no se imprimian (quedaba "\\frac{x}{}" o "( + x)").
+    else if (type == NodeType::CONST_G) os << "G";
+    else if (type == NodeType::CONST_C) os << "c";
+    else if (type == NodeType::CONST_HBAR) os << "\\hbar";
+    else if (type == NodeType::CONST_KB) os << "k_B";
+    else if (type == NodeType::CONST_EPS0) os << "\\varepsilon_0";
 }
 bool TerminalNode::contains_variables() const { 
     return type == NodeType::VAR_X || type == NodeType::VAR_Y || type == NodeType::VAR_T || type == NodeType::VAR_Z; 
@@ -622,8 +647,16 @@ NodePtr BinaryNode::simplify() const {
 
     auto is_zero = [](double v) { return std::isfinite(v) && std::abs(v) < 1e-6; };
     auto is_one = [](double v) { return std::isfinite(v) && std::abs(v - 1.0) < 1e-6; };
-    double lv_v = is_constant(lt) ? sl->eval_t(0,0,0).real() : NAN;
-    double rv_v = is_constant(rt) ? sr->eval_t(0,0,0).real() : NAN;
+    // Valor de una constante para las reglas 0/1 de abajo. Una constante con
+    // parte imaginaria (i, ERC complejo) NO entra: antes se usaba solo .real(),
+    // asi que i valia 0 e "i*(a x)" se simplificaba a 0 y exp(i a x) a 1,
+    // borrando toda solucion oscilante compleja.
+    auto real_const = [](const NodePtr& n) {
+        Complex c = n->eval_t(0, 0, 0);
+        return std::abs(c.imag()) > 1e-12 ? NAN : c.real();
+    };
+    double lv_v = is_constant(lt) ? real_const(sl) : NAN;
+    double rv_v = is_constant(rt) ? real_const(sr) : NAN;
     // Deteccion numerica de cancelacion exacta (A + (-A) = 0, A - A = 0) para
     // casos donde los dos subarboles son equivalentes pero no sintacticamente
     // identicos (ej. "exp(-0.5x^2) + -exp(-0.5x^2)", frecuente tras mutacion/
@@ -771,6 +804,23 @@ NodePtr make_const_pi() { return std::make_unique<TerminalNode>(NodeType::CONST_
 NodePtr make_const_e() { return std::make_unique<TerminalNode>(NodeType::CONST_E); }
 NodePtr make_binary(NodeType op, NodePtr l, NodePtr r) { return std::make_unique<BinaryNode>(op, std::move(l), std::move(r)); }
 NodePtr make_unary(NodeType op, NodePtr c) { return std::make_unique<UnaryNode>(op, std::move(c)); }
+
+NodePtr substitute_variable(const Node* tree, NodeType var, const Node* replacement) {
+    if (!tree) return nullptr;
+    if (auto t = dynamic_cast<const TerminalNode*>(tree))
+        return (t->type == var) ? replacement->clone() : t->clone();
+    if (auto u = dynamic_cast<const UnaryNode*>(tree))
+        return std::make_unique<UnaryNode>(u->type, substitute_variable(u->child.get(), var, replacement));
+    if (auto b = dynamic_cast<const BinaryNode*>(tree))
+        return std::make_unique<BinaryNode>(b->type, substitute_variable(b->left.get(), var, replacement),
+                                            substitute_variable(b->right.get(), var, replacement));
+    if (auto s = dynamic_cast<const SeriesNode*>(tree)) {
+        auto sn = std::make_unique<SeriesNode>(s->n_terms, substitute_variable(s->child.get(), var, replacement));
+        sn->coeffs = s->coeffs;
+        return sn;
+    }
+    return tree->clone();
+}
 
 static NodePtr skeleton_rational(int depth, std::mt19937& gen, const PDEProblem& prob) {
     auto num = random_tree(depth-1, gen, prob); auto den = random_tree(depth-1, gen, prob);
@@ -985,6 +1035,96 @@ NodePtr random_triple_separable_tree(int depth, std::mt19937& gen, const PDEProb
     return make_binary(NodeType::MUL, make_binary(NodeType::MUL, std::move(fx), std::move(fy)), std::move(ft));
 }
 
+// Simbolo del operador: para R lineal homogeneo y autonomo,
+// R(e^{lam.r}) = P(lam) e^{lam.r}. Se obtiene evaluando R sobre el jet exacto
+// del modo (sin usar la solucion ni los datos de borde).
+static Complex operator_symbol(const PDEProblem& prob, Complex lx, Complex ly, Complex lt) {
+    const double x = 0.3, y = 0.4, t = 0.5;
+    Complex e = std::exp(lx * x + ly * y + lt * t);
+    AD j;
+    j.v = e; j.dx = lx * e; j.dy = ly * e; j.dt = lt * e;
+    j.dxx = lx * lx * e; j.dyy = ly * ly * e; j.dtt = lt * lt * e;
+    j.dxy = lx * ly * e; j.dxt = lx * lt * e; j.dyt = ly * lt * e;
+    j.dxxx = lx * lx * lx * e; j.dxxy = lx * lx * ly * e; j.dxyy = lx * ly * ly * e; j.dyyy = ly * ly * ly * e;
+    j.dxxt = lx * lx * lt * e; j.dyyt = ly * ly * lt * e;
+    j.dxxxx = lx * lx * lx * lx * e; j.dxxyy = lx * lx * ly * ly * e; j.dyyyy = ly * ly * ly * ly * e;
+    return prob.pde_residual_ad(j, x, y, t) / e;
+}
+
+NodePtr random_exponential_modes_tree(int max_depth, std::mt19937& gen, const PDEProblem& prob) {
+    std::normal_distribution<double> nd(0.0, 1.0);
+    std::uniform_real_distribution<double> ud(-2.0 * M_PI, 2.0 * M_PI);
+    std::uniform_real_distribution<double> u01(0.0, 1.0);
+    std::vector<char> vars{'x'};
+    if (prob.dim == 2) vars.push_back('y');
+    if (prob.is_unsteady) vars.push_back('t');
+    const int nv = (int)vars.size();
+
+    // Sorteo de lam por variable segun el tipo (0: Re + i Im; 1: solo i Im;
+    // 2: solo Re). Con probabilidad 3/4 la ULTIMA componente se despeja de
+    // P(lam) = 0 (relacion de dispersion / raiz caracteristica del operador)
+    // por secante compleja: la semilla es entonces solucion exacta de la EDP
+    // y la busqueda solo ajusta frecuencias y amplitudes a la frontera.
+    auto draw_lams = [&](int kind) {
+        std::vector<Complex> lam(3, Complex(0.0, 0.0));
+        for (int k = 0; k < nv; ++k) {
+            double re = (kind == 1) ? 0.0 : nd(gen);
+            double im = (kind == 2) ? 0.0 : ud(gen);
+            lam[k] = Complex(re, im);
+        }
+        if (u01(gen) < 0.75) {
+            int last = nv - 1;
+            auto P = [&](Complex z) {
+                std::vector<Complex> l = lam; l[last] = z;
+                return operator_symbol(prob, l[0], prob.dim == 2 ? l[1] : Complex(0.0),
+                                       prob.is_unsteady ? l[nv - 1] : Complex(0.0));
+            };
+            Complex z0 = lam[last], z1 = z0 + Complex(0.1, 0.1);
+            Complex f0 = P(z0), f1 = P(z1);
+            for (int it = 0; it < 60 && std::abs(f1) > 1e-13 * (1.0 + std::norm(z1)); ++it) {
+                Complex den = f1 - f0;
+                if (std::abs(den) < 1e-300) break;
+                Complex z2 = z1 - f1 * (z1 - z0) / den;
+                z0 = z1; f0 = f1; z1 = z2; f1 = P(z1);
+                if (!std::isfinite(z1.real()) || !std::isfinite(z1.imag()) || std::abs(z1) > 1e3) break;
+            }
+            // raiz trivial lam=0 (p.ej. u''=0) daria un modo constante sin la variable: se descarta
+            if (std::isfinite(std::abs(f1)) && std::abs(f1) <= 1e-9 * (1.0 + std::norm(z1)) && std::abs(z1) <= 1e3 && std::abs(z1) > 1e-6)
+                lam[last] = z1;
+        }
+        return lam;
+    };
+    auto lin = [&](const std::vector<Complex>& lam, bool imag_part) {
+        NodePtr acc;
+        for (int k = 0; k < nv; ++k) {
+            double c = imag_part ? lam[k].imag() : lam[k].real();
+            if (c == 0.0) continue;
+            NodePtr m = make_binary(NodeType::MUL, make_erc(c), make_var(vars[k]));
+            acc = acc ? make_binary(NodeType::ADD, std::move(acc), std::move(m)) : std::move(m);
+        }
+        return acc;
+    };
+    auto mode = [&](int kind) {
+        std::vector<Complex> lam = draw_lams(kind);
+        NodePtr re = lin(lam, false), im = lin(lam, true);
+        NodePtr arg;
+        if (im) im = make_binary(NodeType::MUL, make_const_i(), std::move(im));
+        if (re && im) arg = make_binary(NodeType::ADD, std::move(re), std::move(im));
+        else if (re) arg = std::move(re);
+        else if (im) arg = std::move(im);
+        else arg = make_erc(0.0);
+        return make_binary(NodeType::MUL, make_erc(nd(gen)), make_unary(NodeType::EXP, std::move(arg)));
+    };
+    int n_modes = std::uniform_int_distribution<int>(1, 2)(gen);
+    for (int m = n_modes; m >= 1; --m)
+        for (int kind = 0; kind <= 2; ++kind) {
+            NodePtr t = mode(kind);
+            if (m == 2) t = make_binary(NodeType::ADD, std::move(t), mode(kind));
+            if (t->get_depth() <= max_depth) return t;
+        }
+    return mode(2);
+}
+
 NodePtr random_modal_sum_tree(int depth, std::mt19937& gen, const PDEProblem& prob) {
     PDEProblem prob1d = prob;
     prob1d.dim = 1;
@@ -1004,7 +1144,7 @@ NodePtr random_modal_sum_tree(int depth, std::mt19937& gen, const PDEProblem& pr
 
 static bool is_v(const Node* n, double target) {
     if (!n || n->contains_variables()) return false;
-    return std::abs(n->eval_t(0,0,0).real() - target) < 1e-6;
+    return std::abs(n->eval_t(0,0,0) - Complex(target, 0.0)) < 1e-6;
 }
 
 void TerminalNode::print_formal(std::ostream& os, int parent_prec) const { print_latex(os); }
@@ -1103,11 +1243,23 @@ void BinaryNode::print_formal(std::ostream& os, int parent_prec) const {
         // (mas legible) en el resto.
         std::ostringstream rhs; right->print_formal(rhs, own_prec);
         std::string rs = rhs.str();
-        os << (!rs.empty() && rs[0] == '-' ? " \\cdot " : " ") << rs;
+        // Tambien si empieza en un numero: "-0.294 1.699 x" se lee como un solo
+        // numero "-0.2941.699" en el PDF.
+        bool ambiguous = !rs.empty() && (rs[0] == '-' || rs[0] == '.' || std::isdigit((unsigned char)rs[0]));
+        os << (ambiguous ? " \\cdot " : " ") << rs;
     } else {
         left->print_formal(os, own_prec);
-        if (type == NodeType::SUB) os << " - ";
-        right->print_formal(os, own_prec);
+        if (type == NodeType::SUB) {
+            // A - (B + C): el lado derecho de una resta va entre parentesis si
+            // es una suma/resta (precedencia 1) o empieza con signo; antes se
+            // imprimia "A - B + C" y la formula publicada era OTRA.
+            std::ostringstream rhs; right->print_formal(rhs, 1);
+            std::string rs = rhs.str();
+            if (!rs.empty() && rs[0] == '-' && rs.front() != '(') rs = "(" + rs + ")";
+            os << " - " << rs;
+        } else {
+            right->print_formal(os, own_prec);
+        }
     }
     if (need_paren) os << ")";
 }
@@ -1590,4 +1742,63 @@ bool BinaryNode::has_non_affine_trig_arg() const {
 
 bool SeriesNode::has_non_affine_trig_arg() const {
     return child && child->has_non_affine_trig_arg();
+}
+
+// ─── Exportacion exacta a SymPy ──────────────────────────────────────────────
+// Misma semantica que eval_t: GAUSSIAN = exp(-0.5 a^2); grado de los
+// polinomios = clamp(round(Re(der)), 0, 10); SERIES = sum_n c_n child|_{n}.
+static void sympy_num(std::ostream& os, Complex v) {
+    std::ostringstream o; o << std::setprecision(17);
+    if (v.imag() == 0.0) o << "(" << v.real() << ")";
+    else o << "(" << v.real() << (v.imag() < 0 ? "-" : "+") << std::abs(v.imag()) << "*I)";
+    os << o.str();
+}
+void TerminalNode::print_sympy(std::ostream& os) const {
+    switch (type) {
+        case NodeType::VAR_X: os << "x"; break;
+        case NodeType::VAR_Y: os << "y"; break;
+        case NodeType::VAR_T: os << "t"; break;
+        case NodeType::VAR_Z: os << "z"; break;
+        case NodeType::VAR_N: os << current_n; break;
+        case NodeType::CONST_I: os << "I"; break;
+        case NodeType::CONST_PI: os << "pi"; break;
+        case NodeType::CONST_E: os << "E"; break;
+        default: sympy_num(os, eval_t(0.0, 0.0, 0.0)); break;
+    }
+}
+void UnaryNode::print_sympy(std::ostream& os) const {
+    const char* f = "";
+    switch (type) {
+        case NodeType::SIN: f = "sin"; break;   case NodeType::COS: f = "cos"; break;
+        case NodeType::SINH: f = "sinh"; break; case NodeType::COSH: f = "cosh"; break;
+        case NodeType::EXP: f = "exp"; break;   case NodeType::LOG: f = "log"; break;
+        case NodeType::TANH: f = "tanh"; break;
+        case NodeType::SQR: os << "(("; child->print_sympy(os); os << ")**2)"; return;
+        case NodeType::GAUSSIAN: os << "exp(-(1/2)*("; child->print_sympy(os); os << ")**2)"; return;
+        default: f = "Function('u')"; break;
+    }
+    os << f << "("; child->print_sympy(os); os << ")";
+}
+void BinaryNode::print_sympy(std::ostream& os) const {
+    if (type >= NodeType::LEGENDRE && type <= NodeType::LAGUERRE) {
+        int deg = std::clamp((int)std::round(right->eval_t(0, 0, 0).real()), 0, 10);
+        const char* f = type == NodeType::LEGENDRE ? "legendre" : type == NodeType::HERMITE ? "hermite"
+                      : type == NodeType::CHEBYSHEV ? "chebyshevt" : "laguerre";
+        os << f << "(" << deg << ", "; left->print_sympy(os); os << ")";
+        return;
+    }
+    const char* op = type == NodeType::ADD ? ")+(" : type == NodeType::SUB ? ")-(" : type == NodeType::MUL ? ")*("
+                   : type == NodeType::DIV ? ")/(" : ")**(";
+    os << "(("; left->print_sympy(os); os << op; right->print_sympy(os); os << "))";
+}
+void SeriesNode::print_sympy(std::ostream& os) const {
+    int save = current_n;
+    os << "(";
+    for (int n = 1; n <= n_terms; ++n) {
+        current_n = n;
+        if (n > 1) os << "+";
+        sympy_num(os, coeffs[n - 1]); os << "*("; child->print_sympy(os); os << ")";
+    }
+    os << ")";
+    current_n = save;
 }

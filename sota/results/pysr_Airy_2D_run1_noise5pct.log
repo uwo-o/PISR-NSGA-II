@@ -1,0 +1,95 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Airy (noise_pct=0.05) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Airy:
+exp(-x - y)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 9.130e+04
+Progress: 463 / 1500 total iterations (30.867%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.951e-02  0.000e+00  target = 0.40149
+4           1.539e-02  2.171e-01  target = exp(-0.4566 - x)
+5           7.021e-05  5.390e+00  target = inv(exp(y + x))
+6           7.014e-05  1.041e-03  target = 0.99938 / exp(x + y)
+7           7.010e-05  5.647e-04  target = inv(exp((x * 1.0018) + y))
+9           7.009e-05  1.267e-05  target = inv(exp((y * 0.99972) + (x * 1.002)))
+10          7.008e-05  2.101e-04  target = inv(exp(y + (exp(x * 0.0027018) * x)))
+12          7.003e-05  3.373e-04  target = inv(exp(x + (exp((y + -0.60108) * 0.0094484)...
+                                            * y)))
+14          7.002e-05  5.210e-05  target = inv(exp((y * exp((y + -0.46666) * 0.0024646)...
+                                           ) + (x * 1.0012)))
+15          7.002e-05  6.122e-05  target = inv(exp((x * 1.0012) + (y * exp(0.0024646 * ...
+                                           (y - tanh(0.71847))))))
+16          6.995e-05  9.417e-04  target = inv(exp(exp(exp(exp((x - -0.91233) - y)) * 1...
+                                           .288e-05) * (x + y)))
+17          6.985e-05  1.437e-03  target = inv(exp(x + y) * exp(exp(exp(exp(cos(tanh(y)...
+                                            + y)))) * 5.5724e-10))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 1.270e+05
+Progress: 1148 / 1500 total iterations (76.533%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.951e-02  0.000e+00  target = 0.40149
+4           1.539e-02  2.171e-01  target = exp(-0.4566 - x)
+5           7.021e-05  5.390e+00  target = inv(exp(y + x))
+6           7.014e-05  1.041e-03  target = 0.99938 / exp(x + y)
+7           7.010e-05  5.647e-04  target = inv(exp((x * 1.0018) + y))
+8           7.010e-05  2.921e-06  target = 0.99995 / exp((x * 1.0017) + y)
+9           7.008e-05  1.690e-04  target = inv(exp((y + x) * 0.99744)) + -0.0010692
+10          7.008e-05  6.366e-05  target = inv(exp(y + x)) * cos(x * 0.073472)
+12          6.987e-05  1.488e-03  target = cos((0.53531 - y) * -0.12536) * inv(exp(x + ...
+                                           y))
+13          6.982e-05  7.046e-04  target = inv(exp(x + y)) * cos((y - cos(1.0447)) * 0....
+                                           15334)
+14          6.962e-05  2.835e-03  target = inv(exp((y * cos((y - 1.1463) * -0.21544)) +...
+                                            x) * 1.0041)
+15          6.949e-05  1.889e-03  target = inv(exp(x + (y * cos((y - cos(x)) * -0.28222...
+                                           )))) * 0.99657
+17          6.948e-05  7.612e-05  target = inv(1.0031 * exp(x + (cos(((1.1427 * cos(x))...
+                                            - y) * -0.2201) * y)))
+19          6.948e-05  2.354e-06  target = inv(1.0031 * exp(x + (cos((cos(x * (0.30093 ...
+                                           + x)) - y) * -0.2452) * y)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.951e-02  0.000e+00  target = 0.40149
+4           1.539e-02  2.171e-01  target = exp(-0.4566 - x)
+5           7.021e-05  5.390e+00  target = inv(exp(y + x))
+6           7.014e-05  1.041e-03  target = 0.99938 / exp(x + y)
+7           7.010e-05  5.647e-04  target = inv(exp((x * 1.0018) + y))
+8           7.010e-05  2.921e-06  target = 0.99995 / exp((x * 1.0017) + y)
+9           7.005e-05  6.207e-04  target = inv(exp(x + (y * 0.99734))) + -0.00075796
+11          6.992e-05  9.438e-04  target = inv(exp(((y + x) * 1.0074) - 0.01201) + 0.01...
+                                           4046)
+12          6.984e-05  1.138e-03  target = cos((0.45488 - y) * -0.12536) * inv(exp(x + ...
+                                           y))
+13          6.977e-05  1.049e-03  target = cos((y - cos(1.1189)) * 0.15334) * inv(exp(x...
+                                            + y))
+14          6.962e-05  2.133e-03  target = inv(exp((y * cos((1.1427 - y) * -0.22007)) +...
+                                            x) * 1.004)
+15          6.949e-05  1.809e-03  target = inv(exp(x + (y * cos((y - cos(x)) * -0.28222...
+                                           )))) * 0.99657
+16          6.947e-05  2.576e-04  target = inv(exp(x + (y * cos(sin(y - cos(x)) * 0.300...
+                                           92))) * 1.0035)
+19          6.944e-05  1.589e-04  target = inv(exp((y * cos((y - cos(x * (x + 0.26859))...
+                                           ) * -0.2767)) + x) * 1.0035)
+20          6.943e-05  2.110e-04  target = inv(exp(x + (y * cos(sin(y - cos(x * (x + 0....
+                                           30093))) * 0.30092))) * 1.0035)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_220713_sUidsM/hall_of_fame.csv

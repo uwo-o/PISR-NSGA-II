@@ -1,0 +1,122 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Duffing (noise_pct=0.0) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Duffing:
+sin(exp((-0.8922302*y + cos(x + 0.9923218))*tanh(exp(y))))
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 8.330e+04
+Progress: 375 / 1500 total iterations (25.000%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.367e-02  0.000e+00  target = 0.65618
+3           2.069e-02  2.435e-01  target = tanh(cos(y))
+4           1.801e-02  1.388e-01  target = cos(x) * 0.78094
+5           5.954e-03  1.107e+00  target = cos(sin(y + x))
+6           2.600e-03  8.285e-01  target = cos(x) + (-0.43627 * y)
+7           3.173e-04  2.104e+00  target = sin(exp(0.64611 - (y + x)))
+8           2.550e-04  2.187e-01  target = sin(exp(cos(x + 0.91301) - y))
+10          6.042e-05  7.199e-01  target = sin(exp((cos(x + 0.94929) - y) * 0.90762))
+12          4.902e-05  1.045e-01  target = sin(exp(cos((x * 0.92691) + 1.0015) - (y * 0...
+                                           .89854)))
+16          4.740e-05  8.403e-03  target = sin(exp((cos(0.95048 + x) - (cos(cos(x) * 0....
+                                           22597) * y)) * 0.91955))
+17          4.106e-05  1.434e-01  target = sin(exp((cos(0.95048 + x) - y) * (cos((x + -...
+                                           1.4241) * 0.22597) * 0.91955)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 9.570e+04
+Progress: 858 / 1500 total iterations (57.200%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.367e-02  0.000e+00  target = 0.65618
+3           2.069e-02  2.435e-01  target = tanh(cos(y))
+4           1.748e-02  1.686e-01  target = inv(x + 1.085)
+5           5.954e-03  1.077e+00  target = cos(sin(y + x))
+6           1.666e-03  1.274e+00  target = (y * -0.38376) + cos(x)
+7           3.134e-04  1.671e+00  target = sin(exp(0.65038 - (x + y)))
+8           2.550e-04  2.063e-01  target = sin(exp(cos(x + 0.91302) - y))
+10          6.042e-05  7.199e-01  target = sin(exp((cos(x + 0.94929) - y) * 0.90762))
+12          4.902e-05  1.045e-01  target = sin(exp(cos((x * 0.92691) + 1.0015) - (y * 0...
+                                           .89854)))
+14          4.386e-05  5.553e-02  target = sin(exp((cos(x + 0.94931) - y) * cos(cos(x) ...
+                                           * 0.55208)))
+15          3.581e-05  2.029e-01  target = sin(exp((cos(x + 0.95171) - y) * cos(cos(sin...
+                                           (x)) * 0.54274)))
+16          2.500e-05  3.592e-01  target = sin(exp((cos(cos(y) - 0.46208) * cos(x + 0.9...
+                                           5411)) - (y * 0.90836)))
+18          2.360e-05  2.885e-02  target = sin(exp((cos(cos(y * 1.1958) - 0.4536) * cos...
+                                           (x + 0.95172)) - (y * 0.9158)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+
+Expressions evaluated per second: 1.100e+05
+Progress: 1396 / 1500 total iterations (93.067%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.367e-02  0.000e+00  target = 0.65618
+3           2.069e-02  2.435e-01  target = tanh(cos(y))
+4           1.748e-02  1.686e-01  target = inv(x + 1.085)
+5           4.580e-03  1.339e+00  target = cos(x) * cos(y)
+6           1.666e-03  1.011e+00  target = (y * -0.38376) + cos(x)
+7           2.605e-04  1.855e+00  target = tanh(exp(0.76382 - (x + y)))
+8           2.550e-04  2.139e-02  target = sin(exp(cos(x + 0.91302) - y))
+9           1.125e-04  8.182e-01  target = tanh(exp(0.8457 - (y + x)) + -0.061093)
+10          6.042e-05  6.216e-01  target = sin(exp((cos(x + 0.94929) - y) * 0.90762))
+12          4.841e-05  1.108e-01  target = sin(exp((cos(x + 0.91504) - y) * 0.90383)) +...
+                                            -0.015237
+14          3.435e-05  1.716e-01  target = sin(exp((cos(x + 0.91677) * 0.91833) - (y * ...
+                                           0.89223))) - 0.018583
+16          2.427e-05  1.736e-01  target = sin(exp((cos(0.48871 - cos(y)) * cos(x + 0.9...
+                                           5439)) - (y * 0.91043)))
+17          2.417e-05  3.970e-03  target = sin(exp((cos(0.48871 - cos(sin(y))) * cos(x ...
+                                           + 0.95439)) - (y * 0.91043)))
+18          2.360e-05  2.399e-02  target = sin(exp((cos(cos(y * 1.1958) - 0.4536) * cos...
+                                           (x + 0.95172)) - (y * 0.9158)))
+19          2.197e-05  7.182e-02  target = sin(exp((cos(0.46895 - cos(tanh(y / 0.81749)...
+                                           )) * cos(x + 0.95525)) - (y * 0.90596)))
+20          2.191e-05  2.548e-03  target = sin(exp((cos(cos(y / cos(cos(y))) * 0.53479)...
+                                            * cos(x + 0.95434)) - (y * 0.90743)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           3.367e-02  0.000e+00  target = 0.65618
+3           2.069e-02  2.435e-01  target = tanh(cos(y))
+4           1.748e-02  1.686e-01  target = inv(x + 1.085)
+5           4.580e-03  1.339e+00  target = cos(x) * cos(y)
+6           1.666e-03  1.011e+00  target = cos(x) + (y * -0.38376)
+7           2.605e-04  1.855e+00  target = tanh(exp(0.76382 - (x + y)))
+8           2.550e-04  2.139e-02  target = sin(exp(cos(x + 0.91302) - y))
+9           1.125e-04  8.182e-01  target = tanh(exp(0.84582 - (y + x)) + -0.061172)
+10          6.042e-05  6.216e-01  target = sin(exp((cos(x + 0.94929) - y) * 0.90762))
+12          4.788e-05  1.163e-01  target = sin(exp(cos((x + 1.0981) * 0.91826) - (y * 0...
+                                           .89535)))
+14          3.110e-05  2.156e-01  target = sin(exp((cos(x + 0.99232) - (0.89223 * y)) *...
+                                            tanh(exp(y))))
+16          2.427e-05  1.241e-01  target = sin(exp((cos(0.48871 - cos(y)) * cos(x + 0.9...
+                                           5439)) - (y * 0.91043)))
+17          2.417e-05  3.970e-03  target = sin(exp((cos(0.48871 - cos(sin(y))) * cos(x ...
+                                           + 0.95439)) - (y * 0.91043)))
+18          2.228e-05  8.181e-02  target = sin(exp((cos(cos(sin(y) - exp(y))) * cos(x +...
+                                            0.95439)) - (y * 0.91043)))
+19          2.197e-05  1.400e-02  target = sin(exp((cos(0.46895 - cos(tanh(y / 0.81749)...
+                                           )) * cos(x + 0.95525)) - (y * 0.90596)))
+20          2.191e-05  2.548e-03  target = sin(exp((cos(cos(y / cos(cos(y))) * 0.53479)...
+                                            * cos(x + 0.95434)) - (y * 0.90743)))
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_221119_L0y0e7/hall_of_fame.csv

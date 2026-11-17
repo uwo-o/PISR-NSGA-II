@@ -1,0 +1,222 @@
+=============================================================
+  PISR-NSGA-II --- Orquestador de Ecuaciones PDE
+  Pop=500  Gen=1000  Runs=1
+  [!] Modo --replicable ACTIVADO (Semillas Deterministas)
+=============================================================
+
+
+[Run] PISR-NSGA-II en Schrodinger-Unsteady_2D
+  [Oraculo] OK
+  [PI/Schrodinger-Unsteady] gen=0  best_dom(batch)=7.766032e-10  best_bnd(batch)=9.279357e-01  val_score(hof)=1.039273e+00  ref_err(solo registro)=1.122062e+00  infeasible=366/500  front1=14
+  [PI/Schrodinger-Unsteady] gen=5  best_dom(batch)=1.001935e-21  best_bnd(batch)=9.069803e-01  val_score(hof)=9.828909e-01  ref_err(solo registro)=1.041443e+00  infeasible=0/500  front1=48
+  [PI/Schrodinger-Unsteady] gen=10  best_dom(batch)=2.753684e-37  best_bnd(batch)=8.969403e-01  val_score(hof)=9.800408e-01  ref_err(solo registro)=1.037863e+00  infeasible=0/500  front1=110
+  [PI/Schrodinger-Unsteady] gen=15  best_dom(batch)=1.007772e-39  best_bnd(batch)=8.834951e-01  val_score(hof)=9.800408e-01  ref_err(solo registro)=1.037863e+00  infeasible=0/500  front1=217
+  [PI/Schrodinger-Unsteady] gen=20  best_dom(batch)=7.655016e-43  best_bnd(batch)=8.809580e-01  val_score(hof)=9.800408e-01  ref_err(solo registro)=1.037863e+00  infeasible=0/500  front1=217
+  [PI/Schrodinger-Unsteady] gen=25  best_dom(batch)=7.753038e-43  best_bnd(batch)=8.809579e-01  val_score(hof)=9.800408e-01  ref_err(solo registro)=1.037863e+00  infeasible=0/500  front1=380
+  [PI/Schrodinger-Unsteady] gen=30  best_dom(batch)=4.577468e-44  best_bnd(batch)=8.809579e-01  val_score(hof)=9.800408e-01  ref_err(solo registro)=1.037863e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=35  best_dom(batch)=1.030385e-44  best_bnd(batch)=8.806861e-01  val_score(hof)=9.800408e-01  ref_err(solo registro)=1.037863e+00  infeasible=0/500  front1=223
+  [PI/Schrodinger-Unsteady] gen=40  best_dom(batch)=1.030376e-44  best_bnd(batch)=8.809579e-01  val_score(hof)=9.800408e-01  ref_err(solo registro)=1.037863e+00  infeasible=0/500  front1=491
+  [PI/Schrodinger-Unsteady] gen=45  best_dom(batch)=1.030376e-44  best_bnd(batch)=8.809578e-01  val_score(hof)=9.800408e-01  ref_err(solo registro)=1.037863e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=50  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.865121e-01  val_score(hof)=9.795160e-01  ref_err(solo registro)=1.030256e+00  infeasible=0/500  front1=470
+  [PI/Schrodinger-Unsteady] gen=55  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.864052e-01  val_score(hof)=9.760902e-01  ref_err(solo registro)=1.027295e+00  infeasible=0/500  front1=398
+  [PI/Schrodinger-Unsteady] gen=60  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.858957e-01  val_score(hof)=9.760902e-01  ref_err(solo registro)=1.027295e+00  infeasible=0/500  front1=496
+  [PI/Schrodinger-Unsteady] gen=65  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.818762e-01  val_score(hof)=9.760902e-01  ref_err(solo registro)=1.027295e+00  infeasible=0/500  front1=94
+  [PI/Schrodinger-Unsteady] gen=70  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.821875e-01  val_score(hof)=9.760902e-01  ref_err(solo registro)=1.027295e+00  infeasible=0/500  front1=209
+  [PI/Schrodinger-Unsteady] gen=75  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.810041e-01  val_score(hof)=9.726797e-01  ref_err(solo registro)=1.032718e+00  infeasible=0/500  front1=492
+  [PI/Schrodinger-Unsteady] gen=80  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.803998e-01  val_score(hof)=9.711295e-01  ref_err(solo registro)=1.026973e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=85  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.803562e-01  val_score(hof)=9.711295e-01  ref_err(solo registro)=1.026973e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=90  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.802118e-01  val_score(hof)=9.711295e-01  ref_err(solo registro)=1.026973e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=95  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.791415e-01  val_score(hof)=9.706774e-01  ref_err(solo registro)=1.023987e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=100  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.801901e-01  val_score(hof)=9.706774e-01  ref_err(solo registro)=1.023987e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=105  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.796397e-01  val_score(hof)=9.706774e-01  ref_err(solo registro)=1.023987e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=110  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.753523e-01  val_score(hof)=9.706774e-01  ref_err(solo registro)=1.023987e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=115  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.760609e-01  val_score(hof)=9.622637e-01  ref_err(solo registro)=1.033686e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=120  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.750022e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=125  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.748051e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=130  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.745746e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=135  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.745294e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=140  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.744383e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=145  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.744144e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=150  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.742680e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=155  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.740106e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=160  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.740571e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=165  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.740940e-01  val_score(hof)=9.576725e-01  ref_err(solo registro)=1.030788e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=170  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.741206e-01  val_score(hof)=9.576663e-01  ref_err(solo registro)=1.026939e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=175  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.741462e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=180  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=185  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.839208e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=190  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=195  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=200  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.926750e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=205  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.927742e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=210  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.926894e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=215  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.926694e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=220  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.918268e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=225  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.918369e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=230  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.918268e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=235  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.932139e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=240  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=245  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838885e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=250  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=255  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=260  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=265  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=270  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=275  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=280  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=285  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=290  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838857e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=111
+  [PI/Schrodinger-Unsteady] gen=295  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838936e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=455
+  [PI/Schrodinger-Unsteady] gen=300  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.918268e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=30
+  [PI/Schrodinger-Unsteady] gen=305  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838835e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=67
+  [PI/Schrodinger-Unsteady] gen=310  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838017e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=45
+  [PI/Schrodinger-Unsteady] gen=315  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838507e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=33
+  [PI/Schrodinger-Unsteady] gen=320  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.838017e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=46
+  [PI/Schrodinger-Unsteady] gen=325  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788687e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=48
+  [PI/Schrodinger-Unsteady] gen=330  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788942e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=312
+  [PI/Schrodinger-Unsteady] gen=335  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788985e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=159
+  [PI/Schrodinger-Unsteady] gen=340  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788946e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=462
+  [PI/Schrodinger-Unsteady] gen=345  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788939e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=107
+  [PI/Schrodinger-Unsteady] gen=350  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788937e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=68
+  [PI/Schrodinger-Unsteady] gen=355  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788984e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=444
+  [PI/Schrodinger-Unsteady] gen=360  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788937e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=59
+  [PI/Schrodinger-Unsteady] gen=365  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788937e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=35
+  [PI/Schrodinger-Unsteady] gen=370  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788937e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=183
+  [PI/Schrodinger-Unsteady] gen=375  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788938e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=182
+  [PI/Schrodinger-Unsteady] gen=380  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788937e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=249
+  [PI/Schrodinger-Unsteady] gen=385  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788937e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=479
+  [PI/Schrodinger-Unsteady] gen=390  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788937e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=395  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788984e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=42
+  [PI/Schrodinger-Unsteady] gen=400  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788938e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=439
+  [PI/Schrodinger-Unsteady] gen=405  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788984e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=137
+  [PI/Schrodinger-Unsteady] gen=410  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788937e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=87
+  [PI/Schrodinger-Unsteady] gen=415  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788982e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=31
+  [PI/Schrodinger-Unsteady] gen=420  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.788982e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=24
+  [PI/Schrodinger-Unsteady] gen=425  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.760131e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=27
+  [PI/Schrodinger-Unsteady] gen=430  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.736390e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=31
+  [PI/Schrodinger-Unsteady] gen=435  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.720883e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=23
+  [PI/Schrodinger-Unsteady] gen=440  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.694366e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=26
+  [PI/Schrodinger-Unsteady] gen=445  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.575978e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=33
+  [PI/Schrodinger-Unsteady] gen=450  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.578440e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=34
+  [PI/Schrodinger-Unsteady] gen=455  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.577839e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=39
+  [PI/Schrodinger-Unsteady] gen=460  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.545131e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=36
+  [PI/Schrodinger-Unsteady] gen=465  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.579773e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=43
+  [PI/Schrodinger-Unsteady] gen=470  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.578008e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=44
+  [PI/Schrodinger-Unsteady] gen=475  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.575070e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=41
+  [PI/Schrodinger-Unsteady] gen=480  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.570172e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=47
+  [PI/Schrodinger-Unsteady] gen=485  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.500511e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=59
+  [PI/Schrodinger-Unsteady] gen=490  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.498988e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=31
+  [PI/Schrodinger-Unsteady] gen=495  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.498732e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=31
+  [PI/Schrodinger-Unsteady] gen=500  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.498575e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=34
+  [PI/Schrodinger-Unsteady] gen=505  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.500742e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=24
+  [PI/Schrodinger-Unsteady] gen=510  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.474070e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=27
+  [PI/Schrodinger-Unsteady] gen=515  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.476886e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=35
+  [PI/Schrodinger-Unsteady] gen=520  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.475012e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=51
+  [PI/Schrodinger-Unsteady] gen=525  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.488304e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=34
+  [PI/Schrodinger-Unsteady] gen=530  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.477917e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=29
+  [PI/Schrodinger-Unsteady] gen=535  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.476655e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=51
+  [PI/Schrodinger-Unsteady] gen=540  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.476195e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=30
+  [PI/Schrodinger-Unsteady] gen=545  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.475821e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=37
+  [PI/Schrodinger-Unsteady] gen=550  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.559495e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=27
+  [PI/Schrodinger-Unsteady] gen=555  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.534640e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=29
+  [PI/Schrodinger-Unsteady] gen=560  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.559450e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=25
+  [PI/Schrodinger-Unsteady] gen=565  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.577518e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=28
+  [PI/Schrodinger-Unsteady] gen=570  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.534357e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=32
+  [PI/Schrodinger-Unsteady] gen=575  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.535700e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=32
+  [PI/Schrodinger-Unsteady] gen=580  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.523024e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=27
+  [PI/Schrodinger-Unsteady] gen=585  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.522964e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=29
+  [PI/Schrodinger-Unsteady] gen=590  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.524441e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=41
+  [PI/Schrodinger-Unsteady] gen=595  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.524530e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=33
+  [PI/Schrodinger-Unsteady] gen=600  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.523052e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=33
+  [PI/Schrodinger-Unsteady] gen=605  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.522879e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=31
+  [PI/Schrodinger-Unsteady] gen=610  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.513448e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=45
+  [PI/Schrodinger-Unsteady] gen=615  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.511570e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=50
+  [PI/Schrodinger-Unsteady] gen=620  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.510228e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=57
+  [PI/Schrodinger-Unsteady] gen=625  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.508954e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=45
+  [PI/Schrodinger-Unsteady] gen=630  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.503705e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=100
+  [PI/Schrodinger-Unsteady] gen=635  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.538376e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=52
+  [PI/Schrodinger-Unsteady] gen=640  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.538347e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=85
+  [PI/Schrodinger-Unsteady] gen=645  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.538204e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=131
+  [PI/Schrodinger-Unsteady] gen=650  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.539143e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=218
+  [PI/Schrodinger-Unsteady] gen=655  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.539132e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=147
+  [PI/Schrodinger-Unsteady] gen=660  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.538984e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=124
+  [PI/Schrodinger-Unsteady] gen=665  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.543668e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=52
+  [PI/Schrodinger-Unsteady] gen=670  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.539376e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=56
+  [PI/Schrodinger-Unsteady] gen=675  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.539353e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=79
+  [PI/Schrodinger-Unsteady] gen=680  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.660005e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=54
+  [PI/Schrodinger-Unsteady] gen=685  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.668139e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=61
+  [PI/Schrodinger-Unsteady] gen=690  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.660245e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=443
+  [PI/Schrodinger-Unsteady] gen=695  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.660098e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=700  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.659856e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=76
+  [PI/Schrodinger-Unsteady] gen=705  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.665506e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=63
+  [PI/Schrodinger-Unsteady] gen=710  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.661826e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=132
+  [PI/Schrodinger-Unsteady] gen=715  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.674173e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=459
+  [PI/Schrodinger-Unsteady] gen=720  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.674025e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=725  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.673980e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=730  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.673867e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=735  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.673832e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=740  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.673742e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=745  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.673714e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=750  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.673642e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=755  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.678824e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=37
+  [PI/Schrodinger-Unsteady] gen=760  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.674268e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=336
+  [PI/Schrodinger-Unsteady] gen=765  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.678242e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=387
+  [PI/Schrodinger-Unsteady] gen=770  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.677635e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=94
+  [PI/Schrodinger-Unsteady] gen=775  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.769917e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=16
+  [PI/Schrodinger-Unsteady] gen=780  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.753608e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=19
+  [PI/Schrodinger-Unsteady] gen=785  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.751681e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=17
+  [PI/Schrodinger-Unsteady] gen=790  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.737344e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=96
+  [PI/Schrodinger-Unsteady] gen=795  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.737279e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=500
+  [PI/Schrodinger-Unsteady] gen=800  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.716964e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=25
+  [PI/Schrodinger-Unsteady] gen=805  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.714835e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=19
+  [PI/Schrodinger-Unsteady] gen=810  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.713673e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=18
+  [PI/Schrodinger-Unsteady] gen=815  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.685717e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=23
+  [PI/Schrodinger-Unsteady] gen=820  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.645782e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=26
+  [PI/Schrodinger-Unsteady] gen=825  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.645414e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=20
+  [PI/Schrodinger-Unsteady] gen=830  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.645524e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=20
+  [PI/Schrodinger-Unsteady] gen=835  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.648998e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=23
+  [PI/Schrodinger-Unsteady] gen=840  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.592237e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=24
+  [PI/Schrodinger-Unsteady] gen=845  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.601448e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=56
+  [PI/Schrodinger-Unsteady] gen=850  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.592237e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=26
+  [PI/Schrodinger-Unsteady] gen=855  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.592367e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=26
+  [PI/Schrodinger-Unsteady] gen=860  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.573110e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=21
+  [PI/Schrodinger-Unsteady] gen=865  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.565267e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=25
+  [PI/Schrodinger-Unsteady] gen=870  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.549759e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=28
+  [PI/Schrodinger-Unsteady] gen=875  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.558911e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=24
+  [PI/Schrodinger-Unsteady] gen=880  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.546082e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=26
+  [PI/Schrodinger-Unsteady] gen=885  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.551858e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=31
+  [PI/Schrodinger-Unsteady] gen=890  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.542634e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=27
+  [PI/Schrodinger-Unsteady] gen=895  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.537233e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=28
+  [PI/Schrodinger-Unsteady] gen=900  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.536549e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=21
+  [PI/Schrodinger-Unsteady] gen=905  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.536344e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=22
+  [PI/Schrodinger-Unsteady] gen=910  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.535722e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=23
+  [PI/Schrodinger-Unsteady] gen=915  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.534487e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=19
+  [PI/Schrodinger-Unsteady] gen=920  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.540341e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=21
+  [PI/Schrodinger-Unsteady] gen=925  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.548697e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=22
+  [PI/Schrodinger-Unsteady] gen=930  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.534817e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=22
+  [PI/Schrodinger-Unsteady] gen=935  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533964e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=23
+  [PI/Schrodinger-Unsteady] gen=940  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.535321e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=25
+  [PI/Schrodinger-Unsteady] gen=945  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.535005e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=20
+  [PI/Schrodinger-Unsteady] gen=950  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533957e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=33/500  front1=19
+  [PI/Schrodinger-Unsteady] gen=955  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533956e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=21
+  [PI/Schrodinger-Unsteady] gen=960  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533955e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=22
+  [PI/Schrodinger-Unsteady] gen=965  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533954e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=26
+  [PI/Schrodinger-Unsteady] gen=970  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533953e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=46
+  [PI/Schrodinger-Unsteady] gen=975  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533953e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=29
+  [PI/Schrodinger-Unsteady] gen=980  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533952e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=40
+  [PI/Schrodinger-Unsteady] gen=985  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533951e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=87
+  [PI/Schrodinger-Unsteady] gen=990  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533951e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=140
+  [PI/Schrodinger-Unsteady] gen=995  best_dom(batch)=0.000000e+00  best_bnd(batch)=8.533951e-01  val_score(hof)=9.569941e-01  ref_err(solo registro)=1.028037e+00  infeasible=0/500  front1=251
+  [Optimizer] Polishing 6 constants via Adaptive Gradient Descent...
+
++------------------+-------------+----------+-------------+-------------+----------+
+|   Ecuacion: Schrodinger-Unsteady_2D                                           |
++------------------+-------------+----------+-------------+-------------+----------+
+| Metodo           | MSE Dom.    | Pareto   | Best BIC    | MSE Solucion| Tiempo   |
++------------------+-------------+----------+-------------+-------------+----------+
+| PISR-NSGA-II     | 6.4205e-05  | 318      | 1.1319e+02  | 1.0165e+00  | 733.7  s |
++------------------+-------------+----------+-------------+-------------+----------+
+| Health Analytics | Infeasible: 0.0  % | Bloat Factor (Avg nodes): 15.7          |
++------------------+-------------+----------+-------------+-------------+----------+
+
+  Benchmark completado en 733.9s. Resultados en ./results/

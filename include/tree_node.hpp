@@ -92,6 +92,9 @@ public:
     virtual void print(std::ostream& os) const = 0;
     virtual void print_latex(std::ostream& os) const = 0;
     virtual void print_formal(std::ostream& os, int parent_prec = 0) const = 0;
+    // Expresion exacta (constantes con precision completa) en sintaxis SymPy,
+    // para la simplificacion simbolica posterior (report/simplify_expressions.py).
+    virtual void print_sympy(std::ostream& os) const = 0;
     virtual void round_constants(double epsilon = 0.05) = 0;
     
     std::string print_str() const {
@@ -139,6 +142,7 @@ public:
     void print(std::ostream& os) const override;
     void print_latex(std::ostream& os) const override;
     void print_formal(std::ostream& os, int parent_prec = 0) const override;
+    void print_sympy(std::ostream& os) const override;
     void round_constants(double epsilon = 0.05) override;
 
     NodePtr simplify() const override { return clone(); }
@@ -180,6 +184,7 @@ public:
     void print(std::ostream& os) const override;
     void print_latex(std::ostream& os) const override;
     void print_formal(std::ostream& os, int parent_prec = 0) const override;
+    void print_sympy(std::ostream& os) const override;
     void round_constants(double epsilon = 0.05) override;
 
     NodePtr simplify() const override;
@@ -225,6 +230,7 @@ public:
     void print(std::ostream& os) const override;
     void print_latex(std::ostream& os) const override;
     void print_formal(std::ostream& os, int parent_prec = 0) const override;
+    void print_sympy(std::ostream& os) const override;
     void round_constants(double epsilon = 0.05) override;
 
     NodePtr simplify() const override;
@@ -267,6 +273,7 @@ public:
     void print(std::ostream& os) const override;
     void print_latex(std::ostream& os) const override;
     void print_formal(std::ostream& os, int parent_prec = 0) const override;
+    void print_sympy(std::ostream& os) const override;
     void round_constants(double epsilon = 0.05) override;
 
     NodePtr simplify() const override;
@@ -303,6 +310,13 @@ NodePtr random_triple_separable_tree(int max_depth, std::mt19937& gen, const PDE
 // puramente aditivas ni puramente multiplicativas — ver
 // PDEPriors::modal_sum_separable.
 NodePtr random_modal_sum_tree(int max_depth, std::mt19937& gen, const PDEProblem& prob);
+// Suma de 1-2 modos c * e^{lambda . r} con lambda complejo al azar (prior
+// exponential_modes). Respeta max_depth: si el modo completo no cabe, usa
+// solo la parte oscilante o solo la real del exponente.
+NodePtr random_exponential_modes_tree(int max_depth, std::mt19937& gen, const PDEProblem& prob);
+// Copia de `tree` con cada hoja de tipo `var` reemplazada por una copia de
+// `replacement` (p. ej. x -> x(1-x) para sembrar candidatos simetricos).
+NodePtr substitute_variable(const Node* tree, NodeType var, const Node* replacement);
 std::pair<NodePtr, NodePtr> tree_crossover(const NodePtr& p1, const NodePtr& p2, std::mt19937& gen);
 NodePtr tree_mutate(const NodePtr& tree, std::mt19937& gen, const PDEProblem& prob, double aggressiveness = 1.0);
 NodePtr tree_mutate_point(const NodePtr& tree, std::mt19937& gen, const PDEProblem& prob);

@@ -1,0 +1,52 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Painleve-I (noise_pct=0.0) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Painleve-I:
+x*(x*tanh(cos(cos(cos(sin(sin(cos(x)))))))*0.2691827*x + 0.320558)
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 1.180e+05
+Progress: 707 / 1500 total iterations (47.133%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.008e-02  0.000e+00  y = 0.20469
+3           7.658e-04  1.633e+00  y = x * 0.42747
+5           4.436e-04  2.730e-01  y = (x * 0.48065) + -0.035633
+6           1.185e-05  3.622e+00  y = (exp(x) * 0.28493) - 0.2853
+8           4.136e-06  5.264e-01  y = x * ((exp(x) * 0.12273) + 0.16198)
+9           1.755e-07  3.160e+00  y = ((x * (x * 0.18077)) + 0.31792) * x
+10          9.177e-08  6.481e-01  y = sin(x / exp(sin(1.6146 - x) * 1.1224))
+11          2.708e-08  1.220e+00  y = (((x - 0.097868) * (x * 0.19451)) + 0.32395) * x
+17          1.421e-08  1.075e-01  y = x * ((x * ((cos(cos(cos(cos(tanh(sin(x)))))) * 0.24495...
+                                      ) * x)) + 0.3211)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           2.008e-02  0.000e+00  y = 0.20469
+3           7.658e-04  1.633e+00  y = x * 0.42747
+5           4.436e-04  2.730e-01  y = (x * 0.48065) + -0.035633
+6           1.185e-05  3.622e+00  y = (exp(x) * 0.28493) - 0.2853
+7           9.010e-06  2.742e-01  y = x - (sin(sin(x)) * 0.68657)
+8           4.136e-06  7.785e-01  y = x * ((exp(x) * 0.12273) + 0.16198)
+9           1.755e-07  3.160e+00  y = ((x * (x * 0.18077)) + 0.31792) * x
+10          2.639e-08  1.895e+00  y = (exp(x * (x * 0.16467)) + -0.67851) * x
+11          2.610e-08  1.109e-02  y = (((x - 0.10518) * (x * 0.19571)) + 0.32439) * x
+12          3.519e-09  2.004e+00  y = (exp((x * (x - -0.045168)) * 0.15913) + -0.68078) * x
+17          6.955e-10  3.243e-01  y = x * ((((x * x) * cos(tanh(cos(cos(sin(cos(x))))))) * 0...
+                                      .21278) + 0.32063)
+18          4.129e-10  5.214e-01  y = ((((x * tanh(cos(cos(cos(sin(sin(cos(x)))))))) * 0.269...
+                                      18) * x) + 0.32056) * x
+20          3.677e-10  5.797e-02  y = x * ((((x * 0.26936) * tanh(cos(cos(cos(sin(sin(cos(x ...
+                                      * 0.99497)))))))) * x) + 0.32053)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_225532_wCyY4k/hall_of_fame.csv

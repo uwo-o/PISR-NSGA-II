@@ -11,6 +11,9 @@
 #include "pi_solver.hpp"
 int last_special_choice = -1;
 #include "numerical_solver.hpp"
+#include "oracle.hpp"
+#include <set>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -75,11 +78,13 @@ void save_convergence_csv(const std::vector<ConvergenceStats>& history,
                            const std::string& path)
 {
     std::ofstream f(path);
-    f << "gen,best_mse_domain,best_mse_boundary,best_total_mse,best_val_mse\n";
+    // best_val_score: puntaje de validacion (fisica) del campeon.
+    // champion_ref_err: error contra la referencia, solo registro.
+    f << "gen,best_mse_domain,best_mse_boundary,best_total_mse,best_val_score,champion_ref_err\n";
     for (auto& s : history) {
         f << s.gen << "," << s.best_mse_domain << ","
           << s.best_mse_boundary << "," << s.best_total_mse << ","
-          << s.best_val_mse << "\n";
+          << s.best_val_score << "," << s.champion_ref_err << "\n";
     }
 }
 
@@ -100,51 +105,55 @@ void save_best_expression(const Ind& champion, const PDEProblem& prob, const std
     // "1.0000003x - 0.9999997x" a 0. Redondeando primero (1e-3, cosmetico —
     // NO el 0.05 agresivo de antes que snapeaba constantes legitimas a 0)
     // ambos quedan en 1.0 exacto, y simplify() sí puede cancelar/colapsar.
+    // Arbol exacto (sin redondear) para la simplificacion simbolica posterior.
+    {
+        std::string sym_path = path.substr(0, path.size() - 4) + ".sym";
+        std::ofstream fs(sym_path);
+        fs << "raw=" << (champion.raw ? 1 : 0) << "\n";
+        fs << "uses_ansatz=" << (solution_uses_ansatz(prob, champion.raw) ? 1 : 0) << "\n";
+        fs << "real_field=" << (prob.complex_field ? 0 : 1) << "\n";
+        fs << "tree=";
+        champion.tree->print_sympy(fs);
+        fs << "\n";
+    }
     auto final_tree = champion.tree->clone();
     final_tree->round_constants(1e-3);
     final_tree = final_tree->simplify(); // Limpieza simbólica
 
-    // El arbol representa N(x) (o N(x,y)) DENTRO del ansatz de frontera exacta
-    // U = L + B*N (ver apply_boundary_ansatz en pi_solver.cpp) — imprimir solo
-    // N sin el envoltorio es enganoso: si N converge a ~0 (la solucion real ya
-    // es casi L, sin correccion necesaria) el .tex mostraba literalmente "0"
-    // como si esa fuera toda la solucion. Mismo criterio que ansatz_applies():
-    // no aplica a Navier-Stokes (2D, condicion de frontera no-Dirichlet simple).
-    bool use_ansatz = !Config::GENERAL_MODE && Config::USE_ANSATZ &&
-        (dim == 1 || (dim == 2 && prob.type != PDE::NAVIER_STOKES && prob.type != PDE::NAVIER_STOKES_UNSTEADY));
-
-    if (!use_ansatz) {
+    // Mismo criterio que la busqueda (solution_uses_ansatz). Si el campo es
+    // real pero el arbol usa la unidad imaginaria (representacion), la
+    // solucion reportada es Re(.), exactamente lo que se optimizo.
+    bool use_ansatz = solution_uses_ansatz(prob, champion.raw);
+    auto emit = [&](const Node* expr) {
+        bool wrap_re = !prob.complex_field && expr->uses_variable(NodeType::CONST_I);
         f << "$$ ";
-        final_tree->print_formal(f, 0);
+        if (wrap_re) f << "\\operatorname{Re}\\left(";
+        expr->print_formal(f, 0);
+        if (wrap_re) f << "\\right)";
         f << " $$" << std::endl;
-        return;
-    }
+    };
 
-    // Se imprime SIN etiquetar nada (ni "N(x)=", ni "L/B", ni "ansatz") — solo
-    // el resultado. Normalmente eso es N(x) sola (la correccion que la
-    // busqueda de verdad descubrio; fusionarla con L+B como antes no la
-    // "esconde", ese factor B(x)=x(x-1) sigue siendo visible en el resultado
-    // re-escrito mas largo). PERO si N es numericamente ~0 en varios puntos
-    // (la solucion real ya coincide con la interpolacion de frontera, sin
-    // correccion necesaria), mostrar "0" es inutil — en ese caso (solo 1D,
-    // donde L(x) SI tiene forma cerrada simple; en 2D L(x,y) es una
-    // interpolacion transfinita evaluada en runtime sin AST, no hay forma
-    // cerrada generica para fusionar) se arma y simplifica L(x)+B(x)*N(x)
-    // completo, que en la practica colapsa a la interpolacion lineal simple.
-    bool n_negligible = true;
-    for (double xp : {0.13, 0.5, 0.87}) {
-        if (std::abs(final_tree->eval_t(xp, xp*0.6, 0.0)) > 1e-3) { n_negligible = false; break; }
-    }
-    if (n_negligible && dim == 1) {
-        double u0 = prob.bc(0.0, 0.0, 0.0).real();
+    if (!use_ansatz) { emit(final_tree.get()); return; }
+
+    // 1D: se imprime SIEMPRE la formula U(x) final fusionada y simplificada
+    // (no N(x) sola), con la forma del ansatz que corresponde al tipo de dato
+    // de borde del problema.
+    if (dim == 1) {
         NodePtr U;
-        if (prob.priors.one_sided_boundary) {
-            // Ansatz de un solo lado (ver apply_boundary_ansatz en
-            // pi_solver.cpp): U = u0 + x*N, sin termino L(x1) inventado.
-            U = make_binary(NodeType::ADD, make_erc(u0),
-                             make_binary(NodeType::MUL, make_var('x'), std::move(final_tree)));
+        if (prob.bc_kind == BCKind::IVP_LEFT) {
+            // U = u0 + u0' x + x^2 N
+            NodePtr lin = make_binary(NodeType::ADD, make_erc(prob.ivp_u0),
+                                       make_binary(NodeType::MUL, make_erc(prob.ivp_du0), make_var('x')));
+            NodePtr x2 = make_binary(NodeType::MUL, make_var('x'), make_var('x'));
+            U = make_binary(NodeType::ADD, std::move(lin),
+                            make_binary(NodeType::MUL, std::move(x2), std::move(final_tree)));
+        } else if (prob.bc_kind == BCKind::ANCHOR_LEFT) {
+            // U = u0 + x N
+            U = make_binary(NodeType::ADD, make_erc(prob.ivp_u0),
+                            make_binary(NodeType::MUL, make_var('x'), std::move(final_tree)));
         } else {
-            double u1 = prob.bc(1.0, 0.0, 0.0).real();
+            // U = u0 + x(u1-u0) + x(x-1) N
+            Complex u0 = prob.bc(0.0, 0.0, 0.0), u1 = prob.bc(1.0, 0.0, 0.0);
             NodePtr L = make_binary(NodeType::ADD, make_erc(u0),
                                      make_binary(NodeType::MUL, make_var('x'), make_erc(u1 - u0)));
             NodePtr B = make_binary(NodeType::MUL, make_var('x'),
@@ -155,14 +164,13 @@ void save_best_expression(const Ind& champion, const PDEProblem& prob, const std
         U = U->simplify();
         U->round_constants(1e-3);
         U = U->simplify();
-        f << "$$ ";
-        U->print_formal(f, 0);
-        f << " $$" << std::endl;
+        emit(U.get());
         return;
     }
-    f << "$$ ";
-    final_tree->print_formal(f, 0);
-    f << " $$" << std::endl;
+    // 2D: U(x,y) = L(x,y) + x(1-x)y(1-y) N(x,y), con L la interpolacion
+    // transfinita de los datos de borde (sin forma cerrada generica); se
+    // reporta N(x,y).
+    emit(final_tree.get());
 }
 
 // ─── Guardar Rejilla de Evaluación (para plots 3D/1D) ─────────────────────────
@@ -170,68 +178,33 @@ template<typename Ind>
 void save_best_grid(const Ind& champion, const PDEProblem& prob, const std::string& path) {
     if (!champion.tree) return;
     std::ofstream f(path);
+    // u_approx sale de eval_solution: la MISMA cadena (arbol -> ansatz ->
+    // parte real si el campo es real) que optimiza la busqueda, sin copias de
+    // las formulas del ansatz aca. u_exact es la referencia (exacta o
+    // numerica). Problemas no estacionarios: se exporta t=0.5. Campos
+    // complejos: columnas extra con la parte imaginaria.
+    const double t = prob.is_unsteady ? 0.5 : 0.0;
+    const bool cplx = prob.complex_field;
     if (prob.dim == 1) {
-        // El árbol representa N(x) dentro del ansatz U(x) = L(x) + B(x)*N(x)
-        // (mismo que usa PIIndividual::evaluate durante el entrenamiento) — hay
-        // que deshacerlo acá también, si no el grid grafica la corrección cruda
-        // en vez de la solución real.
-        bool use_ansatz_1d = !Config::GENERAL_MODE && Config::USE_ANSATZ;
-        // priors.one_sided_boundary (ver pde_problems.hpp): ansatz de UN SOLO
-        // LADO, U=u0+x*N, sin anclar x=1 a un valor que requiere haber
-        // resuelto la EDO real (fuga de informacion) — ver apply_boundary_ansatz
-        // en pi_solver.cpp para el detalle y el criterio generico de deteccion.
-        bool one_sided = prob.priors.one_sided_boundary;
-        double u0 = prob.bc(0.0, 0.0, 0.0).real();
-        double u1 = prob.bc(1.0, 0.0, 0.0).real();
-        f << "x,u_exact,u_approx\n";
+        f << "x,u_exact,u_approx" << (cplx ? ",u_exact_im,u_approx_im" : "") << "\n";
         for (int i = 0; i <= 100; ++i) {
-            double x = (double)i / 100.0;
-            double N = std::real(champion.tree->eval(x, 0));
-            double u_approx = N;
-            if (use_ansatz_1d && one_sided) {
-                u_approx = u0 + x * N;
-            } else if (use_ansatz_1d) {
-                double L = u0 + x * (u1 - u0);
-                double B = x * (x - 1.0);
-                u_approx = L + B * N;
-            }
-            f << x << "," << std::real(prob.numerical_exact(x, 0, 0)) << "," << u_approx << "\n";
+            double x = i / 100.0;
+            Complex ue = prob.reference(x, 0.0, t);
+            Complex ua = eval_solution(prob, champion.tree.get(), x, 0.0, t, champion.raw);
+            f << x << "," << ue.real() << "," << ua.real();
+            if (cplx) f << "," << ue.imag() << "," << ua.imag();
+            f << "\n";
         }
     } else {
-        // Igual que en 1D: si el ansatz de frontera exacta aplica en 2D
-        // (Dirichlet simple en las 4 aristas — no Navier-Stokes, que usa
-        // condiciones sobre función de corriente/velocidad), el árbol
-        // representa N(x,y) dentro de U(x,y) = L(x,y) + B(x,y)*N(x,y)
-        // (interpolación transfinita) — o, si priors.one_sided_boundary
-        // (dominio semi-infinito truncado, ver pde_problems.hpp), dentro de
-        // la version radial de un solo lado U = u0 + r*N(x,y) — mismas
-        // fórmulas que apply_boundary_ansatz en pi_solver.cpp.
-        bool use_ansatz_2d = !Config::GENERAL_MODE && Config::USE_ANSATZ &&
-            (prob.type != PDE::NAVIER_STOKES && prob.type != PDE::NAVIER_STOKES_UNSTEADY);
-        bool one_sided = prob.priors.one_sided_boundary;
-        double u0 = prob.bc(0.0, 0.0, 0.0).real();
-        f << "x,y,u_exact,u_approx\n";
+        f << "x,y,u_exact,u_approx" << (cplx ? ",u_exact_im,u_approx_im" : "") << "\n";
         for (int i = 0; i <= 30; ++i) {
             for (int j = 0; j <= 30; ++j) {
-                double x = (double)i / 30.0;
-                double y = (double)j / 30.0;
-                double N = std::real(champion.tree->eval(x, y));
-                double u_approx = N;
-                if (use_ansatz_2d && one_sided) {
-                    double r = std::sqrt(x*x + y*y);
-                    u_approx = u0 + r * N;
-                } else if (use_ansatz_2d) {
-                    double g0 = prob.bc(0.0, y, 0.0).real(), g1 = prob.bc(1.0, y, 0.0).real();
-                    double h0 = prob.bc(x, 0.0, 0.0).real(), h1 = prob.bc(x, 1.0, 0.0).real();
-                    double c00 = prob.bc(0.0, 0.0, 0.0).real(), c10 = prob.bc(1.0, 0.0, 0.0).real();
-                    double c01 = prob.bc(0.0, 1.0, 0.0).real(), c11 = prob.bc(1.0, 1.0, 0.0).real();
-                    double L = (1.0 - x) * g0 + x * g1 + (1.0 - y) * h0 + y * h1
-                             - (1.0 - x) * (1.0 - y) * c00 - x * (1.0 - y) * c10
-                             - (1.0 - x) * y * c01 - x * y * c11;
-                    double B = x * (1.0 - x) * y * (1.0 - y);
-                    u_approx = L + B * N;
-                }
-                f << x << "," << y << "," << std::real(prob.numerical_exact(x, y, 0)) << "," << u_approx << "\n";
+                double x = i / 30.0, y = j / 30.0;
+                Complex ue = prob.reference(x, y, t);
+                Complex ua = eval_solution(prob, champion.tree.get(), x, y, t, champion.raw);
+                f << x << "," << y << "," << ue.real() << "," << ua.real();
+                if (cplx) f << "," << ue.imag() << "," << ua.imag();
+                f << "\n";
             }
         }
     }
@@ -417,17 +390,46 @@ Stats compute_stats(const std::vector<Ind>& pop,
 }
 
 // ─── Guardar resumen comparativo ─────────────────────────────────────────────
-void save_summary(const std::vector<Stats>& stats, const std::string& path) {
-    std::ofstream f(path);
-    f << std::fixed << std::setprecision(10);
-    f << "method,pde,pareto_size,best_mse_domain,best_mse_boundary,"
-         "mean_mse_domain,mean_mse_boundary,best_bic,runtime_s,solution_mse\n";
-    for (auto& s : stats) {
-        f << s.method << "," << s.pde << "," << s.front_size << ","
-          << s.best_domain << "," << s.best_bnd << ","
-          << s.mean_domain << "," << s.mean_bnd << ","
-          << s.min_bic << "," << s.runtime_s << "," << s.solution_mse << "\n";
+// Reescribe `path` conservando las filas de EDPs que esta corrida NO toco (la
+// columna `pde_col` identifica la EDP). Asi `--only X` reemplaza solo las
+// filas de X en vez de borrar el resumen de las demas.
+static void merge_csv(const std::string& path, const std::string& header, int pde_col,
+                      const std::set<std::string>& replaced, const std::vector<std::string>& new_rows) {
+    std::vector<std::string> kept;
+    {
+        std::ifstream in(path);
+        std::string line;
+        bool first = true;
+        while (std::getline(in, line)) {
+            if (first) { first = false; if (line != header) break; continue; } // esquema viejo: se descarta
+            if (line.empty()) continue;
+            std::stringstream ss(line); std::string cell; int c = 0; std::string pde;
+            while (std::getline(ss, cell, ',')) { if (c == pde_col) { pde = cell; break; } ++c; }
+            if (!replaced.count(pde)) kept.push_back(line);
+        }
     }
+    std::ofstream f(path);
+    f << header << "\n";
+    for (auto& l : kept) f << l << "\n";
+    for (auto& l : new_rows) f << l << "\n";
+}
+
+static std::string fmt_num(double v) {
+    std::ostringstream o; o << std::setprecision(10) << std::scientific << v; return o.str();
+}
+
+void save_summary(const std::vector<Stats>& stats, const std::string& path) {
+    const std::string header = "method,pde,pareto_size,best_mse_domain,best_mse_boundary,"
+                               "mean_mse_domain,mean_mse_boundary,best_bic,runtime_s,solution_mse";
+    std::set<std::string> replaced; std::vector<std::string> rows;
+    for (auto& s : stats) {
+        replaced.insert(s.pde);
+        rows.push_back(s.method + "," + s.pde + "," + std::to_string(s.front_size) + "," +
+                       fmt_num(s.best_domain) + "," + fmt_num(s.best_bnd) + "," +
+                       fmt_num(s.mean_domain) + "," + fmt_num(s.mean_bnd) + "," +
+                       fmt_num(s.min_bic) + "," + fmt_num(s.runtime_s) + "," + fmt_num(s.solution_mse));
+    }
+    merge_csv(path, header, 1, replaced, rows);
 }
 
 // ─── Tabla en consola (Solo PISR-NSGA-II) ──────────────────────────────────────
@@ -458,41 +460,18 @@ void print_table(const std::string& lbl, const Stats& p) {
     std::cout << "+------------------+-------------+----------+-------------+-------------+----------+\n";
 }
 
+static bool g_skip_oracle = false;
+
 // ─── Una corrida completa (Solo PISR-NSGA-II) ──────────────────────────────────
 std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose, bool is_test, const std::string& only_pde, bool replicable) {
     unsigned seed_base = replicable ? (1000u * (unsigned)(run_id + 1)) : std::random_device{}();
-    std::vector<PDEProblem> all_problems;
-    
-    // Ecuaciones "faciles" de calibracion (solucion cerrada conocida, no
-    // singulares, no rigidas) — sirven de sanity check: si el algoritmo no
-    // converge casi exacto aca, algo esta mal en el pipeline, no en la EDP.
-    all_problems.push_back(make_laplace(1));
-    all_problems.push_back(make_poisson(1));
-    all_problems.push_back(make_harmonic_oscillator(1));
-
-    // 1D y 2D Hardcore Equations
-    for (int d : {1, 2}) {
-        all_problems.push_back(make_airy(d));
-        all_problems.push_back(make_fisher(d));
-        all_problems.push_back(make_duffing(d));
-        all_problems.push_back(make_thomas_fermi(d));
-    }
-
-    // Navier-Stokes (The "Boss" Analyticals)
-    all_problems.push_back(make_navier_stokes());
-    all_problems.push_back(make_navier_stokes_unsteady());
-    
-    // 1D Only Hardcore Numerical Equations
-    all_problems.push_back(make_lane_emden());
-    all_problems.push_back(make_troesch());
-    all_problems.push_back(make_ginzburg_landau());
-    all_problems.push_back(make_painleve1());
+    // Suite unica (la misma que recorre oracle_test).
+    std::vector<PDEProblem> all_problems = benchmark_suite();
 
     std::vector<PDEProblem> problems;
     if (!only_pde.empty()) {
         for (auto& p : all_problems) {
-            std::string lbl = p.name() + (p.dim == 1 ? "_1D" : "_2D");
-            if (lbl == only_pde) {
+            if (problem_label(p) == only_pde) {
                 problems.push_back(p);
             }
         }
@@ -507,62 +486,51 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
 
 
     for (auto& prob : problems) {
-        std::string lbl = prob.name() + (prob.dim == 1 ? "_1D" : "_2D");
-        
+        std::string lbl = problem_label(prob);
+
         if (verbose) std::cout << "\n[Run] PISR-NSGA-II en " << lbl << "\n";
+        // Referencia de alta precision para EXACTAMENTE este problema (solo se
+        // usa para evaluar resultados despues de la busqueda).
+        bool ref_ok = true;
         if (prob.is_numerical) {
-            prob.numerical_truth = NumericalSolver::solve(prob, 50);
+            auto rep = NumericalSolver::reference(prob);
+            ref_ok = rep.ok;
+            if (verbose) std::cout << "  [Referencia] " << rep.method << "  n=" << rep.n
+                                   << "  residuo discreto=" << rep.newton_residual
+                                   << "  dif. Richardson=" << rep.richardson_diff
+                                   << (rep.ok ? "" : "  [NO CONVERGIO]") << "\n";
         }
-        // PISolver hace lo mismo internamente sobre su propia copia de prob,
-        // pero las funciones de exportacion de este archivo (save_best_grid,
-        // save_best_expression) reciben este `prob` de mas arriba, no la copia
-        // interna del solver — sin esto, prob.priors quedaba en su default
-        // (todo false) aca, rompiendo cualquier chequeo generico basado en
-        // priors (ver PDEPriors::one_sided_boundary) del lado de main.cpp.
+        // Oraculo: si el planteamiento o la maquinaria son incoherentes, no se corre.
+        if (!g_skip_oracle) {
+            OracleReport orc = run_oracle(prob);
+            if (!orc.pass || !ref_ok) {
+                print_oracle_report(orc);
+                std::cerr << "[ERROR] Oraculo reprobado en " << lbl << " (usar --skip-oracle para forzar). Se omite.\n";
+                continue;
+            }
+            if (verbose && run_id == 0) std::cout << "  [Oraculo] OK\n";
+        }
+        // Las funciones de exportacion de este archivo usan esta copia de prob.
         prob.priors = probe_priors(prob);
 
-        // Run Numerical Solver (RK4/FDM) baseline for comparison
+        // Linea de base RK4/FDM: el solver numerico a baja resolucion (50 nodos
+        // por eje), medido contra la referencia. Solo problemas estacionarios.
         bool has_numerical = false;
-        double num_rt = 0.0;
-        double num_mse_dom = 0.0;
-        double num_mse_bnd = 0.0;
-
-        if (prob.type != PDE::NAVIER_STOKES && prob.type != PDE::NAVIER_STOKES_UNSTEADY) {
-            has_numerical = true;
+        double num_rt = 0.0, num_mse_dom = 0.0, num_mse_bnd = 0.0;
+        {
             auto t_num0 = std::chrono::steady_clock::now();
             auto num_sol = NumericalSolver::solve(prob, 50);
             num_rt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t_num0).count();
-
-            if (prob.is_numerical) {
-                // For numerical equations, the numerical solution is the ground truth
-                num_mse_dom = 0.0;
-                num_mse_bnd = 0.0;
-            } else {
-                double sum_sq_dom = 0.0;
-                if (prob.dim == 1) {
-                    int N = num_sol.size();
-                    double h = 1.0 / (N - 1);
-                    for (int i = 0; i < N; ++i) {
-                        double x = i * h;
-                        double diff = std::abs(num_sol[i] - prob.exact(x, 0.0));
-                        sum_sq_dom += diff * diff;
-                    }
-                    num_mse_dom = sum_sq_dom / N;
-                    num_mse_bnd = 0.0;
-                } else {
-                    int N = std::sqrt(num_sol.size());
-                    double h = 1.0 / (N - 1);
-                    for (int i = 0; i < N; ++i) {
-                        for (int j = 0; j < N; ++j) {
-                            double x = i * h;
-                            double y = j * h;
-                            double diff = std::abs(num_sol[i * N + j] - prob.exact(x, y));
-                            sum_sq_dom += diff * diff;
-                        }
-                    }
-                    num_mse_dom = sum_sq_dom / (N * N);
-                    num_mse_bnd = 0.0;
+            if (!num_sol.empty()) {
+                has_numerical = true;
+                double sum_sq = 0.0; int n = 0;
+                int N = (prob.dim == 1) ? (int)num_sol.size() : (int)std::lround(std::sqrt((double)num_sol.size()));
+                double h = 1.0 / (N - 1);
+                for (int i = 0; i < N; ++i) {
+                    if (prob.dim == 1) { sum_sq += std::norm(num_sol[i] - prob.reference(i * h, 0.0)); ++n; continue; }
+                    for (int j = 0; j < N; ++j) { sum_sq += std::norm(num_sol[i * N + j] - prob.reference(i * h, j * h)); ++n; }
                 }
+                num_mse_dom = n > 0 ? sum_sq / n : 0.0;
             }
         }
 
@@ -590,11 +558,10 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
                 champion.rank = hof.rank; champion.crowding = hof.crowding;
                 champion.tree_size = hof.tree_size; champion.root_type = hof.root_type;
                 champion.is_feasible = hof.is_feasible; champion.constraint_violation = hof.constraint_violation;
-                if (hof.tree) champion.tree = hof.tree->clone();
+                if (hof.tree) champion.tree = hof.tree->clone(); champion.raw = hof.raw;
                 pi.polish_constants(champion);
-                // Error de solucion real (vs. verdad), no el residuo de la EDP —
-                // ver comentario en Stats::solution_mse.
-                champion_sol_mse = pi.solution_mse(champion);
+                // Error contra la referencia: EVALUACION, despues de la busqueda.
+                champion_sol_mse = pi.reference_error(champion);
             }
 
             double pi_rt = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
@@ -624,7 +591,7 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
             ns.mean_bnd = num_mse_bnd;
             ns.runtime_s = num_rt;
             ns.hypervolume = 0.0;
-            ns.solution_mse = num_mse_dom; // ya es error contra prob.exact(), misma metrica
+            ns.solution_mse = num_mse_dom; // error contra prob.reference(), misma metrica que el campeon
             all_stats.push_back(ns);
         }
     }
@@ -646,6 +613,8 @@ void print_usage(char* prog) {
               << "  --sigma F         ERC mutation sigma (default: " << Config::ERC_SIGMA << ")\n"
               << "  --stop F          Convergence threshold (default: " << Config::STOP_THRESHOLD << ")\n"
               << "  --cores N         Number of CPU threads (default: 1)\n"
+              << "  --skip-oracle     Run even if the oracle test fails (not recommended)\n"
+              << "  --no-hybrid       Only ansatz individuals (no direct-U representation; ablation)\n"
               << "  --help            Show this help\n";
 }
 
@@ -669,6 +638,8 @@ int main(int argc, char* argv[]) {
         else if (std::strcmp(argv[i], "--stop") == 0 && i+1 < argc) Config::STOP_THRESHOLD = std::atof(argv[++i]);
         else if (std::strcmp(argv[i], "--general") == 0) Config::GENERAL_MODE = true;
         else if (std::strcmp(argv[i], "--no-ansatz") == 0) Config::USE_ANSATZ = false;
+        else if (std::strcmp(argv[i], "--skip-oracle") == 0) g_skip_oracle = true;
+        else if (std::strcmp(argv[i], "--no-hybrid") == 0) Config::HYBRID_REPR = false;
         else if (std::strcmp(argv[i], "--cores") == 0 && i+1 < argc) Config::CORES = std::atoi(argv[++i]);
         else if (std::strcmp(argv[i], "--help") == 0) { print_usage(argv[0]); return 0; }
     }
@@ -696,7 +667,11 @@ int main(int argc, char* argv[]) {
     if (replicable) std::cout << "  [!] Modo --replicable ACTIVADO (Semillas Deterministas)\n";
     std::cout << "=============================================================\n\n";
 
-    fs::create_directories("results");
+    // La ablacion sin representacion hibrida (--no-hybrid) escribe aparte, para
+    // no pisar los resultados del metodo por defecto; el reporte las compara.
+    const std::string base_dir = Config::HYBRID_REPR ? "results" : "results/ablation_no_hybrid";
+    if (!Config::HYBRID_REPR) std::cout << "  [!] --no-hybrid: resultados en " << base_dir << "/\n\n";
+    fs::create_directories(base_dir);
     bool verbose = true; 
     std::vector<std::vector<Stats>> all_runs;
 
@@ -709,7 +684,7 @@ int main(int argc, char* argv[]) {
         }
         
         auto t0_run = std::chrono::steady_clock::now();
-        std::string out_dir = (n_runs == 1) ? "results" : "results/run_" + std::to_string(r);
+        std::string out_dir = (n_runs == 1) ? base_dir : base_dir + "/run_" + std::to_string(r);
         if (n_runs > 1) fs::create_directories(out_dir);
         
         auto stats = run_once(r, out_dir, verbose, is_test, only_pde, replicable);
@@ -721,13 +696,21 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    std::ofstream f_all("results/all_runs_summary.csv");
-    f_all << "run,method,pde,pareto_size,best_mse_domain,best_mse_boundary,mean_mse_domain,mean_mse_boundary,hypervolume,runtime_s,solution_mse\n";
-    for (int r = 0; r < n_runs; ++r) {
-        for (auto& s : all_runs[r]) {
-            f_all << r << "," << s.method << "," << s.pde << "," << s.front_size << "," << s.best_domain << ","
-                  << s.best_bnd << "," << s.mean_domain << "," << s.mean_bnd << "," << s.hypervolume << "," << s.runtime_s << "," << s.solution_mse << "\n";
-        }
+    // Fusion por EDP (igual que comparison_summary.csv): una corrida con
+    // --only reemplaza solo las filas de esa EDP.
+    {
+        const std::string header = "run,method,pde,pareto_size,best_mse_domain,best_mse_boundary,"
+                                   "mean_mse_domain,mean_mse_boundary,hypervolume,runtime_s,solution_mse";
+        std::set<std::string> replaced; std::vector<std::string> rows;
+        for (int r = 0; r < n_runs; ++r)
+            for (auto& s : all_runs[r]) {
+                replaced.insert(s.pde);
+                rows.push_back(std::to_string(r) + "," + s.method + "," + s.pde + "," + std::to_string(s.front_size) + "," +
+                               fmt_num(s.best_domain) + "," + fmt_num(s.best_bnd) + "," + fmt_num(s.mean_domain) + "," +
+                               fmt_num(s.mean_bnd) + "," + fmt_num(s.hypervolume) + "," + fmt_num(s.runtime_s) + "," +
+                               fmt_num(s.solution_mse));
+            }
+        merge_csv(base_dir + "/all_runs_summary.csv", header, 2, replaced, rows);
     }
 
     auto t_total = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0_all).count();

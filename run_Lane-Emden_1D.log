@@ -1,0 +1,28 @@
+=============================================================
+  PISR-NSGA-II --- Orquestador de Ecuaciones PDE
+  Pop=500  Gen=1000  Runs=1
+  [!] Modo --replicable ACTIVADO (Semillas Deterministas)
+=============================================================
+
+
+[Run] PISR-NSGA-II en Lane-Emden_1D
+  [Referencia] Taylor + RK4  n=2001  residuo discreto=0  dif. Richardson=1.22125e-14
+  [Oraculo] OK
+[INFO] Singularidad detectada en el PDE. Se usara Gradient Descent (Clipped Mode).
+  [PI/Lane-Emden] gen=0  best_dom(batch)=1.188000e-01  best_bnd(batch)=0.000000e+00  val_score(hof)=8.978280e-01  ref_err(solo registro)=4.157159e-03  infeasible=156/500  front1=7
+  [PI/Lane-Emden] gen=5  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=2.534778e-05  ref_err(solo registro)=2.579542e-08  infeasible=0/500  front1=140
+  [PI/Lane-Emden] gen=10  best_dom(batch)=0.000000e+00  best_bnd(batch)=0.000000e+00  val_score(hof)=6.734949e-06  ref_err(solo registro)=6.574517e-09  infeasible=0/500  front1=211
+[INFO] Early stopping en gen=11 (residuo + frontera de validacion < 1e-05)
+  [Optimizer] Polishing 4 constants via Gradient Descent (Clipped Mode)...
+
++------------------+-------------+----------+-------------+-------------+----------+
+|   Ecuacion: Lane-Emden_1D                                                     |
++------------------+-------------+----------+-------------+-------------+----------+
+| Metodo           | MSE Dom.    | Pareto   | Best BIC    | MSE Solucion| Tiempo   |
++------------------+-------------+----------+-------------+-------------+----------+
+| PISR-NSGA-II     | 2.7856e-09  | 477      | -7.8196e+03 | 2.1862e-12  | 5.669  s |
++------------------+-------------+----------+-------------+-------------+----------+
+| Health Analytics | Infeasible: 0.0  % | Bloat Factor (Avg nodes): 4.1           |
++------------------+-------------+----------+-------------+-------------+----------+
+
+  Benchmark completado en 5.7s. Resultados en ./results/

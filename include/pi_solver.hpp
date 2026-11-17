@@ -9,6 +9,12 @@
 struct PIIndividual : public Individual {
     NodePtr tree;
     double sample_dom_variance = 0.0;
+    // Representacion hibrida: false = el arbol es N y U = ansatz(N) (si el
+    // ansatz aplica); true = el arbol es U directamente y la frontera se mide
+    // como objetivo. Ambas compiten en la misma poblacion: una forma cerrada
+    // simple (sin(pi x), e^{-x^2/2}) suele ser corta como U pero enorme como
+    // N = (U - L)/B.
+    bool raw = false;
 
     // dom_weights (opcional, mismo tamaño y orden que dom): peso multiplicativo
     // por punto en la suma del residuo — inspirado en el analisis NTK de
@@ -21,14 +27,37 @@ struct PIIndividual : public Individual {
                   const std::vector<Point>& bnd,
                   int current_gen = 100,
                   const std::vector<double>* dom_weights = nullptr);
-                  
-    // Evaluación robusta en rejilla fija para el Hall of Fame
-    double get_validation_mse(const PDEProblem& prob, 
-                             const std::vector<Point>& val_dom, 
-                             const std::vector<Point>& val_bnd);
+
+    // Puntaje de validacion (Hall of Fame y early-stop): residuo + frontera en
+    // grillas fijas + verificacion del ansatz en el borde. Solo informacion de
+    // la EDP; nunca mira la referencia.
+    double validation_score(const PDEProblem& prob,
+                            const std::vector<Point>& val_dom,
+                            const std::vector<Point>& val_bnd);
+
+    // Error contra la referencia: SOLO para evaluar resultados, nunca para
+    // decidir nada dentro de la busqueda.
+    double reference_error(const PDEProblem& prob, const std::vector<Point>& pts) const;
 
     bool is_physically_complete(const PDEProblem& prob) const;
+
+    // Si se apunta a un vector, evaluate() anota ahi el motivo de cada
+    // restriccion violada (lo usa el oraculo para diagnosticar).
+    static thread_local std::vector<std::string>* violation_log;
     };
+
+// ─── Cadena unica de evaluacion de la solucion (ver pi_solver.cpp) ───────────
+// U = Re?(ansatz?(arbol)), segun el problema.
+Complex eval_solution(const PDEProblem& prob, const Node* tree, double x, double y, double t, bool raw = false);
+bool solution_uses_ansatz(const PDEProblem& prob, bool raw = false);
+// Perdida fisica de entrenamiento (residuo + frontera medida) sin factibilidad.
+double physics_loss(const PDEProblem& prob, const Node* tree,
+                    const std::vector<Point>& dom, const std::vector<Point>& bnd, bool raw = false);
+// Gradiente de physics_loss respecto de las constantes del arbol (diferencias
+// centradas con paso relativo h_rel). Valido para arboles complejos.
+std::vector<double> constant_gradient(const PDEProblem& prob, Node* tree,
+                                      const std::vector<Point>& dom, const std::vector<Point>& bnd,
+                                      double h_rel = 1e-6, bool raw = false);
 // ─── Solver de PISR-NSGA-II ─────────────────────────────────────────────────────
 class PISolver {
 public:
@@ -116,12 +145,10 @@ private:
 public:
     void polish_constants(PIIndividual& ind); // New high-precision polisher
 
-    // Error de SOLUCION (vs. verdad conocida/numerica) en la grilla fija de
-    // validacion, para cualquier individuo (tipicamente el campeon ya pulido).
-    // Distinto de ind.mse_domain, que es el residuo de la EDP (fisica, no
-    // supervisado) — ver comentario en compute_stats() en main.cpp.
-    double solution_mse(PIIndividual& ind) { return ind.get_validation_mse(prob_, val_dom_pts_, val_bnd_pts_); }
-    
+    // Error de SOLUCION (vs. referencia exacta/numerica) en la grilla de
+    // validacion. Metrica de EVALUACION, para llamar despues de run().
+    double reference_error(const PIIndividual& ind) const { return ind.reference_error(prob_, val_dom_pts_); }
+
 private:
     // Hybrid Committee RAR
     void apply_committee_rar();

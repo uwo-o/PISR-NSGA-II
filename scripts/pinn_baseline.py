@@ -201,6 +201,12 @@ def build_problem(pde_name, dim):
                 # -u'' + 0*u = π²u  →  u'' + π²u = 0
                 k2 = _pi**2 if dim==1 else 2*_pi**2
                 return lap + k2 * u
+                
+            elif pde_name == "Schrodinger-Unsteady":
+                # i u_t + lap u = 0. En t=0, la parte real es cos(pi*x). 
+                # Evaluamos u'' + pi^2 u = 0 como baseline espacial simplificado
+                k2 = _pi**2 if dim==1 else 2*_pi**2
+                return lap + k2 * u
 
             elif pde_name == "Airy":
                 # u'' = var*u
@@ -332,6 +338,8 @@ def build_problem(pde_name, dim):
         ("Helmholtz", 2): (None,                exact_helmholtz),
         ("Schrodinger",1):(lambda x: np.real(exact_schrodinger_1d(x)), None),
         ("Schrodinger",2):(None, lambda x,y: np.real(exact_schrodinger_2d(x,y))),
+        ("Schrodinger-Unsteady",1):(lambda x: np.cos(_pi * x), None),
+        ("Schrodinger-Unsteady",2):(None, lambda x,y: np.cos(_pi * (x + y))),
         ("Airy",       1): (ref_airy_1d,        None),
         ("Airy",       2): (None,               ref_airy_2d),
         ("HarmonicOscillator",1): (ref_ho_1d,  None),
@@ -584,6 +592,8 @@ def main():
     # The Hardcore Physics Benchmark (Matches C++ run_once selection)
     problems = [
         ("Airy",               1), ("Airy",               2),
+        ("Schrodinger",        1), ("Schrodinger",        2),
+        ("Schrodinger-Unsteady",1), ("Schrodinger-Unsteady",2),
         ("Fisher",             1), ("Fisher",             2),
         ("Duffing",            1), ("Duffing",            2),
         ("Thomas-Fermi",        1), ("Thomas-Fermi",        2),

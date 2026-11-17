@@ -1,0 +1,44 @@
+Compiling Julia backend...
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysr/sr.py:1873: UserWarning: Note: Setting `random_state` without also setting `deterministic=True` and `parallelism='serial'` will result in non-deterministic searches.
+  warnings.warn(
+--- Running PySR Benchmark for Duffing (noise_pct=0.05) ---
+Starting PySR Evolution...
+
+Best Discovered Equation by PySR for Duffing:
+cos((x - 1*0.3384559)*1.5813233) + 0.14049132
+--------------------------------------------------
+
+[ Info: Started!
+[ Info: Final population:
+[ Info: Results saved to:
+
+Expressions evaluated per second: 2.310e+05
+Progress: 961 / 1500 total iterations (64.067%)
+════════════════════════════════════════════════════════════════════════════════════════════════════
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           1.969e-02  0.000e+00  y = 1.0084
+4           3.814e-03  5.472e-01  y = cos(x) + 0.16767
+5           1.749e-03  7.793e-01  y = sin(exp(x)) + 0.14082
+6           1.237e-03  3.468e-01  y = cos(x * x) * 1.1156
+7           2.063e-04  1.791e+00  y = (x * (0.62552 - x)) + 1.0307
+8           4.473e-05  1.528e+00  y = cos((x - 0.33846) * 1.5813) + 0.14049
+10          4.171e-05  3.496e-02  y = ((tanh(x) * 1.0798) + 0.7004) * (1.4238 - x)
+11          4.162e-05  2.362e-03  y = (1.4392 - x) * (sin(sin(x) * 1.0611) + 0.69292)
+───────────────────────────────────────────────────────────────────────────────────────────────────
+════════════════════════════════════════════════════════════════════════════════════════════════════
+Press 'q' and then <enter> to stop execution early.
+───────────────────────────────────────────────────────────────────────────────────────────────────
+Complexity  Loss       Score      Equation
+1           1.969e-02  0.000e+00  y = 1.0084
+4           3.814e-03  5.472e-01  y = cos(x) + 0.16767
+5           1.726e-03  7.929e-01  y = sin(exp(x)) + 0.13597
+6           1.237e-03  3.333e-01  y = cos(x * x) * 1.1156
+7           2.063e-04  1.791e+00  y = (x * (0.62552 - x)) + 1.0307
+8           4.473e-05  1.528e+00  y = cos((x - 0.33846) * 1.5813) + 0.14049
+10          4.171e-05  3.496e-02  y = ((tanh(x) * 1.0798) + 0.70039) * (1.4238 - x)
+11          4.126e-05  1.083e-02  y = cos(x + (sin(x * 0.62988) - 0.54691)) + 0.14252
+17          4.126e-05  8.941e-08  y = cos((sin((((x + x) + x) - x) * 0.31491) + x) - 0.54687...
+                                      ) + 0.14251
+───────────────────────────────────────────────────────────────────────────────────────────────────
+  - outputs/20260906_220941_hZGHd5/hall_of_fame.csv

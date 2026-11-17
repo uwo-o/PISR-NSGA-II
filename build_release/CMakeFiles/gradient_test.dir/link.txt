@@ -1,0 +1,1 @@
+/usr/bin/c++  -fopenmp -O3 -march=native -DNDEBUG -Wl,--dependency-file=CMakeFiles/gradient_test.dir/link.d CMakeFiles/gradient_test.dir/tests/gradient_test.cpp.o -o gradient_test  libpisr_core.a -lm -lstdc++fs -fopenmp

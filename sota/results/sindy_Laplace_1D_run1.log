@@ -1,0 +1,8 @@
+/home/uwo/Projects/PISR-NSGA-II/.venv/lib/python3.12/site-packages/pysindy/optimizers/stlsq.py:234: UserWarning: Sparsity parameter is too big (0.1) and eliminated all coefficients
+  warnings.warn(
+--- Running PySINDy Benchmark for Laplace ---
+
+Best Discovered Equation by PySINDy for Laplace:
+ 0.0000
+--------------------------------------------------
+
