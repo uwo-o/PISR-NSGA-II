@@ -28,11 +28,24 @@ export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 PYTHON_JULIACALL_THREADS=1 PYTHON_JUL
 
 echo ">>> 0/3 Entorno (.venv-competitors: torch CPU, PySR + Julia)"
 PY=./.venv-competitors/bin/python3
-if [[ ! -x "$PY" ]]; then
-    python3 -m venv .venv-competitors
-    ./.venv-competitors/bin/pip install -q --upgrade pip
-    ./.venv-competitors/bin/pip install -q --index-url https://download.pytorch.org/whl/cpu torch
-    ./.venv-competitors/bin/pip install -q numpy pandas sympy pysr
+if ! "$PY" -c "import torch, pysr" >/dev/null 2>&1; then
+    rm -rf .venv-competitors   # entorno ausente o a medio crear
+    if ! python3 -m venv .venv-competitors >/dev/null 2>&1; then
+        # Sin el paquete python3-venv (falta ensurepip) y sin sudo: venv sin pip
+        # y pip instalado con get-pip.py.
+        echo "    (sin ensurepip: venv --without-pip + get-pip.py)"
+        rm -rf .venv-competitors
+        python3 -m venv --without-pip .venv-competitors
+        V=$(python3 -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")')
+        GETPIP=$(mktemp)
+        curl -fsSL https://bootstrap.pypa.io/get-pip.py -o "$GETPIP" \
+            || curl -fsSL "https://bootstrap.pypa.io/pip/$V/get-pip.py" -o "$GETPIP"
+        "$PY" "$GETPIP" -q || "$PY" <(curl -fsSL "https://bootstrap.pypa.io/pip/$V/get-pip.py") -q
+        rm -f "$GETPIP"
+    fi
+    "$PY" -m pip install -q --upgrade pip
+    "$PY" -m pip install -q --index-url https://download.pytorch.org/whl/cpu torch
+    "$PY" -m pip install -q numpy pandas sympy pysr
 fi
 # Primera vez: PySR descarga Julia y precompila SymbolicRegression (varios minutos).
 "$PY" -c "import juliacall, pysr" >/dev/null 2>&1 || { echo "[ERROR] no se pudo instalar PySR/Julia"; exit 1; }
