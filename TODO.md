@@ -40,7 +40,8 @@
 - [ ] Troesch: hibrido 1.7e-2 vs --no-hybrid 3.3e-5. Decidir: arreglar la competencia raw/ansatz o desactivar raw cuando hay ansatz exacto.
 - [ ] Re-corridas aun malas con binario de 18:44: Thomas-Fermi_1D (2.4e-2), Schrodinger-Unsteady_2D (1.0, el prior de dispersion no basto).
 - [ ] Lineas base RK4/FDM: Navier-Stokes_2D da NaN a 50 nodos.
-- [ ] Regenerar DeepXDE/PySR/PySINDy con los problemas actuales.
+- [ ] Correr competidores: `./run_competitors.sh --runs 30` (PINN y PINN->PySR; reemplazan a DeepXDE/PySR/PySINDy, que estaban desactualizados y PySR/PySINDy ajustaban la grilla de PISR). Referencia exportada con `PISR-NSGA-II --export-reference`.
+- [ ] Tabla de interpretabilidad PINN+PySR vs PISR (complejidad, recuperacion exacta, extrapolacion) cuando esten las 30 semillas.
 - [ ] Navier-Stokes-Unsteady 2D sigue mal (err 0.27; antes 1.0): revisar.
 - [ ] Re-correr TODOS (los resultados del 20-oct tambien quedan obsoletos: bug de i en simplify) los resultados en `results/` (los actuales son anteriores a las correcciones) y luego `generate_report.sh`.
 - [ ] Ablaciones del revisor (20 semillas, Wilcoxon + Holm, métricas SymPy).

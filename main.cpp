@@ -598,6 +598,74 @@ std::vector<Stats> run_once(int run_id, const std::string& out_dir, bool verbose
     return all_stats;
 }
 
+// ─── Exportar la referencia (para los competidores, sin correr la busqueda) ──
+// Escribe <dir>/<EDP>.csv con las filas:
+//   dom : puntos fijos de validacion y la referencia (la MISMA grilla y la
+//         MISMA referencia con que se calcula solution_mse del campeon);
+//   bnd : puntos de frontera de entrenamiento muestreados con
+//         sample_boundary_point (misma distribucion que usa la busqueda), con
+//         el dato g = bc(); dn = derivada normal exterior de g (solo operadores
+//         de orden 4, Navier-Stokes);
+//   ivp : problema de valor inicial en x=0: u = u(0), dn = u'(0).
+// y <dir>/<EDP>.json con los parametros del problema.
+static int export_references(const std::string& dir, const std::string& only_pde) {
+    fs::create_directories(dir);
+    int written = 0;
+    for (auto prob : benchmark_suite()) {
+        std::string lbl = problem_label(prob);
+        if (!only_pde.empty() && lbl != only_pde) continue;
+        if (prob.is_numerical) {
+            auto rep = NumericalSolver::reference(prob);
+            if (!rep.ok) { std::cerr << "[ERROR] referencia no convergio en " << lbl << "\n"; continue; }
+        }
+        std::ofstream f(dir + "/" + lbl + ".csv");
+        f << std::setprecision(17);
+        f << "kind,x,y,t,u_re,u_im,dn_re,dn_im\n";
+        for (auto& p : prob.validation_points()) {
+            Complex r = prob.reference(p.x, p.y, p.t);
+            f << "dom," << p.x << "," << p.y << "," << p.t << "," << r.real() << "," << r.imag() << ",0,0\n";
+        }
+        if (prob.bc_kind == BCKind::IVP_LEFT || prob.bc_kind == BCKind::ANCHOR_LEFT) {
+            f << "ivp,0,0,0," << prob.ivp_u0.real() << "," << prob.ivp_u0.imag() << ","
+              << prob.ivp_du0.real() << "," << prob.ivp_du0.imag() << "\n";
+        } else {
+            std::mt19937 rng(12345u);
+            const bool steady1d = (prob.dim == 1 && !prob.is_unsteady);
+            std::vector<Point> pts;
+            if (steady1d) pts = {{0.0, 0.0, 0.0}, {1.0, 0.0, 0.0}};
+            else for (int k = 0; k < 4000; ++k) pts.push_back(prob.sample_boundary_point(rng));
+            for (auto& p : pts) {
+                Complex g = prob.bc(p.x, p.y, p.t);
+                Complex dn = 0.0;
+                if (prob.spatial_order > 2) {
+                    double nx = 0.0, ny = 0.0;
+                    if (p.x == 0.0) nx = -1.0; else if (p.x == 1.0) nx = 1.0;
+                    else if (p.y == 0.0) ny = -1.0; else if (p.y == 1.0) ny = 1.0;
+                    if (nx != 0.0 || ny != 0.0) {
+                        const double h = 1e-5;
+                        dn = (prob.bc(p.x + h * nx, p.y + h * ny, p.t) - prob.bc(p.x - h * nx, p.y - h * ny, p.t)) / (2.0 * h);
+                    }
+                }
+                f << "bnd," << p.x << "," << p.y << "," << p.t << "," << g.real() << "," << g.imag() << ","
+                  << dn.real() << "," << dn.imag() << "\n";
+            }
+        }
+        std::ofstream j(dir + "/" + lbl + ".json");
+        j << std::setprecision(17)
+          << "{\"label\": \"" << lbl << "\", \"pde\": \"" << prob.name() << "\", \"dim\": " << prob.dim
+          << ", \"unsteady\": " << (prob.is_unsteady ? "true" : "false")
+          << ", \"complex\": " << (prob.complex_field ? "true" : "false")
+          << ", \"spatial_order\": " << prob.spatial_order
+          << ", \"k2\": " << prob.k2
+          << ", \"bc_kind\": \"" << (prob.bc_kind == BCKind::IVP_LEFT ? "ivp" : prob.bc_kind == BCKind::ANCHOR_LEFT ? "anchor" : "dirichlet") << "\""
+          << ", \"numerical\": " << (prob.is_numerical ? "true" : "false") << "}\n";
+        std::cout << "  " << lbl << "\n";
+        ++written;
+    }
+    std::cout << "[export-reference] " << written << " problemas en " << dir << "/\n";
+    return written > 0 ? 0 : 1;
+}
+
 void print_usage(char* prog) {
     std::cout << "Usage: " << prog << " [options]\n"
               << "Options:\n"
@@ -615,6 +683,7 @@ void print_usage(char* prog) {
               << "  --cores N         Number of CPU threads (default: 1)\n"
               << "  --skip-oracle     Run even if the oracle test fails (not recommended)\n"
               << "  --no-hybrid       Only ansatz individuals (no direct-U representation; ablation)\n"
+              << "  --export-reference DIR  Write validation/boundary reference data per PDE and exit\n"
               << "  --help            Show this help\n";
 }
 
@@ -623,6 +692,7 @@ int main(int argc, char* argv[]) {
     bool is_test = false;
     bool replicable = false;
     std::string only_pde = "";
+    std::string export_dir = "";
 
     for (int i = 1; i < argc; ++i) {
         if (std::strcmp(argv[i], "--runs") == 0 && i+1 < argc) n_runs = std::atoi(argv[++i]);
@@ -641,8 +711,10 @@ int main(int argc, char* argv[]) {
         else if (std::strcmp(argv[i], "--skip-oracle") == 0) g_skip_oracle = true;
         else if (std::strcmp(argv[i], "--no-hybrid") == 0) Config::HYBRID_REPR = false;
         else if (std::strcmp(argv[i], "--cores") == 0 && i+1 < argc) Config::CORES = std::atoi(argv[++i]);
+        else if (std::strcmp(argv[i], "--export-reference") == 0 && i+1 < argc) export_dir = argv[++i];
         else if (std::strcmp(argv[i], "--help") == 0) { print_usage(argv[0]); return 0; }
     }
+    if (!export_dir.empty()) return export_references(export_dir, only_pde);
 
     // Aplicar configuración de paralelismo
     if (Config::CORES > 0) {

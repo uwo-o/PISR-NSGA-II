@@ -7,8 +7,7 @@ benchmark_suite() en src/pde_problems.cpp).
 
 Fuentes:
   PISR-NSGA-II y RK4/FDM : results/all_runs_summary.csv (scripts/consolidate_runs.py)
-  DeepXDE                : results/**/<EDP>_pinn_pareto.csv
-  PySR / PySINDy         : results/**/<EDP>_*_metrics.csv
+  PINN, PINN+PySR        : results/**/<EDP>_pinn.csv, <EDP>_pinn_pysr.csv (run_competitors.sh)
 Las lineas base externas solo se usan si son posteriores a la redefinicion de
 los problemas (benchmarks.is_fresh): antes resolvian otro problema.
 """
@@ -56,33 +55,25 @@ def _fresh(files):
 
 
 def load_external():
-    """(DataFrame con method, pde, solution_mse, runtime_s; n archivos descartados)."""
-    frames, stale = [], 0
-    pinn, old = _fresh(glob.glob(os.path.join(RESULTS_DIR, "**", "*pinn_pareto.csv"), recursive=True))
-    stale += len(old)
-    for f in pinn:
-        t = pd.read_csv(f)
-        if "dim" in t.columns:
-            t["pde"] = t["pde"].astype(str) + "_" + t["dim"].astype(int).astype(str) + "D"
-        t["solution_mse"] = pd.to_numeric(t["mse_domain"], errors="coerce") + pd.to_numeric(t["mse_boundary"], errors="coerce")
-        t["runtime_s"] = pd.to_numeric(t.get("runtime_s", np.nan), errors="coerce")
-        t["method"] = "DeepXDE"
-        frames.append(t[["method", "pde", "solution_mse", "runtime_s"]])
-    sota, old = _fresh(glob.glob(os.path.join(RESULTS_DIR, "**", "*_metrics.csv"), recursive=True))
-    stale += len(old)
-    alias = {"airy": "Airy", "fisher": "Fisher", "duffing": "Duffing", "thomas_fermi": "Thomas-Fermi",
-             "lane_emden": "Lane-Emden", "troesch": "Troesch", "painleve": "Painleve-I",
-             "ginzburg_landau": "Ginzburg-Landau"}
-    for f in sota:
-        t = pd.read_csv(f)
-        if "noise_pct" in t.columns and (pd.to_numeric(t["noise_pct"], errors="coerce").fillna(0) > 0).any():
-            continue
-        for k, v in alias.items():
-            t["pde"] = t["pde"].astype(str).str.replace(rf"^{k}_", f"{v}_", regex=True)
-        t["solution_mse"] = pd.to_numeric(t.get("mse_total"), errors="coerce")
-        t["runtime_s"] = pd.to_numeric(t.get("runtime_s"), errors="coerce")
-        frames.append(t[["method", "pde", "solution_mse", "runtime_s"]])
-    ext = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=["method", "pde", "solution_mse", "runtime_s"])
+    """(DataFrame con method, pde, solution_mse, runtime_s, complexity; n archivos viejos descartados).
+
+    Competidores (run_competitors.sh): PINN y PINN+PySR, con la misma referencia
+    y los mismos puntos que solution_mse de PISR-NSGA-II. Los archivos de las
+    lineas base antiguas (DeepXDE, PySR/PySINDy sobre la grilla de PISR) solo
+    se cuentan, para avisar que se descartaron."""
+    cols = ["method", "pde", "solution_mse", "runtime_s", "complexity"]
+    frames = []
+    for pat in ("*_pinn.csv", "*_pinn_pysr.csv"):
+        fresh, _ = _fresh(glob.glob(os.path.join(RESULTS_DIR, "**", pat), recursive=True))
+        for f in fresh:
+            t = pd.read_csv(f)
+            for c in cols[2:]:
+                t[c] = pd.to_numeric(t[c], errors="coerce") if c in t.columns else np.nan
+            frames.append(t[cols])
+    stale = sum(len(_fresh(glob.glob(os.path.join(RESULTS_DIR, "**", pat), recursive=True))[1])
+                for pat in ("*_pinn_pareto.csv", "*_metrics.csv"))
+    ext = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(columns=cols)
+    ext.loc[ext["solution_mse"] < 0, "solution_mse"] = np.nan
     return ext, stale
 
 
@@ -233,6 +224,11 @@ def make_comparison_table(df, ext):
         r"\centering\small",
         r"\caption{Solution MSE against the reference and wall-clock time. RK4/FDM is the numerical solver "
         r"of the same problem at low resolution (50 nodes per axis); it returns a grid, not a formula. "
+        r"PINN is a physics-informed neural network trained on the same residual and boundary data "
+        r"(no reference data); it returns network weights, not a formula. PINN+PySR distils the PINN "
+        r"prediction into a formula with PySR, the data-free interpretable alternative (its time includes "
+        r"training the PINN). All methods are "
+        r"scored on the same points against the same reference; mean $\pm$ standard deviation over seeds. "
         r"Best MSE per row in bold.}",
         r"\label{tab:comparison}",
         r"\begin{adjustbox}{max width=\linewidth}",
@@ -398,10 +394,10 @@ def overview(df, ext, stale):
     L.append(r"\end{itemize}")
     if stale and ext.empty:
         L.append(r"\paragraph{External baselines.} "
-                 rf"{stale} result files from DeepXDE, PySR and PySINDy were found, but all of them were "
-                 rf"produced before the problems were redefined ({PROBLEMS_REDEFINED:%Y-%m-%d}); they solve "
-                 r"different equations and are excluded. Only the numerical solver (RK4/FDM) is compared "
-                 r"until those baselines are regenerated.")
+                 rf"{stale} result files from the old DeepXDE, PySR and PySINDy baselines were found, but "
+                 rf"they were produced before the problems were redefined ({PROBLEMS_REDEFINED:%Y-%m-%d}) and "
+                 r"solve different equations; they are excluded. Only the numerical solver (RK4/FDM) is "
+                 r"compared until \texttt{run\_competitors.sh} (PINN and PINN+PySR) has been run.")
     return L
 
 

@@ -3,4 +3,9 @@ build/
 *.pdf
 *.tex
 *.out
-*.log.venv/
+*.log
+.venv/
+.venv-competitors/
+results/pysr_tmp/
+
+__pycache__/
