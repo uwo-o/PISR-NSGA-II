@@ -1,0 +1,4 @@
+gen,best_mse_domain,best_mse_boundary,best_total_mse,best_val_score,champion_ref_err
+0,0.00370614,0,0.00370614,0.0781478,0.000671674
+1,0,0,0,0.00140231,1.14984e-05
+2,0,0,0,0.00140231,1.14984e-05

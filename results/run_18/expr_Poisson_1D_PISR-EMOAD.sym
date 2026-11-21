@@ -1,0 +1,4 @@
+raw=1
+uses_ansatz=0
+real_field=1
+tree=((sin(((pi)*(x))))*(exp((((-3.28738600652959e-14))*(x)))))

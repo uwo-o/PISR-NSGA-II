@@ -1,0 +1,4 @@
+raw=1
+uses_ansatz=0
+real_field=1
+tree=exp(-(1/2)*(((x)-((3.9077958766548911e-10))))**2)

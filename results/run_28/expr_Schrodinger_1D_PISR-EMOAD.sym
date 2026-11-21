@@ -1,0 +1,4 @@
+raw=1
+uses_ansatz=0
+real_field=0
+tree=exp(((I)*((((1.9999999997959943))*(x)))))
