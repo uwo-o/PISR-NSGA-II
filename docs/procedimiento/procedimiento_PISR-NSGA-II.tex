@@ -1,0 +1,565 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noshorthands]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,longtable,array,tabularx}
+\usepackage{enumitem}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,fit,calc}
+\usepackage[colorlinks=true,linkcolor=NavyBlue,urlcolor=NavyBlue]{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+\definecolor{accent}{HTML}{1F4E79}
+\definecolor{boxbg}{HTML}{EEF3F8}
+\titleformat{\section}{\Large\bfseries\color{accent}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{accent}}{\thesubsection}{0.6em}{}
+\pagestyle{fancy}\fancyhf{}
+\lhead{\small PISR-NSGA-II --- documento técnico}\rhead{\small\thepage}
+\setlength{\parskip}{4pt}\setlength{\parindent}{0pt}
+\setlist{itemsep=2pt,topsep=3pt}
+
+\newcommand{\code}[1]{\texttt{\small #1}}
+\newcommand{\nota}[1]{\par\smallskip\noindent\colorbox{boxbg}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small #1}}\par\smallskip}
+
+\title{\color{accent}\bfseries PISR-NSGA-II\\[4pt]\large Documento técnico del procedimiento completo}
+\author{Referencia personal del autor --- rama \code{grade}}
+\date{Noviembre 2026}
+
+\begin{document}
+\sloppy
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+Este documento describe, paso a paso, qué hace PISR-NSGA-II desde que recibe una ecuación diferencial
+hasta que entrega una fórmula: las verificaciones y análisis que corren \emph{antes} de la búsqueda, la
+representación de las soluciones, cómo se evalúa cada individuo, qué ocurre en cada generación, cómo se
+elige y pule el campeón, y qué se hace con los resultados después. Cada afirmación remite al archivo del
+código donde está implementada. Los valores de los parámetros son los de \code{src/pi\_solver.cpp}
+(espacio de nombres \code{Config}).
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%=====================================================================
+\section{Visión general}
+%=====================================================================
+
+\paragraph{Problema.} Dada una ecuación diferencial $\mathcal{N}[u] = 0$ en $\Omega=[0,1]^d$ (y
+$t\in[0,1]$ si no es estacionaria) con sus datos de borde o iniciales, encontrar una \emph{fórmula
+cerrada} $u(x,y,t)$ que la satisfaga. El algoritmo usa \textbf{solo} el residuo de la ecuación y los
+datos de borde; la solución de referencia nunca entra en la búsqueda y se usa únicamente para medir el
+resultado al final.
+
+\paragraph{Tesis.} Un físico entiende mejor una fórmula corta que una grilla de números. PISR-NSGA-II
+cambia algo de precisión por interpretabilidad: busca la expresión más simple que resuelva la ecuación,
+y si existe una forma cerrada, la recupera.
+
+\paragraph{Idea del método.} Programación genética (árboles de expresión) con NSGA-II sobre tres
+objetivos a minimizar:
+\begin{align*}
+f_1 &= \text{residuo de la EDP en el dominio},\\
+f_2 &= \text{error de los datos de borde},\\
+f_3 &= \text{tamaño del árbol (nodos)}.
+\end{align*}
+Las derivadas se calculan exactamente con diferenciación automática hacia adelante (jets) sobre
+aritmética compleja.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[node distance=5mm and 4mm, every node/.style={font=\small},
+  box/.style={draw=accent, rounded corners=2pt, fill=boxbg, align=center, minimum height=8mm, text width=24mm},
+  arr/.style={-{Stealth[length=2mm]}, accent, thick}]
+\node[box] (ref) {Referencia\\numérica\\(solo evaluación)};
+\node[box, right=of ref] (orc) {Oráculo\\de coherencia};
+\node[box, right=of orc] (pri) {Sondeo del\\operador\\(priors)};
+\node[box, right=of pri] (ini) {Población\\inicial sesgada};
+\node[box, below=9mm of ini] (loop) {Bucle evolutivo\\NSGA-II\\(hasta 1000 gen.)};
+\node[box, left=of loop] (hof) {Campeón por\\validación física\\(Hall of Fame)};
+\node[box, left=of hof] (pol) {Pulido final\\de constantes};
+\node[box, left=of pol] (out) {Fórmula, grilla,\\frentes, registro};
+\draw[arr] (ref) -- (orc); \draw[arr] (orc) -- (pri); \draw[arr] (pri) -- (ini);
+\draw[arr] (ini) -- (loop); \draw[arr] (loop) -- (hof); \draw[arr] (hof) -- (pol); \draw[arr] (pol) -- (out);
+\end{tikzpicture}
+\caption{Flujo por problema y semilla (\code{run\_once} en \code{main.cpp}).}
+\end{figure}
+
+\paragraph{Ejecución.} \code{./run\_tests.sh} compila y corre las pruebas (gradiente y oráculo de los 21
+problemas); luego \code{./build\_release/PISR-NSGA-II -{}-cores N -{}-replicable -{}-runs 30} corre la suite.
+Cada semilla escribe en \code{results/run\_<k>/}; \code{-{}-only <EDP>} corre un solo problema y
+\code{-{}-no-hybrid} la ablación sin representación híbrida (en \code{results/ablation\_no\_hybrid/}).
+
+%=====================================================================
+\section{La suite de problemas}
+%=====================================================================
+Definida en \code{benchmark\_suite()} (\code{src/pde\_problems.cpp}) y replicada para el reporte en
+\code{report/benchmarks.py}. Residuos en \code{PDEProblem::pde\_residual\_ad}.
+
+{\small
+\begin{longtable}{@{}p{3.1cm}p{5.0cm}p{2.9cm}p{3.3cm}@{}}
+\toprule
+\textbf{Problema} & \textbf{Ecuación} & \textbf{Datos} & \textbf{Referencia}\\\midrule\endhead
+Laplace 1D & $u''=0$ & $u(0),u(1)$ & $x$\\
+Poisson 1D & $u''=-\pi^2\sin\pi x$ & $u(0),u(1)$ & $\sin\pi x$\\
+Oscilador armónico 1D & $u''-x^2u+u=0$ & $u(0),u(1)$ & $e^{-x^2/2}$\\
+Airy 1D / 2D & $u''=xu$;\ $\nabla^2u=(x+y)u$ & borde & $\mathrm{Ai}(x)$;\ $\mathrm{Ai}(2^{-1/3}(x+y))$\\
+Fisher--KPP 1D / 2D & $\nabla^2u+u(1-u)=0$ & borde & numérica\\
+Duffing 1D / 2D & $\nabla^2u+u+u^3=\sin\pi x\,(\sin\pi y)$ & borde & numérica\\
+Thomas--Fermi 1D / 2D & $\nabla^2u=u^{3/2}/\sqrt r$ & $u(0)=1,\ u(1)=0.424$ & numérica\\
+Schrödinger 1D / 2D & $\nabla^2u+4d\,u=0$ (complejo) & borde & $e^{2ix}$;\ $e^{2i(x+y)}$\\
+Schrödinger no estac. 1D / 2D & $i u_t+\nabla^2u=0$ & $u(\cdot,0)$ y borde $\forall t$ & $e^{i\pi(x-\pi t)}$;\ $e^{i\pi(x+y-2\pi t)}$\\
+Navier--Stokes (Kovasznay) & $\psi_y\nabla^2\psi_x-\psi_x\nabla^2\psi_y=\nu\nabla^4\psi$, $\nu=0.05$ & $\psi,\ \partial_n\psi$ & $y-\tfrac{1}{2\pi}e^{\lambda x}\sin 2\pi y$\\
+Navier--Stokes (Taylor--Green) & $\omega_t+\mathbf u\cdot\nabla\omega=\nu\nabla^2\omega$, $\nu=0.01$ & $\psi(\cdot,0)$, $\psi,\partial_n\psi$ & $\sin\pi x\sin\pi y\,e^{-2\pi^2\nu t}$\\
+Lane--Emden ($n=3$) & $u''+\tfrac2x u'+u^3=0$ & IVP: $u(0)=1,u'(0)=0$ & numérica\\
+Troesch ($\lambda=3$) & $u''=3\sinh 3u$ & $u(0)=0,u(1)=1$ & numérica\\
+Ginzburg--Landau & $u''+u-u^3=0$ & $u(0),u(1)$ & $\tanh(x/\sqrt2)$\\
+Painlevé I & $u''=u^2+x$ & $u(0)=0,u(1)=\tfrac12$ & numérica\\\bottomrule
+\end{longtable}}
+
+Decisiones de planteamiento que conviene recordar:
+\begin{itemize}
+\item \textbf{Schrödinger} usa $k^2=4$ (no $\pi^2$) para evitar la resonancia de Dirichlet: con $\pi^2$
+  el problema tenía infinitas soluciones.
+\item \textbf{Lane--Emden} es un problema de valor inicial ($u(0)=1$, $u'(0)=0$), no de contorno.
+\item \textbf{Thomas--Fermi} está truncado a $[0,1]$ con $u(1)=0.424$, el valor tabulado de la solución
+  semi-infinita; ese dato es parte del planteamiento, no una fuga.
+\item \textbf{Ginzburg--Landau}: la solución exacta es $\tanh(x/\sqrt2)$ (antes se usaba $\tanh x$, que
+  no resuelve la ecuación).
+\item \textbf{Navier--Stokes} usa la función de corriente y el residuo real de orden 4 (antes había
+  proxies de orden 2). Kovasznay con $\mathrm{Re}=20$; por ser de orden 4, la frontera incluye
+  $\partial_n\psi$.
+\item Los problemas \textbf{no estacionarios} dan la frontera espacial para todo $t$ y la condición
+  inicial en $t=0$; sin la condición inicial quedarían indeterminados.
+\end{itemize}
+
+%=====================================================================
+\section{Antes de la búsqueda}
+%=====================================================================
+Todo lo de esta sección ocurre por problema, antes de crear la población (\code{run\_once} en
+\code{main.cpp}, y el constructor \code{PISolver::PISolver}).
+
+\subsection{Referencia numérica (solo para evaluar)}
+Para los problemas sin forma cerrada, \code{NumericalSolver::reference} (\code{src/numerical\_solver.cpp})
+calcula una solución de alta precisión usando la \emph{misma} ecuación (\code{pde\_residual\_ad}) y los
+mismos datos de borde que recibe el algoritmo:
+\begin{itemize}
+\item \textbf{1D de contorno:} Newton amortiguado sobre diferencias finitas centradas de orden 2;
+  jacobiano tridiagonal por diferencias finitas, resuelto con el algoritmo de Thomas.
+\item \textbf{1D de valor inicial} (Lane--Emden): RK4 arrancando en $x_0>0$ con una serie de Taylor
+  consistente ($u''(0)$ se resuelve por secante sin conocer la solución), porque el origen es singular.
+\item \textbf{2D de Dirichlet:} SOR no lineal (Newton por punto), arrancando de la interpolación de
+  Coons de los datos.
+\end{itemize}
+El reporte del solver incluye el residuo discreto y la diferencia de Richardson entre resoluciones $h$
+y $h/2$ (estimación del error de discretización). Si no converge, el problema no se corre.
+
+\nota{La referencia solo la leen: el error del campeón al final, el registro de convergencia (columna
+\code{champion\_ref\_err}, solo escritura) y el oráculo. Ninguna decisión de la búsqueda la usa.}
+
+\subsection{Oráculo de coherencia}
+\code{run\_oracle} (\code{src/oracle.cpp}) verifica que el problema esté bien planteado y que la
+maquinaria funcione. Si falla, el problema se omite (salvo \code{-{}-skip-oracle}). Comprobaciones:
+\begin{enumerate}
+\item \textbf{La referencia satisface la EDP}, con un jet por diferencias finitas. Pasa si el residuo
+  RMS es menor que la tolerancia o, para referencias analíticas, si duplicar el paso multiplica el
+  residuo por entre 3 y 5 (es solo error de truncación $O(h^2)$, no una referencia equivocada).
+\item \textbf{La referencia satisface los datos de borde e iniciales.}
+\item \textbf{Bien planteado:} el solver numérico, solo con la ecuación y el borde, reproduce la solución
+  exacta.
+\item \textbf{El árbol de la solución conocida es factible y casi exacto} dentro del algoritmo, en las
+  tres representaciones: sin ansatz, híbrida (U directo) y con ansatz ($N=(u-L)/B$). Esto detecta
+  restricciones de factibilidad que excluirían la respuesta correcta.
+\item \textbf{Priors:} el orden de derivación detectado coincide con el declarado, y se informa qué
+  propiedades del operador se cumplen también en la solución (diagnóstico).
+\end{enumerate}
+\code{tests/oracle\_test} corre el oráculo de los 21 problemas (21/21 aprobados) y
+\code{tests/gradient\_test} verifica el gradiente de constantes.
+
+\subsection{Línea base RK4/FDM}
+El mismo solver numérico a baja resolución (50 nodos por eje) se mide contra la referencia. Es la
+columna RK4/FDM de las tablas: devuelve una grilla, no una fórmula. Solo para problemas estacionarios.
+
+\subsection{Sondeo del operador (priors)}
+\code{probe\_priors} (\code{src/pde\_problems.cpp}) evalúa el residuo sobre \emph{funciones genéricas}
+(jets sintéticos con derivadas hasta orden 4) para descubrir propiedades del operador. Usa los datos de
+borde solo sobre la frontera; nunca la solución en el interior.
+
+\nota{\textbf{Principio:} los priors \emph{sesgan} la inicialización y la elección de esqueletos, pero
+nunca \emph{excluyen} candidatos. Que el operador tenga una propiedad no implica que la solución la
+tenga (depende del borde, del forzamiento y de posibles rupturas de simetría).}
+
+{\small
+\begin{longtable}{@{}p{4.2cm}p{11cm}@{}}
+\toprule\textbf{Prior} & \textbf{Cómo se detecta / para qué se usa}\\\midrule\endhead
+Autonomía en $x$, $y$, $t$ & El residuo no cambia al trasladar el punto. Activa esqueletos espectrales.\\
+Paridad par en $x$ & Residuo invariante ante $x\to-x$.\\
+Polo en el origen & Residuo enorme o no finito en el origen. Activa esqueletos racionales y de
+estiramiento logarítmico $\log(x+\varepsilon)$ (Thomas--Fermi, Lane--Emden).\\
+Modos exponenciales & Operador lineal, homogéneo y autónomo. Siembra $u=\sum_k A_k e^{\lambda\cdot\mathbf x}$;
+con probabilidad $3/4$ una componente de $\lambda$ se despeja de la relación de dispersión
+$P(\lambda)=0$ (símbolo del operador, por secante compleja), así que la semilla ya resuelve la EDP y
+solo falta ajustar el borde. Esos individuos nacen como U directo.\\
+Invarianza de escala & Homogeneidad aproximada. Activa el esqueleto de Frobenius $x^{1/2}\sum x^n$.\\
+Orden de derivación & Se anulan los términos de cada orden y se ve si el residuo cambia (lo verifica el oráculo).\\
+Simetría especular $x\leftrightarrow1-x$ & Operador invariante ante la reflexión \emph{y} datos de borde
+simétricos (evaluados en la frontera). Siembra $N(x(1-x))$.\\
+Separabilidad (2D) & Derivada cruzada del residuo $\approx0$ para $\sin x+\sin y$ o $\sin x\sin y$. Siembra $f(x)+g(y)$ o $f(x)g(y)$.\\
+Suma modal & Operador afín-lineal (superposición). Siembra $f(v)+g(x)h(y)$ (cubre Kovasznay).\\
+Invarianza rotacional & El operador trata $x$ e $y$ igual. Esqueleto de onda plana $f(ax+by)$.\\
+Oscilador amortiguado & Término lineal en la primera derivada. Esqueleto $e^{-av}\sin(bv)$.\\
+Separabilidad triple & 2D no estacionario: $f(x)g(y)h(t)$.\\\bottomrule
+\end{longtable}}
+
+\subsection{Detector de singularidad}
+En el constructor de \code{PISolver} se compara el residuo de un árbol de prueba $x+1$ en el centro y
+cerca del borde ($10^{-5}$). Si el borde es 1000 veces peor, el problema se marca singular
+(\code{Config::IS\_SINGULAR}) y el descenso por gradiente de constantes recorta el gradiente a $\pm50$.
+
+\subsection{Puntos de entrenamiento y de validación}
+\begin{itemize}
+\item \textbf{Entrenamiento} (al azar, por semilla): 500 puntos de dominio (en 1D con distribución de
+  Chebyshev, que concentra puntos en los bordes) y 200 de frontera, muestreados del mismo conjunto que
+  describe la validación (incluida la condición inicial si corresponde).
+\item \textbf{Validación} (fija y determinista, distinta del entrenamiento): 401 puntos interiores en 1D;
+  $41\times21$ en 1D no estacionario; $41\times41$ en 2D; $21\times21\times11$ en 2D no estacionario. La
+  frontera de validación cubre aristas (41 o 21 por arista, por instante) y la condición inicial.
+\end{itemize}
+
+%=====================================================================
+\section{Representación de las soluciones}
+%=====================================================================
+
+\subsection{Árboles de expresión}
+Cada individuo es un árbol (\code{src/tree\_node.cpp}) con el vocabulario:
+\begin{itemize}
+\item \textbf{Binarios:} $+,\ -,\ \times,\ \div,\ $ potencia.
+\item \textbf{Unarios:} $\sin,\cos,\sinh,\cosh,\exp,\tanh,\log$, cuadrado, gaussiana $e^{-a^2/2}$.
+\item \textbf{Polinomios ortogonales:} Legendre, Hermite, Chebyshev, Laguerre (grado $0$--$3$), evaluados
+  sobre argumento complejo.
+\item \textbf{Series:} $\sum_{n=1}^{5} C_n\,f_n$ (esqueletos espectral y de Frobenius).
+\item \textbf{Hojas:} variables $x,y,t$; constantes evolucionables (ERC); $\pi$, $e$, la unidad
+  imaginaria $i$; constantes físicas $G, c, \hbar, k_B, \varepsilon_0$ (para el análisis dimensional).
+\end{itemize}
+Profundidad máxima 6. Los árboles se simplifican algebraicamente después de cada operador genético.
+
+\subsection{Diferenciación automática (jets)}
+Cada nodo devuelve un \emph{jet}: el valor y todas las derivadas parciales necesarias, propagadas con las
+reglas de Leibniz (producto) y de Faà di Bruno (composición). El jet estándar llega a orden 2
+(\code{ad\_eval\_t}); para Navier--Stokes se usa el extendido de orden 4 con derivadas mixtas
+(\code{ad\_eval\_ext\_t}). Todo en aritmética compleja, así que Schrödinger y las rotaciones de fase
+$e^{i\theta}$ funcionan de forma nativa.
+
+\paragraph{Proyección real.} En problemas de campo real, la solución es $\mathrm{Re}(U)$ y se proyecta el
+jet completo \emph{antes} de aplicar el operador (\code{project\_real}): las derivadas conmutan con la
+parte real, pero $\mathrm{Re}(U)^3\ne\mathrm{Re}(U^3)$.
+
+\subsection{Ansatz de frontera exacta}
+Cuando el problema es estacionario y de orden $\le2$ (\code{ansatz\_applies}), el árbol puede representar
+$N$ y la solución se construye como $U = L + B\,N$, con $L$ que interpola los datos y $B$ que se anula
+donde hay dato (\code{apply\_boundary\_ansatz}):
+\begin{align*}
+\text{1D Dirichlet:}\quad & U = g_0 + x(g_1-g_0) + x(x-1)\,N\\
+\text{1D valor inicial:}\quad & U = u_0 + u_0'\,x + x^2 N\\
+\text{2D Dirichlet:}\quad & U = \mathcal C[g](x,y) + x(1-x)\,y(1-y)\,N
+\end{align*}
+donde $\mathcal C[g]$ es la interpolación transfinita (de Coons) de los datos en las cuatro aristas. Con
+ansatz, el error de frontera es cero por construcción. En los problemas no estacionarios y en
+Navier--Stokes el ansatz no aplica, y la frontera es un objetivo medido.
+
+\paragraph{Verificación del ansatz} (\code{ansatz\_border\_check}): la garantía solo vale si $N$ no
+diverge cerca del borde (un $N\sim C/x$ deja $BN\to C\ne0$). Se evalúa $U$ a $10^{-6}$ del borde y se
+compara con el dato; un desvío $>0.05$ hace al individuo infactible, y el desvío entra en el puntaje de
+validación.
+
+\subsection{Representación híbrida}
+Con \code{HYBRID\_REPR} activo (por defecto), conviven en la población individuos con ansatz
+($\code{raw}=\text{false}$, el árbol es $N$) e individuos directos ($\code{raw}=\text{true}$, el árbol es
+$U$ y la frontera se mide). Motivo: una forma cerrada simple como $\sin\pi x$ es corta como $U$ pero
+enorme como $N=(U-L)/B$. Un tercio de la población inicial no sesgada nace directa, y cada hijo cambia
+de representación con probabilidad 5\%. Puede fallar en algunos problemas (Troesch); se compara con la
+ablación \code{-{}-no-hybrid}.
+
+\subsection{La frontera como límite lateral}
+Para individuos directos, el dato de borde se exige también como límite desde el interior
+(\code{boundary\_error}). Motivo, la \emph{trampa del pico}: un término $e^{-(x/\varepsilon)^2}$ con
+$\varepsilon\to0$ fija $U(0)$ exactamente mientras el interior resuelve otra cosa, y ningún punto de
+colocación cae dentro del pico. El límite se estima con extrapolación cúbica $3U(d)-3U(2d)+U(3d)$ a dos
+escalas, $d=10^{-3}$ y $d=10^{-5}$, y se toma el peor de los errores. En operadores de orden 4 se exige
+además la derivada normal $\partial_n U$.
+
+%=====================================================================
+\section{Evaluación de un individuo}
+%=====================================================================
+\code{PIIndividual::evaluate} (\code{src/pi\_solver.cpp}).
+
+\subsection{Factibilidad}
+Solo validez de la expresión y gramática del lenguaje; ningún prior es una restricción. Cada violación
+suma a \code{constraint\_violation}:
+\begin{center}\small
+\begin{tabular}{@{}lr@{}}\toprule
+Restricción & Peso\\\midrule
+No usa todas las variables independientes ($x$; $y$ en 2D; $t$ si no es estacionario) & 10\\
+Residuo no finito & 10\\
+Dimensión física inconsistente (solo árboles sin ERC) & 5\\
+Profundidad unaria $>3$; profundidad $>6$ & 1 c/u\\
+Trigonométrica anidada; argumento trigonométrico no afín & 1 c/u\\
+Polinomio anidado; exponencial anidada; grado de polinomio inválido & 1 c/u\\
+El ansatz no alcanza el dato de borde ($N$ diverge en el borde) & 1\\
+La solución no está definida en la frontera (NaN o infinito) & 1\\\bottomrule
+\end{tabular}\end{center}
+La comparación entre individuos usa la dominancia con restricciones de Deb: un factible domina a un
+infactible; entre infactibles gana el de menor violación.
+
+\subsection{Objetivos}
+\begin{itemize}
+\item $f_1$ (\code{mse\_domain}): promedio ponderado de $|\mathcal N[U]|^2$ en el lote de dominio, con
+  recorte por punto en $10^4$ para que una singularidad no domine el promedio. Los pesos por punto se
+  explican en la sección~\ref{sec:pesos}.
+\item $f_2$ (\code{mse\_boundary}): error de borde medido (cero con ansatz).
+\item $f_3$ (\code{tree\_size}): número de nodos.
+\end{itemize}
+Si todo individuo tiene $f_2=0$ (ansatz sin híbrido), $f_2$ se excluye de NSGA-II: un objetivo empatado
+no aporta a la dominancia pero distorsiona la distancia de hacinamiento.
+
+%=====================================================================
+\section{Población inicial}
+%=====================================================================
+\code{PISolver::run}, con tamaño de población 500:
+\begin{enumerate}
+\item \textbf{Un tercio sesgado por los priors activos}, repartido entre ellos: separable, suma modal,
+  simétrico especular, modos exponenciales.
+\item \textbf{La mitad del resto} con \code{random\_tree\_special}: esqueletos físicos típicos
+  ($1/(1+x^2+y^2)$, gaussiana, $\sin\pi x\sin\pi y$, $\cos\cos$, $\tanh\tanh$, $\sin(\pi x)e^{-t}$,
+  $xe^{-x^2}$, \dots) más los activados por los priors: racional, espectral, Frobenius, estiramiento
+  logarítmico, onda plana rotada, oscilador amortiguado.
+\item \textbf{El resto} con árboles aleatorios: hojas 60\% variables y 40\% constantes; nodos internos
+  40\% aritméticos, 40\% unarios y 20\% polinomios ortogonales.
+\end{enumerate}
+Cada árbol nace multiplicado por una constante evolucionable. Un tercio de los no sesgados nace como
+$U$ directo (híbrido).
+
+%=====================================================================
+\section{El bucle evolutivo}
+%=====================================================================
+Hasta 1000 generaciones. Orden de las operaciones en cada generación $g$:
+
+\subsection{Lote de entrenamiento}
+\begin{itemize}
+\item Mini-lote del 80\% de los puntos disponibles, re-muestreado cada 8 generaciones (no en cada una:
+  con un blanco estable la selección premia mejoras reales, no puntos más fáciles).
+\item Un lote grande hace improbable que una función degenerada tenga residuo bajo por casualidad
+  (se observó con un candidato casi trivial en Airy 1D).
+\item En las últimas 50 generaciones se usa la grilla completa.
+\end{itemize}
+
+\subsection{Refinamiento adaptativo de residuos por comité (RAR)}
+Cada 25 generaciones (\code{apply\_committee\_rar}): un comité formado por las 4 mejores élites y un 40\%
+de individuos al azar evalúa 10\,000 candidatos (1D) o 2\,000 (2D). El 30\% de los puntos del conjunto
+de entrenamiento se reemplaza por los candidatos con mayor residuo de consenso. Así los puntos difíciles
+entran al lote.
+
+\subsection{Pesos por punto}\label{sec:pesos}
+Inspirados en el análisis NTK de PINNs (Wang et al., 2022): dentro del lote, cada punto pesa
+$1+2\,r_i/\max r$, donde $r_i$ es el residuo promedio de hasta 6 individuos del frente. Rango $[1,3]$:
+los puntos fáciles nunca pierden señal y los difíciles pesan hasta el triple. RAR decide \emph{qué}
+puntos entran; los pesos, \emph{cuánto} pesa cada uno.
+
+\subsection{Orden no dominado y campeón}
+Orden no dominado rápido de NSGA-II con restricciones, y actualización del Hall of Fame
+(sección~\ref{sec:campeon}).
+
+\subsection{Parada temprana}
+Si el error de entrenamiento del campeón baja de $10^{-6}$, se confirma en la grilla fija de validación
+(debe bajar de $10^{-5}$). Si se confirma, la corrida termina.
+
+\subsection{Reproducción}
+Selección por torneo de tamaño 4 (gana el de mejor rango y, a igual rango, el de mayor hacinamiento).
+Cada hijo:
+\begin{itemize}
+\item \textbf{Cruzamiento} (prob.\ 0.8): se intercambian términos aditivos entre los padres; si ambos
+  términos son productos, con probabilidad 0.5 se intercambian factores (no se destruye la estructura de
+  un término que funcionaba).
+\item \textbf{Mutación} (\code{tree\_mutate}): 55\% mutación puntual (cambiar el tipo de nodo dentro de su
+  familia funcional); si no, sobre los términos aditivos: borrar uno, agregar uno o reemplazar uno.
+  El reemplazo regenera el término entero con probabilidad $0.6\times$\emph{agresividad} y, si no, muta
+  a nivel de factor (borrar, agregar o reemplazar un factor, o agregar una rotación de fase
+  $e^{i\theta}$ con $\theta$ evolucionable).
+\item \textbf{Enfriamiento:} agresividad $=0.3+0.7(1-g/G)$. Exploración fuerte al inicio, refinamiento al
+  final, con un piso de 0.3 para conservar siempre una vía de escape de óptimos locales.
+\item \textbf{Élites} (algún padre en el frente 1): 70\% solo mutación de constantes ($\sigma=0.1$),
+  30\% mutación estructural. \textbf{No élites:} mutación estructural con prob.\ 0.45 y de constantes
+  ($\sigma=0.2$) con prob.\ 0.4.
+\item Cambio de representación ($N\leftrightarrow U$) con prob.\ 0.05, y simplificación algebraica.
+\end{itemize}
+
+\subsection{Selección de sobrevivientes}
+Padres e hijos se combinan (1000 individuos) y se eligen 500 por rango y distancia de hacinamiento
+(\code{nsga2\_select\_next}). Antes se \textbf{eliminan duplicados}: individuos con el mismo tamaño y los
+mismos objetivos (a $10^{-12}$) pasan al final y solo entran si faltan únicos. Sin esto, un atractor
+trivial (por ejemplo $N=0$, tamaño 1) se clona hasta llenar el frente y congela la búsqueda.
+
+\subsection{Archivo, pulido y registro}
+\begin{itemize}
+\item \textbf{Archivo histórico:} los 4 números (residuo, frontera, tamaño, rango) de cada individuo de
+  cada generación (\code{*\_population\_archive.csv}). En la última generación se guarda además una
+  copia sin pulir de la población.
+\item \textbf{Pulido de constantes de toda la población:} descenso por gradiente con paso adaptativo
+  (lr inicial 0.05; $\times1.1$ si mejora, $\times0.5$ y se revierte si empeora), gradiente por
+  diferencias centradas con paso relativo $10^{-6}$ (válido para árboles complejos). 30 iteraciones cada
+  10 generaciones y 10 en las demás. Así una estructura buena con constantes mal iniciadas no pierde
+  contra una peor con mejor suerte.
+\item \textbf{Registro de convergencia} (\code{*\_convergence.csv}): mínimos del frente en el lote,
+  puntaje de validación del campeón y error del campeón contra la referencia (solo registro).
+\end{itemize}
+
+\nota{Las columnas \code{best\_mse\_domain} y \code{best\_mse\_boundary} son mínimos \emph{por separado}
+sobre el frente, de individuos distintos. En ecuaciones donde una constante es solución (Airy, Fisher,
+Ginzburg--Landau, Lane--Emden, Troesch, NS, Schrödinger no estacionario), $u\equiv0$ vive en el frente
+como extremo de residuo cero, así que esa columna vale 0. Para graficar se usan
+\code{best\_val\_score} y \code{champion\_ref\_err}.}
+
+%=====================================================================
+\section{Selección y pulido del campeón}\label{sec:campeon}
+%=====================================================================
+
+\paragraph{Hall of Fame} (\code{update\_hall\_of\_fame}). En cada generación:
+\begin{enumerate}
+\item Entre los individuos del frente 1 factibles y que usan todas las variables, se toma el de menor
+  error de entrenamiento (ya calculado, sin costo extra).
+\item Se compara con el campeón vigente mediante el \textbf{puntaje de validación}: residuo y frontera en
+  las grillas fijas, más el desvío del ansatz en el borde. Solo información de la EDP; la referencia
+  nunca entra.
+\end{enumerate}
+
+\paragraph{La solución trivial.} $u\equiv0$ puede estar en el frente (residuo cero), pero su puntaje de
+validación incluye el error de frontera, así que nunca gana. Es el modo de falla que Rockett (2026) deja
+abierto.
+
+\paragraph{Pulido final.} Al terminar, el campeón se pule con 200 iteraciones de descenso por gradiente
+contra la grilla fija de validación (no contra el mini-lote, para no sobreajustar). Luego se mide su
+error contra la referencia (\code{solution\_mse}), que es la métrica de las tablas.
+
+%=====================================================================
+\section{Salidas y post-proceso}
+%=====================================================================
+
+\subsection{Archivos por problema y semilla}
+\begin{center}\small
+\begin{tabular}{@{}p{6cm}p{9cm}@{}}\toprule
+Archivo & Contenido\\\midrule
+\code{<P>\_pi\_gn\_pareto.csv} & Población final (todos los rangos).\\
+\code{<P>\_pi\_gn\_pareto\_unpolished.csv} & Población final antes del pulido.\\
+\code{<P>\_pi\_gn\_population\_archive.csv} & Archivo histórico ($\sim$340 MB por semilla; no va a git).\\
+\code{<P>\_pi\_gn\_convergence.csv} & Registro por generación.\\
+\code{expr\_<P>\_PISR-EMOAD.tex} / \code{.sym} & Fórmula del campeón (LaTeX y SymPy, con \code{raw}, \code{uses\_ansatz}).\\
+\code{grid\_<P>\_PISR-EMOAD.csv} & Campeón y referencia en una grilla (t = 0.5 si no es estacionario).\\
+\code{comparison\_summary.csv} & Resumen por EDP de la semilla.\\
+\code{results/all\_runs\_summary.csv} & Todas las semillas (fusión por EDP; \code{-{}-only} reemplaza solo su fila).\\\bottomrule
+\end{tabular}\end{center}
+
+\subsection{Reporte} (\code{./generate\_report.sh})
+\begin{enumerate}
+\item \code{consolidate\_runs.py}: arma \code{all\_runs\_summary.csv} (conserva el hipervolumen).
+\item Figuras: soluciones, frentes, convergencia (mediana y banda intercuartil sobre las semillas).
+\item \code{simplify\_expressions.py}: simplifica la fórmula con SymPy, redondea constantes a valores
+  exactos ($p/q$, $\pi$, $\sqrt2$, \dots) y verifica contra la grilla del campeón (tolerancia relativa
+  $\le10^{-3}$).
+\item \code{extrapolation.py}: evalúa el campeón en $[0,1.5]$ y lo compara con un polinomio de Chebyshev
+  de igual precisión interior.
+\item \code{physics\_checks.py}: extrae cantidades físicas de la fórmula (energía, $u'(0)$, número de
+  onda, dispersión, radio de Lane--Emden, tasa de decaimiento).
+\item \code{interpretability.py}: PISR contra PINN+PySR (error, nodos, recuperación exacta,
+  extrapolación).
+\item \code{generate\_report.py} y \code{pdflatex}.
+\end{enumerate}
+\nota{\textbf{Semilla mediana:} todo lo que necesita una sola fórmula (expresiones, gráficos por
+problema, extrapolación, física) usa la semilla cuyo error es el 15.º de 30. Las tablas de error
+agregan todas las semillas.}
+
+\subsection{Competidores} (\code{./run\_competitors.sh -{}-runs 30})
+\begin{itemize}
+\item \code{PISR-NSGA-II -{}-export-reference} escribe, por EDP, los puntos de validación, la referencia y
+  los datos de borde (\code{results/reference/}). Así los competidores se miden en los mismos puntos y
+  con la misma referencia.
+\item \textbf{PINN} (\code{competitors/pinn.py}): red $4\times50$ tanh en float64, con los mismos residuos
+  (copiados de \code{pde\_residual\_ad} y verificados contra las soluciones exactas). 10\,000
+  iteraciones de Adam y 2\,000 de L-BFGS, con tope de 30 min por trabajo.
+\item \textbf{PINN+PySR} (\code{competitors/pinn\_pysr.py}): PySR ajusta una fórmula a la predicción del
+  PINN (nunca a la referencia). Guarda la fórmula elegida y el frente completo.
+\end{itemize}
+
+%=====================================================================
+\section{Dónde se usa la referencia (garantías contra fugas)}
+%=====================================================================
+\begin{center}\small
+\begin{tabular}{@{}p{6.5cm}cp{6.5cm}@{}}\toprule
+Componente & ¿Usa la referencia? & Qué usa\\\midrule
+Evaluación, objetivos, RAR, pesos & No & Residuo y datos de borde\\
+Sondeo de priors & No & Operador sobre funciones genéricas; borde solo en la frontera\\
+Hall of Fame, parada temprana, pulido & No & Puntaje de validación (física)\\
+Registro de convergencia & Solo escritura & \code{champion\_ref\_err}, que nada lee\\
+\code{solution\_mse}, reporte, oráculo & Sí & Evaluación después de la búsqueda\\\bottomrule
+\end{tabular}\end{center}
+
+%=====================================================================
+\section{Parámetros}
+%=====================================================================
+\begin{center}\small
+\begin{tabular}{@{}lll@{}}\toprule
+Parámetro & Valor & Opción de línea de comandos\\\midrule
+Población / generaciones & 500 / 1000 & \code{-{}-pop}, \code{-{}-gen}\\
+Puntos de dominio / frontera & 500 / 200 & \code{-{}-domain}, \code{-{}-boundary}\\
+Profundidad máxima & 6 & \code{-{}-depth}\\
+$\sigma$ de mutación de constantes & 0.20 & \code{-{}-sigma}\\
+Prob.\ de cruzamiento / mutación & 0.80 / 0.45 & ---\\
+Torneo & 4 & ---\\
+Umbral de parada & $10^{-6}$ (validación $10^{-5}$) & \code{-{}-stop}\\
+RAR: intervalo / candidatos / fracción & 25 / 10\,000 / 0.30 & ---\\
+RAR: élites / fracción al azar & 4 / 0.40 & ---\\
+Mini-lote / re-muestreo & 80\% / cada 8 gen. & ---\\
+Representación híbrida & activa & \code{-{}-no-hybrid}\\
+Ansatz de frontera & activo & \code{-{}-no-ansatz}\\\bottomrule
+\end{tabular}\end{center}
+
+%=====================================================================
+\section{Resultados de las 30 semillas (resumen)}
+%=====================================================================
+\begin{itemize}
+\item 15 de 21 problemas bajo $10^{-3}$ en al menos el 83\% de las semillas.
+\item Recuperación exacta de la forma cerrada: Laplace, Poisson, oscilador y Schrödinger 1D (30/30);
+  Schrödinger 2D (29/30); Schrödinger no estacionario 1D (26/30); NS no estacionario (12/30);
+  Ginzburg--Landau (11/30; las demás son aproximaciones de otra forma con error $\sim10^{-8}$).
+\item No resueltos: Thomas--Fermi 1D y 2D (singularidad en el origen), Troesch (capa límite rígida),
+  NS Kovasznay (no linealidad de orden 4), Schrödinger no estacionario 2D (la búsqueda mejora el
+  residuo sin acercarse a la solución).
+\item Tiempo mediano: unas 3.2 h por semilla para la suite completa en 32 núcleos.
+\end{itemize}
+
+%=====================================================================
+\section{Historial de correcciones importantes}
+%=====================================================================
+Para recordar por qué el código es como es:
+\begin{itemize}
+\item \textbf{Problemas redefinidos} (20 de octubre de 2026): Airy verdadero, Lane--Emden como IVP,
+  Thomas--Fermi en $[0,1]$, Schrödinger no resonante, Ginzburg--Landau con $\tanh(x/\sqrt2)$, NS con el
+  residuo real. Los resultados anteriores a esa fecha se excluyen del reporte.
+\item \textbf{La referencia salió de la selección:} el Hall of Fame y la parada temprana comparaban
+  contra la referencia; ahora usan solo el puntaje físico de validación.
+\item \textbf{Trampa del pico:} cerrada exigiendo la frontera como límite lateral.
+\item \textbf{Laguerre con argumento complejo:} los polinomios se evaluaban sobre la parte real, y
+  Lane--Emden daba residuo 0 con $u\equiv1$.
+\item \textbf{Impresión de fórmulas:} $A-(B+C)$ salía sin paréntesis y las constantes físicas salían
+  vacías; se corrigió y se recuperaron los signos de las fórmulas antiguas.
+\item \textbf{Kovasznay recalibrado} a $\mathrm{Re}=20$ con amplitud $1/(2\pi)$; con $\mathrm{Re}=100$ el
+  problema era casi trivial ($\psi\approx y$ ya daba $10^{-7}$).
+\item \textbf{Resúmenes que se pisaban:} \code{-{}-only} borraba las demás filas; ahora se fusionan por EDP.
+\end{itemize}
+
+\end{document}

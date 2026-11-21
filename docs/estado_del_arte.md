@@ -129,7 +129,20 @@ Hay que verificar en el texto de Rockett qué remedio propone, para no atribuirl
 basado en restricciones físicas. Reporta superar a otros métodos de ML en EDO y EDP. En versiones del
 artículo el método aparece como **SymPDE**. Compara contra la vía en dos etapas (PINN+DSR) y reporta
 que esta suele recuperar el esqueleto correcto pero falla en las constantes, porque el error del PINN se
-amplifica en la regresión simbólica; es la cita para la crítica a PINN+PySR. **Es el rival
+amplifica en la regresión simbólica; es la cita para la crítica a PINN+PySR.
+
+**Detalle de su evaluación** (leído de la versión v2 en HTML, parte por extracción automática; verificar
+en el PDF antes de citar cifras):
+- Benchmarks: Van der Pol (sin forma cerrada), Poisson 2D/3D y calor 2D/3D con soluciones polinómicas en
+  $[-1,1]^d$, y el conjunto "Gamma" de 12 problemas tipo Poisson (polinomios, trigonométricas, log,
+  $\sqrt{x}$, $x^y$) en $[-1,1]$ o $[0.5,1.5]$. **No se superponen con la suite de PISR-NSGA-II.**
+- Métrica principal: tasa de recuperación $P_{Re}$ en 20 corridas (esqueleto equivalente tras
+  simplificar y MSE $<10^{-8}$), más la pérdida física y el MSE contra la solución.
+- Resultado clave para nuestra tesis: en Poisson 2D/3D y calor 2D/3D, SSDE recupera 100% y
+  **PINN+DSR 0%**, con MSE de $10^{-1}$; también fallan KAN y PR-GPSR (la GP con regularización física
+  de Oh et al.). En el conjunto Gamma, PINN+DSR recupera los polinomios simples pero cae a 0% en 6 de 12.
+- Código: el repositorio **github.com/Hintonein/SSDE** existe (verificado que responde; no revisé su
+  contenido). Si se quisiera correr SSDE sobre nuestra suite, es por ahí. **Es el rival
 moderno más fuerte**: misma tarea (forma cerrada sin datos) con aprendizaje profundo. Si su código es
 público, es la línea base a correr.
 
