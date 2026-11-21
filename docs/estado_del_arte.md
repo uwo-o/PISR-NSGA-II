@@ -36,6 +36,20 @@ Lo que PISR-NSGA-II puede defender como propio, según esta revisión:
 Los puntos 2–4 son diferencias de grado; el punto 1 es la diferencia de enfoque y coincide con la tesis
 central de la memoria (interpretabilidad a cambio de precisión).
 
+### Dos familias de métodos para obtener una fórmula sin datos
+
+| | En dos etapas (destilación) | De punta a punta |
+|---|---|---|
+| Idea | Resolver con una red (PINN) y ajustar una fórmula a su salida con regresión simbólica | Buscar la fórmula optimizando directamente contra el residuo y el borde |
+| Trabajos | SymTorch 2026, StruSR 2025, PINN+SR (Neural Comput. Appl. 2025); DeSyR 2026 como híbrido | Tsoulos & Lagaris 2006, Oh 2023, Rockett 2025–2026, SSDE 2025, SES 2026, **PISR-NSGA-II** |
+| Crítica principal | Los errores del PINN se propagan: suele acertar el esqueleto y fallar las constantes (SSDE) | Búsqueda más difícil: el residuo es el único guía |
+
+La crítica a la primera familia viene del artículo de SSDE, que compara contra PINN+DSR (casi idéntico a
+nuestro PINN+PySR). Es el argumento de fondo de la memoria: una búsqueda guiada por la ecuación premia
+directamente la forma exacta (residuo cero), mientras que la destilación ajusta una aproximación numérica
+y puede agregar términos que solo modelan su error. **Casi todas las cifras de estos trabajos son de los
+propios autores, con benchmarks distintos; no encontré una comparación independiente entre familias.**
+
 ---
 
 ## 2. Tabla comparativa
@@ -50,6 +64,9 @@ central de la memoria (interpretabilidad a cambio de precisión).
 | Wei et al. 2025, SSDE (ICML) | RL: RNN + gradiente de política buscadora de riesgo | Sí | 1 | Restricciones físicas en la recompensa | No | No | EDO y EDP variadas |
 | SES 2026 (arXiv) | Modelo simbólico diferenciable | Sí | 1 | Residuos de condiciones | No consta | No | Algebraicas, EDO, EDP |
 | SymTorch 2026 (arXiv) | PINN entrenada y luego destilada con PySR | Indirecto (vía PINN) | Pareto de PySR | La de la PINN | No | Parcial (forma funcional) | Ecuación de calor 1D (demo) |
+| PINN+SR, Neural Comput. Appl. 2025 | PINN y luego regresión simbólica | Indirecto (vía PINN) | 1 | La de la PINN | No | No | Burgers, evolución de 5.º orden |
+| DeSyR 2026 (arXiv) | PINN guía la estructura; coeficientes refinados con la física | Indirecto (vía PINN) | 2 etapas | La de la PINN | No consta | No consta | EDP (revisar PDF) |
+| KAN / Symbolic-KAN 2024–2026 | Red de Kolmogorov-Arnold física, funciones convertibles a símbolos | Sí | 1 | Términos de pérdida | No | Parcial | EDP de demostración |
 | PhySO, Tenachi et al. 2023 | RL con unidades físicas | **No** (ajusta datos) | 1 | — | No | Coherencia de unidades | Feynman / SRBench |
 | **PISR-NSGA-II** | GP + NSGA-II + jets AD | Sí | **3 (residuo, frontera, nodos)** | **Ansatz exacto (1D, IVP, Coons 2D)** e híbrido | **Sí** | **Sí: extrapolación y cantidades físicas** | 21 problemas: lineales, no lineales, complejos, NS, singulares |
 
@@ -109,7 +126,10 @@ Hay que verificar en el texto de Rockett qué remedio propone, para no atribuirl
 ### SSDE: Wei et al. (2025)
 *Closed-form Solutions: A New Perspective on Solving Differential Equations*, ICML 2025, PMLR 267,
 66062–66083. Una RNN genera expresiones con un gradiente de política buscador de riesgo y un evaluador
-basado en restricciones físicas. Reporta superar a otros métodos de ML en EDO y EDP. **Es el rival
+basado en restricciones físicas. Reporta superar a otros métodos de ML en EDO y EDP. En versiones del
+artículo el método aparece como **SymPDE**. Compara contra la vía en dos etapas (PINN+DSR) y reporta
+que esta suele recuperar el esqueleto correcto pero falla en las constantes, porque el error del PINN se
+amplifica en la regresión simbólica; es la cita para la crítica a PINN+PySR. **Es el rival
 moderno más fuerte**: misma tarea (forma cerrada sin datos) con aprendizaje profundo. Si su código es
 público, es la línea base a correr.
 
@@ -122,8 +142,36 @@ de autores ni los benchmarks; revisar el PDF.
 SymTorch (arXiv:2602.21307) destila una red en expresiones con PySR. En su demo de una PINN recupera la
 forma de la solución de la ecuación de calor 1D. StruSR (arXiv:2510.06635) guía la regresión simbólica
 con expansiones de Taylor de una PINN. Representan la vía alternativa **PINN y después regresión
-simbólica**: es la línea base natural para "interpretabilidad desde la física" y se puede armar con
-DeepXDE (ya está en el repositorio) y PySR.
+simbólica**: es la línea base natural para "interpretabilidad desde la física". **Está implementada**
+como competidor PINN+PySR (`competitors/`, `run_competitors.sh`), con la misma referencia y la misma
+métrica que PISR-NSGA-II.
+
+### PINN + regresión simbólica (Neural Computing and Applications, 2025)
+*Physics-informed neural network with symbolic regression for deriving analytical approximate solutions
+to nonlinear partial differential equations*, DOI 10.1007/s00521-025-11450-9. Misma vía en dos etapas,
+aplicada a Burgers y a ecuaciones de evolución de quinto orden; reporta buena concordancia (error
+absoluto medio) entre la PINN y la expresión simbólica. **Autores sin confirmar**; revisar el PDF.
+
+### DeSyR (2026)
+*A decoupled symbolic recovery framework for PDEs with PINN-guided structure discovery and physics-based
+coefficient refinement*, arXiv:2609.00530. Híbrido de las dos familias: la PINN propone la estructura y
+los coeficientes se refinan contra la física. Existe precisamente porque la destilación pura falla en las
+constantes, lo que respalda la crítica de SSDE. **Pregunta probable en la defensa**: "¿y si se refinan
+las constantes de PySR con la física?". Respuesta: es lo que hace DeSyR, y confirma que la ecuación debe
+guiar la búsqueda; PISR-NSGA-II lo hace desde el principio (estructura y constantes contra el residuo).
+
+### Redes de Kolmogorov-Arnold (KAN)
+Liu et al. (2024, arXiv:2404.19756) muestran que una KAN puede reemplazar al perceptrón de una PINN y
+que sus funciones univariadas aprendidas se pueden convertir en símbolos. Variantes: Symbolic-KAN
+(arXiv:2603.23854) y GINN-KAN (arXiv:2408.14780). Es una tercera vía hacia la interpretabilidad, pero la
+extracción simbólica sigue siendo un agregado y no una característica estándar. Sirve para la sección de
+trabajo relacionado y como trabajo futuro.
+
+### PySR con pérdida física
+PySR acepta una función de pérdida propia en Julia (`loss_function`), así que en principio podría
+minimizar el residuo de una EDP. No encontré ningún ejemplo publicado, y su documentación advierte que
+una pérdida con manipulación simbólica puede romper `.sympy()` y `.predict()`. Construirla sería un
+PISR alternativo dentro de PySR; queda como trabajo futuro, no como línea base estándar.
 
 ### PhySO: Tenachi et al. (2023)
 *Deep symbolic regression for physics guided by units constraints*, arXiv:2303.03192. Regresión
@@ -140,8 +188,10 @@ físicos y para la comparación de eficiencia de datos.
 2. **SSDE**: si el código es público, correrlo sobre una intersección de la suite (Poisson, oscilador,
    Airy, Lane–Emden, Schrödinger). Si no lo es, comparar contra las cifras de su artículo en los
    problemas compartidos.
-3. **PINN y después PySR** (estilo SymTorch): DeepXDE más PySR sobre la salida de la PINN. Es la
-   alternativa "interpretable" más obvia que un revisor va a preguntar.
+3. **PINN y después PySR** (estilo SymTorch). **Implementado**: PINN en PyTorch con los mismos residuos
+   y datos de borde, y PySR sobre su predicción (`run_competitors.sh`, 30 semillas). La tabla de
+   interpretabilidad del reporte (`report/interpretability.py`) compara error, tamaño de la fórmula,
+   recuperación exacta y extrapolación.
 4. **Métricas de comparación**, alineadas con la tesis:
    - tasa de recuperación exacta en 20 semillas (equivalencia simbólica con SymPy);
    - error de extrapolación (sección 5 del reporte);
@@ -150,7 +200,10 @@ físicos y para la comparación de eficiencia de datos.
    - el MSE, como métrica secundaria.
 5. **La falla trivial (y = 0)** como experimento propio: contar en cuántas semillas cada método cae en
    la solución trivial, en los problemas donde existe (Troesch, Lane–Emden). Responde directamente al
-   problema abierto de Rockett.
+   problema abierto de Rockett. **Observación de las 30 semillas**: en los problemas donde una constante
+   resuelve la ecuación (Airy, Fisher, Ginzburg–Landau, Lane–Emden, Troesch, NS, Schrödinger no
+   estacionario), u ≡ 0 aparece en el frente de Pareto como extremo de residuo mínimo, pero nunca es
+   elegida campeona, porque la selección por validación suma el error de frontera.
 
 ---
 
@@ -167,3 +220,7 @@ físicos y para la comparación de eficiencia de datos.
 - SymTorch 2026: [arXiv:2602.21307](https://arxiv.org/pdf/2602.21307); StruSR 2025: [arXiv:2510.06635](https://arxiv.org/html/2510.06635v1)
 - PhySO 2023: [arXiv:2303.03192](https://arxiv.org/pdf/2303.03192)
 - Kozax (NSGA-II con aptitud y tamaño, EDE estocásticas) 2026: [arXiv:2603.09597](https://arxiv.org/pdf/2603.09597)
+- PINN + regresión simbólica 2025: [Springer, Neural Computing and Applications](https://link.springer.com/article/10.1007/s00521-025-11450-9)
+- DeSyR 2026: [arXiv:2609.00530](https://arxiv.org/pdf/2609.00530)
+- KAN 2024: [arXiv:2404.19756](https://arxiv.org/pdf/2404.19756); Symbolic-KAN 2026: [arXiv:2603.23854](https://arxiv.org/pdf/2603.23854); GINN-KAN: [arXiv:2408.14780](https://arxiv.org/html/2408.14780v2)
+- Demo de SymTorch con PINN: [documentación](https://symtorch.readthedocs.io/en/latest/demos/pinns_demo.html)
