@@ -6,7 +6,10 @@ reporte:
 
   convergence_history.pdf : val_score del campeon (criterio de seleccion, solo
                             informacion de la EDP) y error contra la referencia
-                            (solo registro, nunca usado en la busqueda).
+                            (solo registro, nunca usado en la busqueda);
+                            mediana y banda intercuartil sobre las semillas.
+  Las demas figuras usan la semilla mediana de cada problema
+  (benchmarks.representative_run).
   parsimony_pressure.pdf  : mejor MSE total del frente por tamano de arbol.
   pareto_fronts_3d.pdf    : frente de Pareto en (dominio, frontera, nodos).
 """
@@ -21,7 +24,7 @@ import pandas as pd
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, "report"))
-from benchmarks import BENCHMARKS, FAMILY_TITLE, latest_result  # noqa: E402
+from benchmarks import BENCHMARKS, FAMILY_TITLE, is_fresh, latest_result, seed_dirs  # noqa: E402
 
 FIGS_DIR = os.path.join(BASE_DIR, "report", "figures")
 os.makedirs(FIGS_DIR, exist_ok=True)
@@ -49,7 +52,7 @@ NCOLS = 4
 
 
 def nice(b):
-    return f"{b.display} ({b.dim}D)".replace("\\'e", "é").replace('\\"o', "ö").replace("--", "–").replace("$", "")
+    return f"{b.display} ({b.dim}D)".replace("\\'e", "é").replace('\\"o', "ö").replace("--", "–").replace("\\lambda", "λ").replace("$", "")
 
 
 def grid_axes(projection=None, panel_h=3.3):
@@ -70,25 +73,68 @@ def family_legend(fig):
     fig.legend(handles, labels, loc="outside lower center", ncol=3, fontsize=9, title="Panel title colour = problem family")
 
 
-def plot_convergence():
-    fig, axes = grid_axes()
-    for ax, b in zip(axes, BENCHMARKS):
-        title(ax, b)
-        p = latest_result(f"{b.label}_pi_gn_convergence.csv")
-        if not p:
-            ax.text(0.5, 0.5, "no data", ha="center", va="center", transform=ax.transAxes, color="#999")
+def seed_curves(label, col):
+    """Matriz (semillas x generaciones) de `col`. Una semilla que paro antes
+    (parada temprana) conserva su ultimo valor: el campeon ya no cambia."""
+    curves = []
+    for d in seed_dirs():
+        p = os.path.join(d, f"{label}_pi_gn_convergence.csv")
+        if not os.path.exists(p) or not is_fresh(p):
             continue
         df = pd.read_csv(p)
+        if df.empty or col not in df.columns:
+            continue
+        y = pd.to_numeric(df[col], errors="coerce").where(lambda v: v < 1e17)
+        curves.append(pd.Series(y.to_numpy(), index=df["gen"].to_numpy()))
+    if not curves:
+        return None
+    n = int(max(c.index.max() for c in curves)) + 1
+    M = np.vstack([c.reindex(range(n)).ffill().to_numpy() for c in curves])
+    return M
+
+
+def plot_convergence():
+    fig, axes = grid_axes()
+    n_seeds = sum(any(is_fresh(os.path.join(d, f)) for f in os.listdir(d)) for d in seed_dirs())
+    for ax, b in zip(axes, BENCHMARKS):
+        title(ax, b)
+        M0 = seed_curves(b.label, "best_val_score") if n_seeds else None
+        if n_seeds and (M0 is None or M0.shape[1] <= 2):
+            # Parada temprana en la generacion 0-1: el registro corta antes de
+            # anotar la generacion en que se resolvio (solo queda la gen. 0).
+            ax.text(0.5, 0.5, "solved within the first generation\nin every seed (early stop)",
+                    ha="center", va="center", transform=ax.transAxes, color="#777", fontsize=8.5)
+            ax.set_xticks([]); ax.set_yticks([])
+            continue
+        drew = False
         for col, color, label, ls in [("best_val_score", C_VAL, "Validation score (selection)", "-"),
                                       ("champion_ref_err", C_REF, "Error vs. reference (log only)", "--")]:
-            if col in df.columns:
-                y = pd.to_numeric(df[col], errors="coerce").clip(lower=1e-30)
-                ax.plot(df["gen"], y, color=color, lw=1.6, ls=ls, label=label)
+            M = seed_curves(b.label, col) if n_seeds else None
+            if M is None:
+                p = latest_result(f"{b.label}_pi_gn_convergence.csv")  # corrida unica
+                if not p or pd.read_csv(p).empty:
+                    continue
+                df = pd.read_csv(p)
+                M = pd.to_numeric(df[col], errors="coerce").to_numpy()[None, :]
+            M = np.clip(M, 1e-30, None)
+            g = np.arange(M.shape[1])
+            with np.errstate(all="ignore"):
+                med = np.nanmedian(M, axis=0)
+                q25, q75 = np.nanpercentile(M, 25, axis=0), np.nanpercentile(M, 75, axis=0)
+            ax.plot(g, med, color=color, lw=1.6, ls=ls, label=label)
+            if M.shape[0] > 1:
+                ax.fill_between(g, q25, q75, color=color, alpha=0.18, lw=0)
+            drew = True
+        if not drew:
+            ax.text(0.5, 0.5, "no data", ha="center", va="center", transform=ax.transAxes, color="#999", fontsize=8.5)
+            continue
         ax.set_yscale("log")
         ax.set_xlabel("generation")
-    axes[0].legend(loc="upper right")
+    # Leyenda en el primer panel con curvas (Laplace se resuelve en la gen. 0).
+    next((ax for ax in axes if ax.get_lines()), axes[0]).legend(loc="upper right")
     family_legend(fig)
-    fig.suptitle("Convergence of the hall-of-fame champion")
+    sub = f"median and interquartile band over {n_seeds} seeds" if n_seeds > 1 else "single run"
+    fig.suptitle(f"Convergence of the hall-of-fame champion ({sub})")
     save(fig, "convergence_history.pdf")
 
 

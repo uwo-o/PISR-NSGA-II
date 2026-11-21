@@ -1,17 +1,17 @@
 problem,quantity,meaning,expected,formula,rel_error
-HarmonicOscillator_1D,$E=-u''(0)/2u(0)$,ground-state energy,0.5,0.499506,0.0009879999999999889
-Airy_1D,$u'(0)$,$\mathrm{Ai}'(0)$,-0.2588194037928068,-0.259,0.0006977691956116141
-Thomas-Fermi_1D,$u(0)$,nuclear charge normalisation,1.0,0.673,0.32699999999999996
-Thomas-Fermi_1D,$u'(0)$,initial slope (energy of the atom),-1.588071022611375,-0.673,0.5762154271328875
+HarmonicOscillator_1D,$E=-u''(0)/2u(0)$,ground-state energy,0.5,0.4999999998413712,3.1725755356148966e-10
+Airy_1D,$u'(0)$,$\mathrm{Ai}'(0)$,-0.2588194037928068,-0.2601281798867731,0.005056715512002367
+Thomas-Fermi_1D,$u(0)$,nuclear charge normalisation,1.0,0.45958071084542435,0.5404192891545756
+Thomas-Fermi_1D,$u'(0)$,initial slope (energy of the atom),-1.588071022611375,-0.16907029507898894,0.8935373212710759
 Schrodinger_1D,$|u|$,probability density (constant),1.0,1.0,0.0
-Schrodinger_1D,$k=\partial_x\arg u$,wavenumber,2.0,2.0,0.0
-Schrodinger_2D,$k_x=\partial_x\arg u$,wavenumber,2.0,2.0,0.0
-Schrodinger-Unsteady_1D,$\omega/k^2$,free-particle dispersion,1.0,1.0003161400385834,0.000316140038583379
-Schrodinger-Unsteady_2D,$\omega/|k|^2$,free-particle dispersion,1.0,-0.8805568053992696,1.8805568053992696
-Navier-Stokes-Unsteady_2D,$-\partial_t \ln\|\psi\|$,viscous decay rate $2\pi^2\nu$,0.19739208802178718,1.1741684545168833,4.948406880357253
-Lane-Emden_1D,$u''(0)$,central curvature,-0.3333333333333333,-0.33325823223570183,0.00022530329289444095
-Lane-Emden_1D,$\xi_1$ (first zero),stellar radius,6.896848619375123,7.694793772788618,0.11569706650829624
-Troesch_1D,$u'(0)$,classic Troesch quantity,0.25560421556295393,,
-Ginzburg-Landau_1D,$u'(0)$,wall slope $1/\sqrt2$,0.7071067811865475,0.707,0.00015101140222176587
-Ginzburg-Landau_1D,$u(4)$,far field $\to 1$ ($\tanh(4/\sqrt2)$),0.9930373454058692,3.42,2.4439792378625946
-Painleve-I_1D,$u'(0)$,initial slope,0.3204964276664997,0.32,0.0015489335407391188
+Schrodinger_1D,$k=\partial_x\arg u$,wavenumber,2.0,1.9999999997959943,1.0200285061046088e-10
+Schrodinger_2D,$k_x=\partial_x\arg u$,wavenumber,2.0,1.999770725255502,0.00011463737224903792
+Schrodinger-Unsteady_1D,$\omega/k^2$,free-particle dispersion,1.0,0.9999983351382277,1.6648617723324932e-06
+Schrodinger-Unsteady_2D,$\omega/|k|^2$,free-particle dispersion,1.0,-0.07393890463743691,1.073938904637437
+Navier-Stokes-Unsteady_2D,$-\partial_t \ln\|\psi\|$,viscous decay rate $2\pi^2\nu$,0.19739208802178718,1.168027782500112,4.91729787250232
+Lane-Emden_1D,$u''(0)$,central curvature,-0.3333333333333333,-0.3333154081958987,5.377541230378036e-05
+Lane-Emden_1D,$\xi_1$ (first zero),stellar radius,6.896848619375123,7.700406928524323,0.11651093905291562
+Troesch_1D,$u'(0)$,classic Troesch quantity,0.25560421556295393,0.21770337851498345,0.14827938954174139
+Ginzburg-Landau_1D,$u'(0)$,wall slope $1/\sqrt2$,0.7071067811865475,0.7066297069546731,0.0006746848489754677
+Ginzburg-Landau_1D,$u(4)$,far field $\to 1$ ($\tanh(4/\sqrt2)$),0.9930373454058692,-2.118233450873874,3.1330853876478533
+Painleve-I_1D,$u'(0)$,initial slope,0.3204964276664997,0.320474759620992,6.760775982903042e-05

@@ -5,10 +5,19 @@ set -e
 cd "$(dirname "$0")"
 
 PY=./.venv/bin/python3
-if [ ! -x "$PY" ]; then
+if ! "$PY" -c "import pandas, numpy, matplotlib, scipy, sympy" >/dev/null 2>&1; then
     echo ">>> Creando .venv (pandas, numpy, matplotlib, scipy, sympy)"
-    python3 -m venv .venv
-    ./.venv/bin/pip install -q pandas numpy matplotlib scipy sympy
+    rm -rf .venv
+    if ! python3 -m venv .venv >/dev/null 2>&1; then
+        # Sin python3-venv (falta ensurepip) y sin sudo: venv sin pip + get-pip.py
+        rm -rf .venv
+        python3 -m venv --without-pip .venv
+        GETPIP=$(mktemp)
+        curl -fsSL https://bootstrap.pypa.io/get-pip.py -o "$GETPIP"
+        "$PY" "$GETPIP" -q
+        rm -f "$GETPIP"
+    fi
+    "$PY" -m pip install -q pandas numpy matplotlib scipy sympy
 fi
 
 echo ">>> 1/4 Consolidando resultados"
@@ -26,6 +35,12 @@ $PY report/physics_checks.py
 $PY report/generate_report.py
 $PY report/generate_formulas_table.py
 
+if ! command -v pdflatex >/dev/null 2>&1; then
+    echo ">>> 4/4 pdflatex no esta instalado: se omite la compilacion."
+    echo "    Tablas, figuras y report/results.tex quedaron listos; compilar en otra maquina con:"
+    echo "    cd report && pdflatex results.tex (3 veces)"
+    exit 0
+fi
 echo ">>> 4/4 Compilando LaTeX"
 cd report
 for i in 1 2 3; do

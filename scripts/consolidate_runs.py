@@ -13,6 +13,7 @@ una corrida vieja; el reporte salia con resultados obsoletos sin avisar.
 """
 import glob
 import os
+import sys
 
 import numpy as np
 import pandas as pd
@@ -20,6 +21,8 @@ import pandas as pd
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RESULTS_DIR = os.path.join(BASE_DIR, "results")
 OUT_CSV = os.path.join(RESULTS_DIR, "all_runs_summary.csv")
+sys.path.insert(0, os.path.join(BASE_DIR, "report"))
+from benchmarks import is_fresh  # noqa: E402
 
 COLUMNS = [
     "run", "method", "pde", "pareto_size",
@@ -35,7 +38,7 @@ def multi_run_sources():
     out = []
     for d in sorted(dirs, key=lambda p: int(os.path.basename(p).replace("run_", ""))):
         csv = os.path.join(d, "comparison_summary.csv")
-        if os.path.exists(csv):
+        if os.path.exists(csv) and is_fresh(csv):
             out.append((int(os.path.basename(d).replace("run_", "")), csv))
     return out
 
@@ -72,6 +75,20 @@ def consolidate():
     df = df[COLUMNS]
     for c in COLUMNS[3:]:
         df[c] = pd.to_numeric(df[c], errors="coerce")
+    # El all_runs_summary.csv que escribe el binario trae columnas que los
+    # comparison_summary.csv por semilla no tienen (hipervolumen): se conservan,
+    # cruzando por (run, method, pde), en vez de perderlas al reescribir.
+    if os.path.exists(OUT_CSV):
+        old = pd.read_csv(OUT_CSV)
+        if set(["run", "method", "pde"]) <= set(old.columns):
+            key = ["run", "method", "pde"]
+            old = old.drop_duplicates(key).set_index(key)
+            df = df.set_index(key)
+            for c in COLUMNS[3:]:
+                if c in old.columns:
+                    prev = pd.to_numeric(old[c], errors="coerce").reindex(df.index)
+                    df[c] = df[c].where(df[c].notna(), prev)
+            df = df.reset_index()[COLUMNS]
     # solution_mse = -1 es el centinela de "sin campeon".
     df.loc[df["solution_mse"] < 0, "solution_mse"] = np.nan
 

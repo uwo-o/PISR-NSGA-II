@@ -382,6 +382,10 @@ def overview(df, ext, stale):
          r"\begin{itemize}[leftmargin=1.5em,itemsep=2pt]",
          rf"\item \textbf{{{len(BENCHMARKS)}}} benchmark problems in {len(by_family())} families "
          rf"(Table~\ref{{tab:suite}}); \textbf{{{n_runs}}} run{'s' if n_runs != 1 else ''} per problem.",
+         *([r"\item Accuracy tables and convergence curves aggregate all seeds. Anything that needs a single "
+            r"formula (discovered expressions, per-problem figures, extrapolation, physical consistency) uses the "
+            r"\emph{median seed} of each problem: the seed whose solution error ranks in the middle, i.e.\ the "
+            r"typical outcome, neither the best run nor an arbitrary one."] if n_runs > 1 else []),
          rf"\item Solution MSE: \stgood\ \textbf{{{n_good}}} below $10^{{-6}}$, "
          rf"\stfair\ \textbf{{{n_fair}}} below $10^{{-3}}$, \stpoor\ \textbf{{{n_poor}}} at or above $10^{{-3}}$.",
          ]

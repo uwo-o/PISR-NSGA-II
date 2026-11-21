@@ -129,10 +129,71 @@ def labels():
 RESULTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results")
 
 
+_SEED_CACHE = {}
+
+
+def seed_errors(label: str):
+    """[(run, solution_mse)] de PISR-NSGA-II para `label`, ordenado por error,
+    desde results/all_runs_summary.csv (solo corridas con campeon)."""
+    if label in _SEED_CACHE:
+        return _SEED_CACHE[label]
+    import csv
+    path = os.path.join(RESULTS_DIR, "all_runs_summary.csv")
+    out = []
+    if os.path.exists(path) and is_fresh(path):
+        with open(path) as f:
+            for row in csv.DictReader(f):
+                if row.get("method") != "PISR-NSGA-II" or row.get("pde") != label:
+                    continue
+                try:
+                    run, err = int(row["run"]), float(row["solution_mse"])
+                except (KeyError, ValueError):
+                    continue
+                if err >= 0 and err == err:
+                    out.append((run, err))
+    out.sort(key=lambda t: t[1])
+    _SEED_CACHE[label] = out
+    return out
+
+
+def representative_run(label: str):
+    """Semilla mediana de `label` (la de rango ceil(n/2) por error; con 30
+    semillas, la 15.a) o None si no hay corridas multi-semilla. Es la que el
+    reporte usa para mostrar UNA formula: el caso tipico, ni el mejor ni uno
+    al azar."""
+    errs = seed_errors(label)
+    if not errs or not os.path.isdir(os.path.join(RESULTS_DIR, "run_0")):
+        return None
+    return errs[(len(errs) - 1) // 2][0]
+
+
+def seed_dirs():
+    """Directorios results/run_<k> vigentes (multi-semilla), ordenados por k."""
+    import glob, re
+    ds = [d for d in glob.glob(os.path.join(RESULTS_DIR, "run_*")) if re.search(r"run_\d+$", d)]
+    return sorted(ds, key=lambda d: int(d.rsplit("_", 1)[1]))
+
+
+def _label_of(filename: str):
+    hits = [b.label for b in BENCHMARKS if b.label in filename]
+    return max(hits, key=len) if hits else None
+
+
 def latest_result(filename: str):
-    """Ruta mas reciente de `filename` entre results/ y results/run_*/ (o None).
-    Corrida unica escribe en results/, multi-semilla en results/run_<k>/."""
+    """Ruta de `filename` para mostrar en el reporte (o None).
+
+    Con corridas multi-semilla (results/run_<k>/) devuelve el archivo de la
+    semilla MEDIANA del problema (representative_run). Si ahi no existe (p. ej.
+    los derivados que escribe el propio reporte en results/, como
+    expr_<EDP>_simplified.tex) o no hay multi-semilla, el mas reciente entre
+    results/ y results/run_*/."""
     import glob
+    label = _label_of(filename)
+    rep = representative_run(label) if label else None
+    if rep is not None:
+        p = os.path.join(RESULTS_DIR, f"run_{rep}", filename)
+        if os.path.exists(p) and is_fresh(p):
+            return p
     cands = [os.path.join(RESULTS_DIR, filename)] + glob.glob(os.path.join(RESULTS_DIR, "run_*", filename))
     # Solo resultados posteriores a la redefinicion de los problemas: un archivo
     # viejo de results/run_* resolvio OTRA ecuacion.
