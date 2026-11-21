@@ -1,0 +1,4 @@
+raw=0
+uses_ansatz=1
+real_field=1
+tree=((chebyshevt(3, (((-5.272859e-35+0.5*I))*(tanh(x)))))/((0.83125873137276496)))

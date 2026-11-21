@@ -1,0 +1,4 @@
+raw=1
+uses_ansatz=0
+real_field=1
+tree=legendre(1, exp(-(1/2)*(x)**2))

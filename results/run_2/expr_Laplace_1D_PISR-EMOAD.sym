@@ -1,0 +1,4 @@
+raw=0
+uses_ansatz=1
+real_field=1
+tree=((((x)+(tanh(((x)**2)))))/((0-2.4068177802503726e-11*I)))

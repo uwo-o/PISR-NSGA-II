@@ -1,0 +1,4 @@
+raw=1
+uses_ansatz=0
+real_field=1
+tree=tanh(((x)*((0.70710678119504145))))

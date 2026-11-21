@@ -1,0 +1,4 @@
+raw=0
+uses_ansatz=0
+real_field=1
+tree=((((exp((((-0.19739208802637734))*(t))))*(sin(((pi)*(y))))))*(sin(((pi)*(x)))))
