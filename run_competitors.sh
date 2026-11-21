@@ -7,6 +7,7 @@
 #   --runs N   semillas 0..N-1, escritas en results/run_<k>/ (como --runs del binario).
 #              Con --runs 1 escribe en results/ directamente.
 #   --jobs N   trabajos en paralelo (por defecto nproc/2). Cada uno usa 1 hilo.
+#              PySR usa como maximo MemAvailable/2 GB procesos (Julia ~1-1.5 GB c/u).
 #   --test     pocas iteraciones: solo prueba la tuberia (no usar para el reporte).
 # Es reanudable: lo ya calculado se omite, asi que relanzarlo continua donde quedo.
 set -euo pipefail
@@ -66,10 +67,13 @@ for s in $SEEDS; do for p in $PROBS; do echo "$s $p"; done; done |
         && tail -1 "results/competitors_logs/pinn_$2_run$1.log" \
         || echo "[PINN] $2 run $1: FALLO (ver results/competitors_logs/pinn_$2_run$1.log)"' "$PY"
 
-echo ">>> 3/3 PINN -> PySR, $JOBS procesos"
+# Cada proceso de PySR (Julia) usa ~1-1.5 GB: se limita a MemAvailable / 2 GB.
+MEM_GB=$(awk '/MemAvailable/ {print int($2 / 1048576)}' /proc/meminfo)
+PJOBS=$(( MEM_GB / 2 )); [[ "$PJOBS" -gt "$JOBS" ]] && PJOBS=$JOBS; [[ "$PJOBS" -lt 1 ]] && PJOBS=1
+echo ">>> 3/3 PINN -> PySR, $PJOBS procesos (${MEM_GB} GB libres)"
 RUNARG=""; [[ "$RUNS" -gt 1 ]] && RUNARG="--runs $RUNS"
-for i in $(seq 0 $((JOBS - 1))); do
-    "$PY" competitors/pinn_pysr.py --shard "$i" --nshards "$JOBS" $RUNARG ${ONLY:+--only "$ONLY"} $TEST \
+for i in $(seq 0 $((PJOBS - 1))); do
+    "$PY" competitors/pinn_pysr.py --shard "$i" --nshards "$PJOBS" $RUNARG ${ONLY:+--only "$ONLY"} $TEST \
         > "results/competitors_logs/pysr_shard$i.log" 2>&1 &
 done
 wait
