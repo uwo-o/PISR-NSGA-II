@@ -1,0 +1,1 @@
+{"label": "Ginzburg-Landau_1D", "pde": "Ginzburg-Landau", "dim": 1, "unsteady": false, "complex": false, "spatial_order": 2, "k2": 0, "bc_kind": "dirichlet", "numerical": false}

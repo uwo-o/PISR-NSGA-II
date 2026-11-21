@@ -1,0 +1,1 @@
+{"label": "Laplace_1D", "pde": "Laplace", "dim": 1, "unsteady": false, "complex": false, "spatial_order": 2, "k2": 0, "bc_kind": "dirichlet", "numerical": false}

@@ -1,0 +1,1 @@
+{"label": "Schrodinger_1D", "pde": "Schrodinger", "dim": 1, "unsteady": false, "complex": true, "spatial_order": 2, "k2": 4, "bc_kind": "dirichlet", "numerical": false}
