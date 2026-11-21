@@ -1,0 +1,1 @@
+{"label": "Schrodinger-Unsteady_2D", "pde": "Schrodinger-Unsteady", "dim": 2, "unsteady": true, "complex": true, "spatial_order": 2, "k2": 0, "bc_kind": "dirichlet", "numerical": false}

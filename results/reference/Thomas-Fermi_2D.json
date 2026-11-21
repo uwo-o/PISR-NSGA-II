@@ -1,0 +1,1 @@
+{"label": "Thomas-Fermi_2D", "pde": "Thomas-Fermi", "dim": 2, "unsteady": false, "complex": false, "spatial_order": 2, "k2": 0, "bc_kind": "dirichlet", "numerical": true}
