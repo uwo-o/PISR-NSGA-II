@@ -1,0 +1,1891 @@
+problem,run,method,depth,constants,singular
+Laplace_1D,0,PISR-NSGA-II,0,0,False
+Laplace_1D,0,PySR best,1,5,False
+Laplace_1D,1,PISR-NSGA-II,0,0,False
+Laplace_1D,1,PySR best,1,4,False
+Laplace_1D,2,PISR-NSGA-II,0,1,False
+Laplace_1D,2,PySR best,3,4,False
+Laplace_1D,3,PISR-NSGA-II,0,0,False
+Laplace_1D,3,PySR best,3,1,False
+Laplace_1D,4,PISR-NSGA-II,0,0,False
+Laplace_1D,4,PySR best,5,4,False
+Laplace_1D,5,PISR-NSGA-II,0,0,False
+Laplace_1D,5,PySR best,12,2,False
+Laplace_1D,6,PISR-NSGA-II,1,4,False
+Laplace_1D,6,PySR best,6,6,False
+Laplace_1D,7,PISR-NSGA-II,0,0,False
+Laplace_1D,7,PySR best,2,2,False
+Laplace_1D,8,PISR-NSGA-II,0,0,False
+Laplace_1D,8,PySR best,2,4,False
+Laplace_1D,9,PISR-NSGA-II,0,0,False
+Laplace_1D,9,PySR best,2,3,True
+Laplace_1D,10,PISR-NSGA-II,0,0,False
+Laplace_1D,10,PySR best,2,3,False
+Laplace_1D,11,PISR-NSGA-II,0,0,False
+Laplace_1D,11,PySR best,4,5,False
+Laplace_1D,12,PISR-NSGA-II,0,0,False
+Laplace_1D,12,PySR best,1,3,False
+Laplace_1D,13,PISR-NSGA-II,0,1,False
+Laplace_1D,13,PySR best,5,4,False
+Laplace_1D,14,PISR-NSGA-II,0,0,False
+Laplace_1D,14,PySR best,10,3,False
+Laplace_1D,15,PISR-NSGA-II,0,0,False
+Laplace_1D,15,PySR best,1,4,False
+Laplace_1D,16,PISR-NSGA-II,0,0,False
+Laplace_1D,16,PySR best,6,3,True
+Laplace_1D,17,PISR-NSGA-II,0,0,False
+Laplace_1D,17,PySR best,4,5,True
+Laplace_1D,18,PISR-NSGA-II,0,0,False
+Laplace_1D,18,PySR best,2,2,False
+Laplace_1D,19,PISR-NSGA-II,0,0,False
+Laplace_1D,19,PySR best,2,7,True
+Laplace_1D,20,PISR-NSGA-II,0,0,False
+Laplace_1D,20,PySR best,1,6,False
+Laplace_1D,21,PISR-NSGA-II,0,0,False
+Laplace_1D,21,PySR best,7,4,False
+Laplace_1D,22,PISR-NSGA-II,0,0,False
+Laplace_1D,22,PySR best,8,3,False
+Laplace_1D,23,PISR-NSGA-II,0,0,False
+Laplace_1D,23,PySR best,3,7,False
+Laplace_1D,24,PISR-NSGA-II,0,0,False
+Laplace_1D,24,PySR best,4,3,False
+Laplace_1D,25,PISR-NSGA-II,0,1,False
+Laplace_1D,25,PySR best,1,5,False
+Laplace_1D,26,PISR-NSGA-II,0,0,False
+Laplace_1D,26,PySR best,4,7,False
+Laplace_1D,27,PISR-NSGA-II,0,1,False
+Laplace_1D,27,PySR best,2,4,False
+Laplace_1D,28,PISR-NSGA-II,1,1,False
+Laplace_1D,28,PySR best,2,2,True
+Laplace_1D,29,PISR-NSGA-II,0,0,False
+Laplace_1D,29,PySR best,3,5,True
+Poisson_1D,0,PISR-NSGA-II,1,1,False
+Poisson_1D,0,PySR best,2,4,False
+Poisson_1D,1,PISR-NSGA-II,1,1,False
+Poisson_1D,1,PySR best,3,4,False
+Poisson_1D,2,PISR-NSGA-II,1,1,False
+Poisson_1D,2,PySR best,3,4,False
+Poisson_1D,3,PISR-NSGA-II,1,1,False
+Poisson_1D,3,PySR best,3,6,False
+Poisson_1D,4,PISR-NSGA-II,1,1,False
+Poisson_1D,4,PySR best,2,3,False
+Poisson_1D,5,PISR-NSGA-II,1,1,False
+Poisson_1D,5,PySR best,1,2,False
+Poisson_1D,6,PISR-NSGA-II,1,1,False
+Poisson_1D,6,PySR best,1,2,False
+Poisson_1D,7,PISR-NSGA-II,1,1,False
+Poisson_1D,7,PySR best,1,2,False
+Poisson_1D,8,PISR-NSGA-II,1,1,False
+Poisson_1D,8,PySR best,6,4,False
+Poisson_1D,9,PISR-NSGA-II,1,1,False
+Poisson_1D,9,PySR best,2,5,False
+Poisson_1D,10,PISR-NSGA-II,1,1,False
+Poisson_1D,10,PySR best,2,4,False
+Poisson_1D,11,PISR-NSGA-II,1,1,False
+Poisson_1D,11,PySR best,2,5,False
+Poisson_1D,12,PISR-NSGA-II,1,1,False
+Poisson_1D,12,PySR best,4,3,False
+Poisson_1D,13,PISR-NSGA-II,1,1,False
+Poisson_1D,13,PySR best,1,2,False
+Poisson_1D,14,PISR-NSGA-II,1,0,False
+Poisson_1D,14,PySR best,3,5,False
+Poisson_1D,15,PISR-NSGA-II,1,1,False
+Poisson_1D,15,PySR best,1,6,True
+Poisson_1D,16,PISR-NSGA-II,1,1,False
+Poisson_1D,16,PySR best,5,4,False
+Poisson_1D,17,PISR-NSGA-II,1,1,False
+Poisson_1D,17,PySR best,1,6,False
+Poisson_1D,18,PISR-NSGA-II,1,1,False
+Poisson_1D,18,PySR best,1,3,False
+Poisson_1D,19,PISR-NSGA-II,1,1,False
+Poisson_1D,19,PySR best,6,2,False
+Poisson_1D,20,PISR-NSGA-II,1,0,False
+Poisson_1D,20,PySR best,3,4,False
+Poisson_1D,21,PISR-NSGA-II,1,1,False
+Poisson_1D,21,PySR best,2,3,True
+Poisson_1D,22,PISR-NSGA-II,1,1,False
+Poisson_1D,22,PySR best,1,4,False
+Poisson_1D,23,PISR-NSGA-II,1,1,False
+Poisson_1D,23,PySR best,1,3,False
+Poisson_1D,24,PISR-NSGA-II,1,1,False
+Poisson_1D,24,PySR best,3,3,False
+Poisson_1D,25,PISR-NSGA-II,1,1,False
+Poisson_1D,25,PySR best,2,4,False
+Poisson_1D,26,PISR-NSGA-II,1,1,False
+Poisson_1D,26,PySR best,2,6,False
+Poisson_1D,27,PISR-NSGA-II,1,1,False
+Poisson_1D,27,PySR best,2,6,False
+Poisson_1D,28,PISR-NSGA-II,1,1,False
+Poisson_1D,28,PySR best,1,3,True
+Poisson_1D,29,PISR-NSGA-II,1,1,False
+Poisson_1D,29,PySR best,1,2,False
+HarmonicOscillator_1D,0,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,0,PySR best,4,4,True
+HarmonicOscillator_1D,1,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,1,PySR best,6,5,False
+HarmonicOscillator_1D,2,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,2,PySR best,2,4,False
+HarmonicOscillator_1D,3,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,3,PySR best,3,6,False
+HarmonicOscillator_1D,4,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,4,PySR best,5,6,False
+HarmonicOscillator_1D,5,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,5,PySR best,3,2,False
+HarmonicOscillator_1D,6,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,6,PySR best,3,2,False
+HarmonicOscillator_1D,7,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,7,PySR best,5,4,False
+HarmonicOscillator_1D,8,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,8,PySR best,3,2,False
+HarmonicOscillator_1D,9,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,9,PySR best,3,2,False
+HarmonicOscillator_1D,10,PISR-NSGA-II,1,0,False
+HarmonicOscillator_1D,10,PySR best,10,1,False
+HarmonicOscillator_1D,11,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,11,PySR best,4,3,False
+HarmonicOscillator_1D,12,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,12,PySR best,2,3,False
+HarmonicOscillator_1D,13,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,13,PySR best,6,5,False
+HarmonicOscillator_1D,14,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,14,PySR best,2,6,True
+HarmonicOscillator_1D,15,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,15,PySR best,4,2,False
+HarmonicOscillator_1D,16,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,16,PySR best,7,3,False
+HarmonicOscillator_1D,17,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,17,PySR best,3,4,False
+HarmonicOscillator_1D,18,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,18,PySR best,6,3,True
+HarmonicOscillator_1D,19,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,19,PySR best,7,3,False
+HarmonicOscillator_1D,20,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,20,PySR best,3,3,False
+HarmonicOscillator_1D,21,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,21,PySR best,6,4,True
+HarmonicOscillator_1D,22,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,22,PySR best,2,3,False
+HarmonicOscillator_1D,23,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,23,PySR best,5,2,False
+HarmonicOscillator_1D,24,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,24,PySR best,2,3,True
+HarmonicOscillator_1D,25,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,25,PySR best,5,2,False
+HarmonicOscillator_1D,26,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,26,PySR best,5,2,False
+HarmonicOscillator_1D,27,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,27,PySR best,3,4,False
+HarmonicOscillator_1D,28,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,28,PySR best,2,3,False
+HarmonicOscillator_1D,29,PISR-NSGA-II,1,1,False
+HarmonicOscillator_1D,29,PySR best,4,4,False
+Airy_1D,0,PISR-NSGA-II,1,4,False
+Airy_1D,0,PySR best,1,4,False
+Airy_1D,1,PISR-NSGA-II,1,4,False
+Airy_1D,1,PySR best,3,5,False
+Airy_1D,2,PISR-NSGA-II,1,2,False
+Airy_1D,2,PySR best,5,3,False
+Airy_1D,3,PISR-NSGA-II,1,2,False
+Airy_1D,3,PySR best,5,3,False
+Airy_1D,4,PISR-NSGA-II,1,3,False
+Airy_1D,4,PySR best,2,8,False
+Airy_1D,5,PISR-NSGA-II,1,2,False
+Airy_1D,5,PySR best,6,3,False
+Airy_1D,6,PISR-NSGA-II,1,4,False
+Airy_1D,6,PySR best,6,3,False
+Airy_1D,7,PISR-NSGA-II,1,2,False
+Airy_1D,7,PySR best,6,4,False
+Airy_1D,8,PISR-NSGA-II,1,2,False
+Airy_1D,8,PySR best,4,5,True
+Airy_1D,9,PISR-NSGA-II,1,5,False
+Airy_1D,9,PySR best,7,4,False
+Airy_1D,10,PISR-NSGA-II,1,2,False
+Airy_1D,10,PySR best,4,2,False
+Airy_1D,11,PISR-NSGA-II,1,3,False
+Airy_1D,11,PySR best,2,4,False
+Airy_1D,12,PISR-NSGA-II,1,3,False
+Airy_1D,12,PySR best,3,5,False
+Airy_1D,13,PISR-NSGA-II,1,6,False
+Airy_1D,13,PySR best,10,3,False
+Airy_1D,14,PISR-NSGA-II,1,4,False
+Airy_1D,14,PySR best,6,5,False
+Airy_1D,15,PISR-NSGA-II,1,3,False
+Airy_1D,15,PySR best,5,3,False
+Airy_1D,16,PISR-NSGA-II,1,2,False
+Airy_1D,16,PySR best,8,3,False
+Airy_1D,17,PISR-NSGA-II,2,2,False
+Airy_1D,17,PySR best,7,4,False
+Airy_1D,18,PISR-NSGA-II,1,4,False
+Airy_1D,18,PySR best,7,6,False
+Airy_1D,19,PISR-NSGA-II,1,6,False
+Airy_1D,19,PySR best,6,3,False
+Airy_1D,20,PISR-NSGA-II,1,4,False
+Airy_1D,20,PySR best,8,3,False
+Airy_1D,21,PISR-NSGA-II,1,4,False
+Airy_1D,21,PySR best,1,5,False
+Airy_1D,22,PISR-NSGA-II,1,3,False
+Airy_1D,22,PySR best,5,3,False
+Airy_1D,23,PISR-NSGA-II,1,2,False
+Airy_1D,23,PySR best,2,4,False
+Airy_1D,24,PISR-NSGA-II,1,2,False
+Airy_1D,24,PySR best,8,4,False
+Airy_1D,25,PISR-NSGA-II,1,5,False
+Airy_1D,25,PySR best,5,4,False
+Airy_1D,26,PISR-NSGA-II,1,3,False
+Airy_1D,26,PySR best,8,2,False
+Airy_1D,27,PISR-NSGA-II,1,8,False
+Airy_1D,27,PySR best,2,4,False
+Airy_1D,28,PISR-NSGA-II,1,3,False
+Airy_1D,28,PySR best,10,3,False
+Airy_1D,29,PISR-NSGA-II,1,4,False
+Airy_1D,29,PySR best,1,5,False
+Airy_2D,0,PISR-NSGA-II,2,3,False
+Airy_2D,0,PySR best,7,2,False
+Airy_2D,1,PISR-NSGA-II,2,3,False
+Airy_2D,1,PySR best,2,3,False
+Airy_2D,2,PISR-NSGA-II,2,3,False
+Airy_2D,2,PySR best,7,1,False
+Airy_2D,3,PISR-NSGA-II,2,3,False
+Airy_2D,3,PySR best,5,5,False
+Airy_2D,4,PISR-NSGA-II,2,3,False
+Airy_2D,4,PySR best,3,4,False
+Airy_2D,5,PISR-NSGA-II,2,3,False
+Airy_2D,5,PySR best,7,1,False
+Airy_2D,6,PISR-NSGA-II,2,3,False
+Airy_2D,6,PySR best,8,3,False
+Airy_2D,7,PISR-NSGA-II,2,3,False
+Airy_2D,7,PySR best,6,4,False
+Airy_2D,8,PISR-NSGA-II,2,3,False
+Airy_2D,8,PySR best,6,3,False
+Airy_2D,9,PISR-NSGA-II,2,3,False
+Airy_2D,9,PySR best,3,2,False
+Airy_2D,10,PISR-NSGA-II,2,3,False
+Airy_2D,10,PySR best,5,4,False
+Airy_2D,11,PISR-NSGA-II,2,5,False
+Airy_2D,11,PySR best,2,4,False
+Airy_2D,12,PISR-NSGA-II,2,3,False
+Airy_2D,12,PySR best,10,3,False
+Airy_2D,13,PISR-NSGA-II,2,3,False
+Airy_2D,13,PySR best,9,2,False
+Airy_2D,14,PISR-NSGA-II,2,4,False
+Airy_2D,14,PySR best,5,4,False
+Airy_2D,15,PISR-NSGA-II,2,4,False
+Airy_2D,15,PySR best,3,2,False
+Airy_2D,16,PISR-NSGA-II,2,4,False
+Airy_2D,16,PySR best,4,2,False
+Airy_2D,17,PISR-NSGA-II,2,3,False
+Airy_2D,17,PySR best,4,4,False
+Airy_2D,18,PISR-NSGA-II,2,3,False
+Airy_2D,18,PySR best,2,3,False
+Airy_2D,19,PISR-NSGA-II,2,3,False
+Airy_2D,19,PySR best,7,4,False
+Airy_2D,20,PISR-NSGA-II,2,3,False
+Airy_2D,20,PySR best,7,2,False
+Airy_2D,21,PISR-NSGA-II,2,4,False
+Airy_2D,21,PySR best,4,2,False
+Airy_2D,22,PISR-NSGA-II,2,4,False
+Airy_2D,22,PySR best,7,1,False
+Airy_2D,23,PISR-NSGA-II,2,5,False
+Airy_2D,23,PySR best,6,5,False
+Airy_2D,24,PISR-NSGA-II,2,3,False
+Airy_2D,24,PySR best,3,2,False
+Airy_2D,25,PISR-NSGA-II,2,3,True
+Airy_2D,25,PySR best,3,3,False
+Airy_2D,26,PISR-NSGA-II,2,4,False
+Airy_2D,26,PySR best,5,4,False
+Airy_2D,27,PISR-NSGA-II,2,5,False
+Airy_2D,27,PySR best,1,3,False
+Airy_2D,28,PISR-NSGA-II,2,3,False
+Airy_2D,28,PySR best,9,3,False
+Airy_2D,29,PISR-NSGA-II,2,3,False
+Airy_2D,29,PySR best,1,5,False
+Fisher_1D,0,PISR-NSGA-II,1,2,False
+Fisher_1D,0,PySR best,7,4,False
+Fisher_1D,1,PISR-NSGA-II,1,2,False
+Fisher_1D,1,PySR best,5,7,True
+Fisher_1D,2,PISR-NSGA-II,1,2,False
+Fisher_1D,2,PySR best,10,5,False
+Fisher_1D,3,PISR-NSGA-II,1,2,False
+Fisher_1D,3,PySR best,11,3,False
+Fisher_1D,4,PISR-NSGA-II,1,3,False
+Fisher_1D,4,PySR best,13,4,False
+Fisher_1D,5,PISR-NSGA-II,1,2,False
+Fisher_1D,5,PySR best,6,3,False
+Fisher_1D,6,PISR-NSGA-II,1,2,False
+Fisher_1D,6,PySR best,9,3,False
+Fisher_1D,7,PISR-NSGA-II,1,3,False
+Fisher_1D,7,PySR best,2,7,False
+Fisher_1D,8,PISR-NSGA-II,1,2,False
+Fisher_1D,8,PySR best,4,5,False
+Fisher_1D,9,PISR-NSGA-II,1,2,False
+Fisher_1D,9,PySR best,9,5,False
+Fisher_1D,10,PISR-NSGA-II,1,2,False
+Fisher_1D,10,PySR best,4,3,False
+Fisher_1D,11,PISR-NSGA-II,1,2,False
+Fisher_1D,11,PySR best,2,3,False
+Fisher_1D,12,PISR-NSGA-II,1,2,False
+Fisher_1D,12,PySR best,1,6,False
+Fisher_1D,13,PISR-NSGA-II,1,2,False
+Fisher_1D,13,PySR best,5,4,False
+Fisher_1D,14,PISR-NSGA-II,1,2,False
+Fisher_1D,14,PySR best,1,7,False
+Fisher_1D,15,PISR-NSGA-II,1,3,False
+Fisher_1D,15,PySR best,3,5,False
+Fisher_1D,16,PISR-NSGA-II,1,2,False
+Fisher_1D,16,PySR best,2,5,False
+Fisher_1D,17,PISR-NSGA-II,1,2,False
+Fisher_1D,17,PySR best,5,5,False
+Fisher_1D,18,PISR-NSGA-II,1,2,False
+Fisher_1D,18,PySR best,1,7,False
+Fisher_1D,19,PISR-NSGA-II,1,3,False
+Fisher_1D,19,PySR best,0,5,False
+Fisher_1D,20,PISR-NSGA-II,1,2,False
+Fisher_1D,20,PySR best,5,7,False
+Fisher_1D,21,PISR-NSGA-II,1,2,False
+Fisher_1D,21,PySR best,6,6,False
+Fisher_1D,22,PISR-NSGA-II,1,2,False
+Fisher_1D,22,PySR best,4,5,False
+Fisher_1D,23,PISR-NSGA-II,1,2,False
+Fisher_1D,23,PySR best,2,4,False
+Fisher_1D,24,PISR-NSGA-II,1,2,False
+Fisher_1D,24,PySR best,3,6,False
+Fisher_1D,25,PISR-NSGA-II,1,2,False
+Fisher_1D,25,PySR best,11,2,False
+Fisher_1D,26,PISR-NSGA-II,1,2,False
+Fisher_1D,26,PySR best,5,5,False
+Fisher_1D,27,PISR-NSGA-II,1,2,False
+Fisher_1D,27,PySR best,3,4,False
+Fisher_1D,28,PISR-NSGA-II,1,2,False
+Fisher_1D,28,PySR best,1,4,False
+Fisher_1D,29,PISR-NSGA-II,1,2,False
+Fisher_1D,29,PySR best,4,6,False
+Fisher_2D,0,PISR-NSGA-II,1,3,False
+Fisher_2D,0,PySR best,3,3,False
+Fisher_2D,1,PISR-NSGA-II,1,3,False
+Fisher_2D,1,PySR best,2,5,False
+Fisher_2D,2,PISR-NSGA-II,1,3,False
+Fisher_2D,2,PySR best,3,5,True
+Fisher_2D,3,PISR-NSGA-II,1,4,False
+Fisher_2D,3,PySR best,2,3,False
+Fisher_2D,4,PISR-NSGA-II,1,3,False
+Fisher_2D,4,PySR best,1,4,False
+Fisher_2D,5,PISR-NSGA-II,1,3,False
+Fisher_2D,5,PySR best,4,4,True
+Fisher_2D,6,PISR-NSGA-II,1,3,False
+Fisher_2D,6,PySR best,3,3,False
+Fisher_2D,7,PISR-NSGA-II,1,3,False
+Fisher_2D,7,PySR best,0,5,False
+Fisher_2D,8,PISR-NSGA-II,1,5,False
+Fisher_2D,8,PySR best,4,2,False
+Fisher_2D,9,PISR-NSGA-II,1,4,False
+Fisher_2D,9,PySR best,3,3,True
+Fisher_2D,10,PISR-NSGA-II,1,6,False
+Fisher_2D,10,PySR best,6,1,False
+Fisher_2D,11,PISR-NSGA-II,1,3,False
+Fisher_2D,11,PySR best,5,4,False
+Fisher_2D,12,PISR-NSGA-II,1,4,False
+Fisher_2D,12,PySR best,2,5,True
+Fisher_2D,13,PISR-NSGA-II,1,2,False
+Fisher_2D,13,PySR best,5,4,True
+Fisher_2D,14,PISR-NSGA-II,1,4,False
+Fisher_2D,14,PySR best,3,3,False
+Fisher_2D,15,PISR-NSGA-II,1,3,False
+Fisher_2D,15,PySR best,3,2,False
+Fisher_2D,16,PISR-NSGA-II,2,2,True
+Fisher_2D,16,PySR best,3,3,False
+Fisher_2D,17,PISR-NSGA-II,1,3,False
+Fisher_2D,17,PySR best,6,1,False
+Fisher_2D,18,PISR-NSGA-II,1,4,False
+Fisher_2D,18,PySR best,1,3,False
+Fisher_2D,19,PISR-NSGA-II,1,5,False
+Fisher_2D,19,PySR best,2,3,False
+Fisher_2D,20,PISR-NSGA-II,1,4,False
+Fisher_2D,20,PySR best,6,1,False
+Fisher_2D,21,PISR-NSGA-II,1,3,False
+Fisher_2D,21,PySR best,4,2,False
+Fisher_2D,22,PISR-NSGA-II,1,5,False
+Fisher_2D,22,PySR best,4,3,True
+Fisher_2D,23,PISR-NSGA-II,1,3,False
+Fisher_2D,23,PySR best,3,3,False
+Fisher_2D,24,PISR-NSGA-II,1,3,False
+Fisher_2D,24,PySR best,5,3,True
+Fisher_2D,25,PISR-NSGA-II,1,6,False
+Fisher_2D,25,PySR best,9,2,False
+Fisher_2D,26,PISR-NSGA-II,1,4,False
+Fisher_2D,26,PySR best,3,3,True
+Fisher_2D,27,PISR-NSGA-II,1,4,False
+Fisher_2D,27,PySR best,7,2,False
+Fisher_2D,28,PISR-NSGA-II,1,3,False
+Fisher_2D,28,PySR best,2,4,True
+Fisher_2D,29,PISR-NSGA-II,1,4,False
+Fisher_2D,29,PySR best,4,2,False
+Duffing_1D,0,PISR-NSGA-II,1,3,False
+Duffing_1D,0,PySR best,7,3,True
+Duffing_1D,1,PISR-NSGA-II,2,2,False
+Duffing_1D,1,PySR best,2,6,False
+Duffing_1D,2,PISR-NSGA-II,1,2,False
+Duffing_1D,2,PySR best,3,2,False
+Duffing_1D,3,PISR-NSGA-II,1,6,False
+Duffing_1D,3,PySR best,2,5,False
+Duffing_1D,4,PISR-NSGA-II,1,2,True
+Duffing_1D,4,PySR best,5,4,True
+Duffing_1D,5,PISR-NSGA-II,3,6,False
+Duffing_1D,5,PySR best,6,4,False
+Duffing_1D,6,PISR-NSGA-II,1,2,False
+Duffing_1D,6,PySR best,8,3,False
+Duffing_1D,7,PISR-NSGA-II,1,3,False
+Duffing_1D,7,PySR best,3,5,False
+Duffing_1D,8,PISR-NSGA-II,1,3,False
+Duffing_1D,8,PySR best,3,2,False
+Duffing_1D,9,PISR-NSGA-II,1,2,False
+Duffing_1D,9,PySR best,3,6,False
+Duffing_1D,10,PISR-NSGA-II,3,7,False
+Duffing_1D,10,PySR best,2,4,False
+Duffing_1D,11,PISR-NSGA-II,1,3,False
+Duffing_1D,11,PySR best,4,6,False
+Duffing_1D,12,PISR-NSGA-II,3,2,False
+Duffing_1D,12,PySR best,7,5,False
+Duffing_1D,13,PISR-NSGA-II,1,3,False
+Duffing_1D,13,PySR best,5,6,False
+Duffing_1D,14,PISR-NSGA-II,1,4,False
+Duffing_1D,14,PySR best,4,5,False
+Duffing_1D,15,PISR-NSGA-II,1,3,False
+Duffing_1D,15,PySR best,4,4,False
+Duffing_1D,16,PISR-NSGA-II,1,4,False
+Duffing_1D,16,PySR best,5,3,False
+Duffing_1D,17,PISR-NSGA-II,2,7,False
+Duffing_1D,17,PySR best,10,4,False
+Duffing_1D,18,PISR-NSGA-II,1,3,False
+Duffing_1D,18,PySR best,1,5,True
+Duffing_1D,19,PISR-NSGA-II,1,2,False
+Duffing_1D,19,PySR best,1,3,False
+Duffing_1D,20,PISR-NSGA-II,1,3,False
+Duffing_1D,20,PySR best,5,4,False
+Duffing_1D,21,PISR-NSGA-II,1,3,False
+Duffing_1D,21,PySR best,1,5,True
+Duffing_1D,22,PISR-NSGA-II,1,3,False
+Duffing_1D,22,PySR best,4,4,False
+Duffing_1D,23,PISR-NSGA-II,3,6,False
+Duffing_1D,23,PySR best,3,7,False
+Duffing_1D,24,PISR-NSGA-II,3,6,False
+Duffing_1D,24,PySR best,9,4,False
+Duffing_1D,25,PISR-NSGA-II,3,6,False
+Duffing_1D,25,PySR best,5,4,False
+Duffing_1D,26,PISR-NSGA-II,1,3,False
+Duffing_1D,26,PySR best,7,2,False
+Duffing_1D,27,PISR-NSGA-II,1,5,False
+Duffing_1D,27,PySR best,3,6,False
+Duffing_1D,28,PISR-NSGA-II,2,3,False
+Duffing_1D,28,PySR best,1,4,False
+Duffing_1D,29,PISR-NSGA-II,1,3,False
+Duffing_1D,29,PySR best,3,4,False
+Duffing_2D,0,PISR-NSGA-II,2,4,False
+Duffing_2D,0,PySR best,3,2,False
+Duffing_2D,1,PISR-NSGA-II,2,2,False
+Duffing_2D,1,PySR best,1,2,False
+Duffing_2D,2,PISR-NSGA-II,2,5,False
+Duffing_2D,2,PySR best,7,5,False
+Duffing_2D,3,PISR-NSGA-II,1,5,False
+Duffing_2D,3,PySR best,5,2,False
+Duffing_2D,4,PISR-NSGA-II,1,3,False
+Duffing_2D,4,PySR best,6,2,True
+Duffing_2D,5,PISR-NSGA-II,3,4,False
+Duffing_2D,5,PySR best,3,3,False
+Duffing_2D,6,PISR-NSGA-II,1,4,False
+Duffing_2D,6,PySR best,3,3,False
+Duffing_2D,7,PISR-NSGA-II,1,6,False
+Duffing_2D,7,PySR best,2,5,False
+Duffing_2D,8,PISR-NSGA-II,2,3,False
+Duffing_2D,8,PySR best,1,5,False
+Duffing_2D,9,PISR-NSGA-II,1,9,False
+Duffing_2D,9,PySR best,1,2,False
+Duffing_2D,10,PISR-NSGA-II,1,1,False
+Duffing_2D,10,PySR best,4,5,False
+Duffing_2D,11,PISR-NSGA-II,1,7,False
+Duffing_2D,11,PySR best,3,4,False
+Duffing_2D,12,PISR-NSGA-II,1,4,False
+Duffing_2D,12,PySR best,6,0,False
+Duffing_2D,13,PISR-NSGA-II,2,7,False
+Duffing_2D,13,PySR best,3,4,False
+Duffing_2D,14,PISR-NSGA-II,1,4,False
+Duffing_2D,14,PySR best,3,3,False
+Duffing_2D,15,PISR-NSGA-II,2,4,False
+Duffing_2D,15,PySR best,5,2,False
+Duffing_2D,16,PISR-NSGA-II,1,4,False
+Duffing_2D,16,PySR best,7,1,False
+Duffing_2D,17,PISR-NSGA-II,1,6,False
+Duffing_2D,17,PySR best,2,3,True
+Duffing_2D,18,PISR-NSGA-II,1,5,False
+Duffing_2D,18,PySR best,2,3,False
+Duffing_2D,19,PISR-NSGA-II,2,1,False
+Duffing_2D,19,PySR best,1,5,False
+Duffing_2D,20,PISR-NSGA-II,1,3,False
+Duffing_2D,20,PySR best,7,4,False
+Duffing_2D,21,PISR-NSGA-II,1,7,False
+Duffing_2D,21,PySR best,9,2,False
+Duffing_2D,22,PISR-NSGA-II,2,4,False
+Duffing_2D,22,PySR best,4,4,False
+Duffing_2D,23,PISR-NSGA-II,1,5,False
+Duffing_2D,23,PySR best,6,3,False
+Duffing_2D,24,PISR-NSGA-II,1,4,False
+Duffing_2D,24,PySR best,4,5,False
+Duffing_2D,25,PISR-NSGA-II,1,4,False
+Duffing_2D,25,PySR best,3,3,False
+Duffing_2D,26,PISR-NSGA-II,1,4,False
+Duffing_2D,26,PySR best,7,2,False
+Duffing_2D,27,PISR-NSGA-II,1,5,False
+Duffing_2D,27,PySR best,1,4,False
+Duffing_2D,28,PISR-NSGA-II,1,3,False
+Duffing_2D,28,PySR best,6,3,False
+Duffing_2D,29,PISR-NSGA-II,1,6,False
+Duffing_2D,29,PySR best,11,2,False
+Thomas-Fermi_1D,0,PISR-NSGA-II,1,4,False
+Thomas-Fermi_1D,0,PySR best,7,3,False
+Thomas-Fermi_1D,1,PISR-NSGA-II,2,3,False
+Thomas-Fermi_1D,1,PySR best,8,3,False
+Thomas-Fermi_1D,2,PISR-NSGA-II,1,4,False
+Thomas-Fermi_1D,2,PySR best,2,4,False
+Thomas-Fermi_1D,3,PISR-NSGA-II,2,3,False
+Thomas-Fermi_1D,3,PySR best,1,4,False
+Thomas-Fermi_1D,4,PISR-NSGA-II,2,7,False
+Thomas-Fermi_1D,4,PySR best,3,4,False
+Thomas-Fermi_1D,5,PISR-NSGA-II,2,2,False
+Thomas-Fermi_1D,5,PySR best,5,3,False
+Thomas-Fermi_1D,6,PISR-NSGA-II,1,3,False
+Thomas-Fermi_1D,6,PySR best,7,3,False
+Thomas-Fermi_1D,7,PISR-NSGA-II,2,2,False
+Thomas-Fermi_1D,7,PySR best,5,5,False
+Thomas-Fermi_1D,8,PISR-NSGA-II,2,4,False
+Thomas-Fermi_1D,8,PySR best,2,4,False
+Thomas-Fermi_1D,9,PISR-NSGA-II,1,5,False
+Thomas-Fermi_1D,9,PySR best,3,5,False
+Thomas-Fermi_1D,10,PISR-NSGA-II,1,3,False
+Thomas-Fermi_1D,10,PySR best,6,3,False
+Thomas-Fermi_1D,11,PISR-NSGA-II,1,3,False
+Thomas-Fermi_1D,11,PySR best,3,5,False
+Thomas-Fermi_1D,12,PISR-NSGA-II,2,5,False
+Thomas-Fermi_1D,12,PySR best,4,6,False
+Thomas-Fermi_1D,13,PISR-NSGA-II,1,5,False
+Thomas-Fermi_1D,13,PySR best,7,3,False
+Thomas-Fermi_1D,14,PISR-NSGA-II,1,4,False
+Thomas-Fermi_1D,14,PySR best,3,4,False
+Thomas-Fermi_1D,15,PISR-NSGA-II,1,6,False
+Thomas-Fermi_1D,15,PySR best,1,8,True
+Thomas-Fermi_1D,16,PISR-NSGA-II,1,3,False
+Thomas-Fermi_1D,16,PySR best,6,5,False
+Thomas-Fermi_1D,17,PISR-NSGA-II,2,2,False
+Thomas-Fermi_1D,17,PySR best,4,4,False
+Thomas-Fermi_1D,18,PISR-NSGA-II,1,5,False
+Thomas-Fermi_1D,18,PySR best,7,3,False
+Thomas-Fermi_1D,19,PISR-NSGA-II,1,1,False
+Thomas-Fermi_1D,19,PySR best,2,5,False
+Thomas-Fermi_1D,20,PISR-NSGA-II,1,4,False
+Thomas-Fermi_1D,20,PySR best,8,2,False
+Thomas-Fermi_1D,21,PISR-NSGA-II,1,4,False
+Thomas-Fermi_1D,21,PySR best,3,7,False
+Thomas-Fermi_1D,22,PISR-NSGA-II,1,6,False
+Thomas-Fermi_1D,22,PySR best,4,3,False
+Thomas-Fermi_1D,23,PISR-NSGA-II,1,4,False
+Thomas-Fermi_1D,23,PySR best,3,6,False
+Thomas-Fermi_1D,24,PISR-NSGA-II,1,4,False
+Thomas-Fermi_1D,24,PySR best,3,5,False
+Thomas-Fermi_1D,25,PISR-NSGA-II,1,3,False
+Thomas-Fermi_1D,25,PySR best,3,5,False
+Thomas-Fermi_1D,26,PISR-NSGA-II,1,5,False
+Thomas-Fermi_1D,26,PySR best,12,3,False
+Thomas-Fermi_1D,27,PISR-NSGA-II,1,5,False
+Thomas-Fermi_1D,27,PySR best,5,3,False
+Thomas-Fermi_1D,28,PISR-NSGA-II,2,2,False
+Thomas-Fermi_1D,28,PySR best,6,5,False
+Thomas-Fermi_1D,29,PISR-NSGA-II,2,3,False
+Thomas-Fermi_1D,29,PySR best,3,5,False
+Thomas-Fermi_2D,0,PISR-NSGA-II,1,7,False
+Thomas-Fermi_2D,0,PySR best,4,4,False
+Thomas-Fermi_2D,1,PISR-NSGA-II,1,4,False
+Thomas-Fermi_2D,1,PySR best,2,5,False
+Thomas-Fermi_2D,2,PISR-NSGA-II,1,4,False
+Thomas-Fermi_2D,2,PySR best,2,6,False
+Thomas-Fermi_2D,3,PISR-NSGA-II,1,4,False
+Thomas-Fermi_2D,3,PySR best,1,4,False
+Thomas-Fermi_2D,4,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,4,PySR best,2,4,True
+Thomas-Fermi_2D,5,PISR-NSGA-II,1,4,False
+Thomas-Fermi_2D,5,PySR best,2,3,False
+Thomas-Fermi_2D,6,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,6,PySR best,2,4,True
+Thomas-Fermi_2D,7,PISR-NSGA-II,1,8,False
+Thomas-Fermi_2D,7,PySR best,6,3,False
+Thomas-Fermi_2D,8,PISR-NSGA-II,1,8,False
+Thomas-Fermi_2D,8,PySR best,2,4,True
+Thomas-Fermi_2D,9,PISR-NSGA-II,1,4,False
+Thomas-Fermi_2D,9,PySR best,4,4,True
+Thomas-Fermi_2D,10,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,10,PySR best,3,3,False
+Thomas-Fermi_2D,11,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,11,PySR best,3,3,False
+Thomas-Fermi_2D,12,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,12,PySR best,1,4,False
+Thomas-Fermi_2D,13,PISR-NSGA-II,1,8,False
+Thomas-Fermi_2D,13,PySR best,4,3,False
+Thomas-Fermi_2D,14,PISR-NSGA-II,1,6,False
+Thomas-Fermi_2D,14,PySR best,2,4,False
+Thomas-Fermi_2D,15,PISR-NSGA-II,1,6,False
+Thomas-Fermi_2D,15,PySR best,5,3,False
+Thomas-Fermi_2D,16,PISR-NSGA-II,1,8,False
+Thomas-Fermi_2D,16,PySR best,4,3,False
+Thomas-Fermi_2D,17,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,17,PySR best,3,6,False
+Thomas-Fermi_2D,18,PISR-NSGA-II,1,4,False
+Thomas-Fermi_2D,18,PySR best,2,4,False
+Thomas-Fermi_2D,19,PISR-NSGA-II,1,6,False
+Thomas-Fermi_2D,19,PySR best,7,2,True
+Thomas-Fermi_2D,20,PISR-NSGA-II,1,7,False
+Thomas-Fermi_2D,20,PySR best,2,4,False
+Thomas-Fermi_2D,21,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,21,PySR best,3,2,False
+Thomas-Fermi_2D,22,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,22,PySR best,5,1,False
+Thomas-Fermi_2D,23,PISR-NSGA-II,1,8,False
+Thomas-Fermi_2D,23,PySR best,4,2,False
+Thomas-Fermi_2D,24,PISR-NSGA-II,1,6,False
+Thomas-Fermi_2D,24,PySR best,2,3,False
+Thomas-Fermi_2D,25,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,25,PySR best,1,5,False
+Thomas-Fermi_2D,26,PISR-NSGA-II,1,7,False
+Thomas-Fermi_2D,26,PySR best,2,4,False
+Thomas-Fermi_2D,27,PISR-NSGA-II,1,8,False
+Thomas-Fermi_2D,27,PySR best,7,3,False
+Thomas-Fermi_2D,28,PISR-NSGA-II,1,4,False
+Thomas-Fermi_2D,28,PySR best,3,4,False
+Thomas-Fermi_2D,29,PISR-NSGA-II,1,5,False
+Thomas-Fermi_2D,29,PySR best,5,4,False
+Schrodinger_1D,0,PISR-NSGA-II,1,2,False
+Schrodinger_1D,0,PySR best,4,6,False
+Schrodinger_1D,1,PISR-NSGA-II,1,2,False
+Schrodinger_1D,1,PySR best,8,10,False
+Schrodinger_1D,2,PISR-NSGA-II,1,2,False
+Schrodinger_1D,2,PySR best,3,6,False
+Schrodinger_1D,3,PISR-NSGA-II,1,2,False
+Schrodinger_1D,3,PySR best,3,7,False
+Schrodinger_1D,4,PISR-NSGA-II,1,1,False
+Schrodinger_1D,4,PySR best,5,4,True
+Schrodinger_1D,5,PISR-NSGA-II,1,2,False
+Schrodinger_1D,5,PySR best,4,11,False
+Schrodinger_1D,6,PISR-NSGA-II,1,2,False
+Schrodinger_1D,6,PySR best,3,8,False
+Schrodinger_1D,7,PISR-NSGA-II,1,2,False
+Schrodinger_1D,7,PySR best,4,6,False
+Schrodinger_1D,8,PISR-NSGA-II,1,2,False
+Schrodinger_1D,8,PySR best,3,9,True
+Schrodinger_1D,9,PISR-NSGA-II,1,2,False
+Schrodinger_1D,9,PySR best,8,4,False
+Schrodinger_1D,10,PISR-NSGA-II,1,2,False
+Schrodinger_1D,10,PySR best,6,5,False
+Schrodinger_1D,11,PISR-NSGA-II,1,2,False
+Schrodinger_1D,11,PySR best,4,7,False
+Schrodinger_1D,12,PISR-NSGA-II,1,1,False
+Schrodinger_1D,12,PySR best,3,8,False
+Schrodinger_1D,13,PISR-NSGA-II,1,1,False
+Schrodinger_1D,13,PySR best,4,6,False
+Schrodinger_1D,14,PISR-NSGA-II,1,1,False
+Schrodinger_1D,14,PySR best,3,9,True
+Schrodinger_1D,15,PISR-NSGA-II,1,2,False
+Schrodinger_1D,15,PySR best,14,4,False
+Schrodinger_1D,16,PISR-NSGA-II,1,2,False
+Schrodinger_1D,16,PySR best,3,7,False
+Schrodinger_1D,17,PISR-NSGA-II,1,2,False
+Schrodinger_1D,17,PySR best,5,6,True
+Schrodinger_1D,18,PISR-NSGA-II,1,2,False
+Schrodinger_1D,18,PySR best,4,6,True
+Schrodinger_1D,19,PISR-NSGA-II,1,2,False
+Schrodinger_1D,19,PySR best,3,9,True
+Schrodinger_1D,20,PISR-NSGA-II,1,2,False
+Schrodinger_1D,20,PySR best,4,8,True
+Schrodinger_1D,21,PISR-NSGA-II,1,2,False
+Schrodinger_1D,21,PySR best,3,3,True
+Schrodinger_1D,22,PISR-NSGA-II,1,2,False
+Schrodinger_1D,22,PySR best,2,5,False
+Schrodinger_1D,23,PISR-NSGA-II,1,2,False
+Schrodinger_1D,23,PySR best,3,11,False
+Schrodinger_1D,24,PISR-NSGA-II,1,2,False
+Schrodinger_1D,24,PySR best,3,9,True
+Schrodinger_1D,25,PISR-NSGA-II,1,2,False
+Schrodinger_1D,25,PySR best,4,7,False
+Schrodinger_1D,26,PISR-NSGA-II,1,2,False
+Schrodinger_1D,26,PySR best,6,7,True
+Schrodinger_1D,27,PISR-NSGA-II,1,2,False
+Schrodinger_1D,27,PySR best,8,7,False
+Schrodinger_1D,28,PISR-NSGA-II,1,1,False
+Schrodinger_1D,28,PySR best,5,9,False
+Schrodinger_1D,29,PISR-NSGA-II,1,1,False
+Schrodinger_1D,29,PySR best,5,2,True
+Schrodinger_2D,0,PISR-NSGA-II,1,2,False
+Schrodinger_2D,0,PySR best,4,7,False
+Schrodinger_2D,1,PISR-NSGA-II,1,3,False
+Schrodinger_2D,1,PySR best,2,9,False
+Schrodinger_2D,2,PISR-NSGA-II,1,3,False
+Schrodinger_2D,2,PySR best,1,5,True
+Schrodinger_2D,3,PISR-NSGA-II,1,3,False
+Schrodinger_2D,3,PySR best,2,3,False
+Schrodinger_2D,4,PISR-NSGA-II,1,3,False
+Schrodinger_2D,4,PySR best,2,8,False
+Schrodinger_2D,5,PISR-NSGA-II,1,3,False
+Schrodinger_2D,5,PySR best,1,8,False
+Schrodinger_2D,6,PISR-NSGA-II,1,2,False
+Schrodinger_2D,6,PySR best,2,11,True
+Schrodinger_2D,7,PISR-NSGA-II,1,3,False
+Schrodinger_2D,7,PySR best,2,5,False
+Schrodinger_2D,8,PISR-NSGA-II,1,3,False
+Schrodinger_2D,8,PySR best,3,8,False
+Schrodinger_2D,9,PISR-NSGA-II,1,2,False
+Schrodinger_2D,9,PySR best,2,6,False
+Schrodinger_2D,10,PISR-NSGA-II,1,3,False
+Schrodinger_2D,10,PySR best,1,5,False
+Schrodinger_2D,11,PISR-NSGA-II,1,3,False
+Schrodinger_2D,11,PySR best,1,7,False
+Schrodinger_2D,12,PISR-NSGA-II,1,2,False
+Schrodinger_2D,12,PySR best,2,3,False
+Schrodinger_2D,13,PISR-NSGA-II,1,3,False
+Schrodinger_2D,13,PySR best,1,9,False
+Schrodinger_2D,14,PISR-NSGA-II,1,2,False
+Schrodinger_2D,14,PySR best,4,3,True
+Schrodinger_2D,15,PISR-NSGA-II,1,3,False
+Schrodinger_2D,15,PySR best,2,7,True
+Schrodinger_2D,16,PISR-NSGA-II,1,3,False
+Schrodinger_2D,16,PySR best,3,4,False
+Schrodinger_2D,17,PISR-NSGA-II,1,2,False
+Schrodinger_2D,17,PySR best,2,6,False
+Schrodinger_2D,18,PISR-NSGA-II,1,3,False
+Schrodinger_2D,18,PySR best,1,7,False
+Schrodinger_2D,19,PISR-NSGA-II,1,2,False
+Schrodinger_2D,19,PySR best,1,6,False
+Schrodinger_2D,20,PISR-NSGA-II,1,3,False
+Schrodinger_2D,20,PySR best,3,7,False
+Schrodinger_2D,21,PISR-NSGA-II,1,3,False
+Schrodinger_2D,21,PySR best,2,3,False
+Schrodinger_2D,22,PISR-NSGA-II,1,3,False
+Schrodinger_2D,22,PySR best,3,5,False
+Schrodinger_2D,23,PISR-NSGA-II,1,2,False
+Schrodinger_2D,23,PySR best,1,9,False
+Schrodinger_2D,24,PISR-NSGA-II,1,2,False
+Schrodinger_2D,24,PySR best,2,7,True
+Schrodinger_2D,25,PISR-NSGA-II,1,3,False
+Schrodinger_2D,25,PySR best,1,5,True
+Schrodinger_2D,26,PISR-NSGA-II,1,2,False
+Schrodinger_2D,26,PySR best,2,9,False
+Schrodinger_2D,27,PISR-NSGA-II,1,2,False
+Schrodinger_2D,27,PySR best,3,7,False
+Schrodinger_2D,28,PISR-NSGA-II,1,2,False
+Schrodinger_2D,28,PySR best,2,5,False
+Schrodinger_2D,29,PISR-NSGA-II,1,3,False
+Schrodinger_2D,29,PySR best,1,2,False
+Schrodinger-Unsteady_1D,0,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_1D,0,PySR best,2,9,True
+Schrodinger-Unsteady_1D,1,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_1D,1,PySR best,1,6,False
+Schrodinger-Unsteady_1D,2,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,2,PySR best,1,5,False
+Schrodinger-Unsteady_1D,3,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,3,PySR best,6,8,False
+Schrodinger-Unsteady_1D,4,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,4,PySR best,1,7,False
+Schrodinger-Unsteady_1D,5,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,5,PySR best,2,6,False
+Schrodinger-Unsteady_1D,6,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,6,PySR best,3,6,False
+Schrodinger-Unsteady_1D,7,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,7,PySR best,2,9,False
+Schrodinger-Unsteady_1D,8,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,8,PySR best,1,8,True
+Schrodinger-Unsteady_1D,9,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,9,PySR best,5,9,False
+Schrodinger-Unsteady_1D,10,PISR-NSGA-II,1,11,False
+Schrodinger-Unsteady_1D,10,PySR best,1,4,False
+Schrodinger-Unsteady_1D,11,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,11,PySR best,3,6,False
+Schrodinger-Unsteady_1D,12,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,12,PySR best,1,7,False
+Schrodinger-Unsteady_1D,13,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,13,PySR best,5,6,False
+Schrodinger-Unsteady_1D,14,PISR-NSGA-II,1,3,False
+Schrodinger-Unsteady_1D,14,PySR best,2,8,False
+Schrodinger-Unsteady_1D,15,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,15,PySR best,1,6,False
+Schrodinger-Unsteady_1D,16,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,16,PySR best,1,6,False
+Schrodinger-Unsteady_1D,17,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_1D,17,PySR best,1,8,False
+Schrodinger-Unsteady_1D,18,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_1D,18,PySR best,1,4,False
+Schrodinger-Unsteady_1D,19,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,19,PySR best,1,7,False
+Schrodinger-Unsteady_1D,20,PISR-NSGA-II,1,3,False
+Schrodinger-Unsteady_1D,20,PySR best,2,10,False
+Schrodinger-Unsteady_1D,21,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_1D,21,PySR best,4,7,False
+Schrodinger-Unsteady_1D,22,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_1D,22,PySR best,3,6,False
+Schrodinger-Unsteady_1D,23,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_1D,23,PySR best,1,7,False
+Schrodinger-Unsteady_1D,24,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,24,PySR best,3,11,False
+Schrodinger-Unsteady_1D,25,PISR-NSGA-II,1,3,False
+Schrodinger-Unsteady_1D,25,PySR best,1,5,False
+Schrodinger-Unsteady_1D,26,PISR-NSGA-II,1,2,False
+Schrodinger-Unsteady_1D,26,PySR best,3,7,False
+Schrodinger-Unsteady_1D,27,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_1D,27,PySR best,1,6,False
+Schrodinger-Unsteady_1D,28,PISR-NSGA-II,1,3,False
+Schrodinger-Unsteady_1D,28,PySR best,1,9,False
+Schrodinger-Unsteady_1D,29,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_1D,29,PySR best,1,9,False
+Schrodinger-Unsteady_2D,0,PISR-NSGA-II,1,7,False
+Schrodinger-Unsteady_2D,0,PySR best,1,6,False
+Schrodinger-Unsteady_2D,1,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,1,PySR best,1,5,False
+Schrodinger-Unsteady_2D,2,PISR-NSGA-II,1,5,False
+Schrodinger-Unsteady_2D,2,PySR best,2,6,False
+Schrodinger-Unsteady_2D,3,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,3,PySR best,3,4,True
+Schrodinger-Unsteady_2D,4,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_2D,4,PySR best,3,6,False
+Schrodinger-Unsteady_2D,5,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,5,PySR best,3,7,False
+Schrodinger-Unsteady_2D,6,PISR-NSGA-II,1,5,False
+Schrodinger-Unsteady_2D,6,PySR best,1,7,False
+Schrodinger-Unsteady_2D,7,PISR-NSGA-II,2,6,False
+Schrodinger-Unsteady_2D,7,PySR best,1,7,False
+Schrodinger-Unsteady_2D,8,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,8,PySR best,3,6,False
+Schrodinger-Unsteady_2D,9,PISR-NSGA-II,2,5,False
+Schrodinger-Unsteady_2D,9,PySR best,1,4,True
+Schrodinger-Unsteady_2D,10,PISR-NSGA-II,0,7,False
+Schrodinger-Unsteady_2D,10,PySR best,1,5,False
+Schrodinger-Unsteady_2D,11,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_2D,11,PySR best,1,6,False
+Schrodinger-Unsteady_2D,12,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,12,PySR best,5,5,True
+Schrodinger-Unsteady_2D,13,PISR-NSGA-II,0,6,False
+Schrodinger-Unsteady_2D,13,PySR best,1,5,False
+Schrodinger-Unsteady_2D,14,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,14,PySR best,4,5,True
+Schrodinger-Unsteady_2D,15,PISR-NSGA-II,0,8,False
+Schrodinger-Unsteady_2D,15,PySR best,3,7,False
+Schrodinger-Unsteady_2D,16,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_2D,16,PySR best,2,8,False
+Schrodinger-Unsteady_2D,17,PISR-NSGA-II,1,5,False
+Schrodinger-Unsteady_2D,17,PySR best,1,6,False
+Schrodinger-Unsteady_2D,18,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_2D,18,PySR best,1,6,False
+Schrodinger-Unsteady_2D,19,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,19,PySR best,4,6,True
+Schrodinger-Unsteady_2D,20,PISR-NSGA-II,1,5,False
+Schrodinger-Unsteady_2D,20,PySR best,1,6,False
+Schrodinger-Unsteady_2D,21,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_2D,21,PySR best,1,6,False
+Schrodinger-Unsteady_2D,22,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,22,PySR best,4,5,True
+Schrodinger-Unsteady_2D,23,PISR-NSGA-II,1,5,False
+Schrodinger-Unsteady_2D,23,PySR best,1,6,False
+Schrodinger-Unsteady_2D,24,PISR-NSGA-II,1,5,False
+Schrodinger-Unsteady_2D,24,PySR best,3,7,False
+Schrodinger-Unsteady_2D,25,PISR-NSGA-II,1,7,False
+Schrodinger-Unsteady_2D,25,PySR best,1,6,False
+Schrodinger-Unsteady_2D,26,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_2D,26,PySR best,1,7,False
+Schrodinger-Unsteady_2D,27,PISR-NSGA-II,1,4,False
+Schrodinger-Unsteady_2D,27,PySR best,3,9,False
+Schrodinger-Unsteady_2D,28,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,28,PySR best,1,5,False
+Schrodinger-Unsteady_2D,29,PISR-NSGA-II,1,6,False
+Schrodinger-Unsteady_2D,29,PySR best,1,6,True
+Navier-Stokes_2D,0,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,0,PySR best,6,1,False
+Navier-Stokes_2D,1,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,1,PySR best,3,1,False
+Navier-Stokes_2D,2,PISR-NSGA-II,1,7,False
+Navier-Stokes_2D,2,PySR best,3,3,False
+Navier-Stokes_2D,3,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,3,PySR best,1,4,False
+Navier-Stokes_2D,4,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,4,PySR best,3,5,False
+Navier-Stokes_2D,5,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,5,PySR best,3,0,True
+Navier-Stokes_2D,6,PISR-NSGA-II,1,9,False
+Navier-Stokes_2D,6,PySR best,3,2,False
+Navier-Stokes_2D,7,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,7,PySR best,5,5,False
+Navier-Stokes_2D,8,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,8,PySR best,2,4,False
+Navier-Stokes_2D,9,PISR-NSGA-II,1,6,False
+Navier-Stokes_2D,9,PySR best,4,4,False
+Navier-Stokes_2D,10,PISR-NSGA-II,1,6,False
+Navier-Stokes_2D,10,PySR best,2,6,False
+Navier-Stokes_2D,11,PISR-NSGA-II,1,7,False
+Navier-Stokes_2D,11,PySR best,2,3,False
+Navier-Stokes_2D,12,PISR-NSGA-II,1,2,False
+Navier-Stokes_2D,12,PySR best,2,3,False
+Navier-Stokes_2D,13,PISR-NSGA-II,1,6,False
+Navier-Stokes_2D,13,PySR best,1,4,False
+Navier-Stokes_2D,14,PISR-NSGA-II,1,6,False
+Navier-Stokes_2D,14,PySR best,2,2,False
+Navier-Stokes_2D,15,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,15,PySR best,3,6,False
+Navier-Stokes_2D,16,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,16,PySR best,2,3,False
+Navier-Stokes_2D,17,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,17,PySR best,1,5,False
+Navier-Stokes_2D,18,PISR-NSGA-II,1,4,False
+Navier-Stokes_2D,18,PySR best,2,3,False
+Navier-Stokes_2D,19,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,19,PySR best,1,4,False
+Navier-Stokes_2D,20,PISR-NSGA-II,1,9,False
+Navier-Stokes_2D,20,PySR best,3,2,False
+Navier-Stokes_2D,21,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,21,PySR best,2,2,False
+Navier-Stokes_2D,22,PISR-NSGA-II,1,4,False
+Navier-Stokes_2D,22,PySR best,2,3,False
+Navier-Stokes_2D,23,PISR-NSGA-II,1,7,False
+Navier-Stokes_2D,23,PySR best,3,2,False
+Navier-Stokes_2D,24,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,24,PySR best,3,3,False
+Navier-Stokes_2D,25,PISR-NSGA-II,1,4,False
+Navier-Stokes_2D,25,PySR best,3,6,False
+Navier-Stokes_2D,26,PISR-NSGA-II,1,4,False
+Navier-Stokes_2D,26,PySR best,1,3,False
+Navier-Stokes_2D,27,PISR-NSGA-II,1,3,False
+Navier-Stokes_2D,27,PySR best,3,2,False
+Navier-Stokes_2D,28,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,28,PySR best,4,3,False
+Navier-Stokes_2D,29,PISR-NSGA-II,1,5,False
+Navier-Stokes_2D,29,PySR best,5,4,False
+Navier-Stokes-Unsteady_2D,0,PISR-NSGA-II,1,6,False
+Navier-Stokes-Unsteady_2D,0,PySR best,5,4,False
+Navier-Stokes-Unsteady_2D,1,PISR-NSGA-II,1,5,False
+Navier-Stokes-Unsteady_2D,1,PySR best,4,3,False
+Navier-Stokes-Unsteady_2D,2,PISR-NSGA-II,1,2,False
+Navier-Stokes-Unsteady_2D,2,PySR best,3,4,False
+Navier-Stokes-Unsteady_2D,3,PISR-NSGA-II,1,7,False
+Navier-Stokes-Unsteady_2D,3,PySR best,3,3,False
+Navier-Stokes-Unsteady_2D,4,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,4,PySR best,3,4,False
+Navier-Stokes-Unsteady_2D,5,PISR-NSGA-II,1,2,False
+Navier-Stokes-Unsteady_2D,5,PySR best,3,3,True
+Navier-Stokes-Unsteady_2D,6,PISR-NSGA-II,1,1,False
+Navier-Stokes-Unsteady_2D,6,PySR best,1,6,False
+Navier-Stokes-Unsteady_2D,7,PISR-NSGA-II,1,7,False
+Navier-Stokes-Unsteady_2D,7,PySR best,3,3,False
+Navier-Stokes-Unsteady_2D,8,PISR-NSGA-II,1,7,False
+Navier-Stokes-Unsteady_2D,8,PySR best,1,5,False
+Navier-Stokes-Unsteady_2D,9,PISR-NSGA-II,1,7,False
+Navier-Stokes-Unsteady_2D,9,PySR best,2,4,False
+Navier-Stokes-Unsteady_2D,10,PISR-NSGA-II,1,6,False
+Navier-Stokes-Unsteady_2D,10,PySR best,4,2,False
+Navier-Stokes-Unsteady_2D,11,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,11,PySR best,1,4,False
+Navier-Stokes-Unsteady_2D,12,PISR-NSGA-II,1,7,False
+Navier-Stokes-Unsteady_2D,12,PySR best,3,2,False
+Navier-Stokes-Unsteady_2D,13,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,13,PySR best,1,4,True
+Navier-Stokes-Unsteady_2D,14,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,14,PySR best,1,6,False
+Navier-Stokes-Unsteady_2D,15,PISR-NSGA-II,1,1,False
+Navier-Stokes-Unsteady_2D,15,PySR best,2,5,False
+Navier-Stokes-Unsteady_2D,16,PISR-NSGA-II,1,6,False
+Navier-Stokes-Unsteady_2D,16,PySR best,2,6,True
+Navier-Stokes-Unsteady_2D,17,PISR-NSGA-II,1,4,False
+Navier-Stokes-Unsteady_2D,17,PySR best,4,3,False
+Navier-Stokes-Unsteady_2D,18,PISR-NSGA-II,1,7,False
+Navier-Stokes-Unsteady_2D,18,PySR best,2,4,False
+Navier-Stokes-Unsteady_2D,19,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,19,PySR best,1,4,False
+Navier-Stokes-Unsteady_2D,20,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,20,PySR best,2,3,True
+Navier-Stokes-Unsteady_2D,21,PISR-NSGA-II,1,7,False
+Navier-Stokes-Unsteady_2D,21,PySR best,4,6,False
+Navier-Stokes-Unsteady_2D,22,PISR-NSGA-II,1,5,False
+Navier-Stokes-Unsteady_2D,22,PySR best,4,3,False
+Navier-Stokes-Unsteady_2D,23,PISR-NSGA-II,1,5,False
+Navier-Stokes-Unsteady_2D,23,PySR best,2,3,False
+Navier-Stokes-Unsteady_2D,24,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,24,PySR best,4,4,False
+Navier-Stokes-Unsteady_2D,25,PISR-NSGA-II,1,5,False
+Navier-Stokes-Unsteady_2D,25,PySR best,4,5,False
+Navier-Stokes-Unsteady_2D,26,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,26,PySR best,1,4,False
+Navier-Stokes-Unsteady_2D,27,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,27,PySR best,1,4,True
+Navier-Stokes-Unsteady_2D,28,PISR-NSGA-II,1,3,False
+Navier-Stokes-Unsteady_2D,28,PySR best,2,5,False
+Navier-Stokes-Unsteady_2D,29,PISR-NSGA-II,1,4,False
+Navier-Stokes-Unsteady_2D,29,PySR best,1,5,False
+Lane-Emden_1D,0,PISR-NSGA-II,1,2,False
+Lane-Emden_1D,0,PySR best,4,4,True
+Lane-Emden_1D,1,PISR-NSGA-II,1,2,False
+Lane-Emden_1D,1,PySR best,5,4,False
+Lane-Emden_1D,2,PISR-NSGA-II,0,5,False
+Lane-Emden_1D,2,PySR best,4,3,False
+Lane-Emden_1D,3,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,3,PySR best,5,5,False
+Lane-Emden_1D,4,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,4,PySR best,2,4,False
+Lane-Emden_1D,5,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,5,PySR best,3,3,False
+Lane-Emden_1D,6,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,6,PySR best,6,3,True
+Lane-Emden_1D,7,PISR-NSGA-II,1,2,False
+Lane-Emden_1D,7,PySR best,6,4,False
+Lane-Emden_1D,8,PISR-NSGA-II,0,5,False
+Lane-Emden_1D,8,PySR best,2,2,False
+Lane-Emden_1D,9,PISR-NSGA-II,2,4,False
+Lane-Emden_1D,9,PySR best,4,5,True
+Lane-Emden_1D,10,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,10,PySR best,5,5,False
+Lane-Emden_1D,11,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,11,PySR best,6,4,False
+Lane-Emden_1D,12,PISR-NSGA-II,0,4,False
+Lane-Emden_1D,12,PySR best,2,4,True
+Lane-Emden_1D,13,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,13,PySR best,7,3,False
+Lane-Emden_1D,14,PISR-NSGA-II,0,5,False
+Lane-Emden_1D,14,PySR best,2,4,False
+Lane-Emden_1D,15,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,15,PySR best,5,3,False
+Lane-Emden_1D,16,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,16,PySR best,2,3,False
+Lane-Emden_1D,17,PISR-NSGA-II,1,2,False
+Lane-Emden_1D,17,PySR best,3,6,False
+Lane-Emden_1D,18,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,18,PySR best,3,4,False
+Lane-Emden_1D,19,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,19,PySR best,6,3,True
+Lane-Emden_1D,20,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,20,PySR best,2,3,False
+Lane-Emden_1D,21,PISR-NSGA-II,0,5,False
+Lane-Emden_1D,21,PySR best,13,4,True
+Lane-Emden_1D,22,PISR-NSGA-II,1,2,False
+Lane-Emden_1D,22,PySR best,3,5,False
+Lane-Emden_1D,23,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,23,PySR best,6,3,False
+Lane-Emden_1D,24,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,24,PySR best,6,4,False
+Lane-Emden_1D,25,PISR-NSGA-II,1,4,False
+Lane-Emden_1D,25,PySR best,6,3,False
+Lane-Emden_1D,26,PISR-NSGA-II,0,2,False
+Lane-Emden_1D,26,PySR best,4,3,False
+Lane-Emden_1D,27,PISR-NSGA-II,0,3,False
+Lane-Emden_1D,27,PySR best,9,4,False
+Lane-Emden_1D,28,PISR-NSGA-II,0,4,False
+Lane-Emden_1D,28,PySR best,10,4,False
+Lane-Emden_1D,29,PISR-NSGA-II,1,3,False
+Lane-Emden_1D,29,PySR best,10,2,False
+Troesch_1D,0,PISR-NSGA-II,1,2,False
+Troesch_1D,0,PySR best,6,4,False
+Troesch_1D,1,PISR-NSGA-II,1,4,False
+Troesch_1D,1,PySR best,3,4,False
+Troesch_1D,2,PISR-NSGA-II,1,5,False
+Troesch_1D,2,PySR best,1,5,False
+Troesch_1D,3,PISR-NSGA-II,1,4,False
+Troesch_1D,3,PySR best,1,6,True
+Troesch_1D,4,PISR-NSGA-II,1,4,False
+Troesch_1D,4,PySR best,1,3,True
+Troesch_1D,5,PISR-NSGA-II,2,3,False
+Troesch_1D,5,PySR best,1,3,False
+Troesch_1D,6,PISR-NSGA-II,1,3,False
+Troesch_1D,6,PySR best,2,4,False
+Troesch_1D,7,PISR-NSGA-II,1,4,False
+Troesch_1D,7,PySR best,3,3,True
+Troesch_1D,8,PISR-NSGA-II,1,3,False
+Troesch_1D,8,PySR best,3,3,True
+Troesch_1D,9,PISR-NSGA-II,2,2,False
+Troesch_1D,9,PySR best,1,3,False
+Troesch_1D,10,PISR-NSGA-II,1,2,False
+Troesch_1D,10,PySR best,6,5,False
+Troesch_1D,11,PISR-NSGA-II,2,2,False
+Troesch_1D,11,PySR best,5,4,True
+Troesch_1D,12,PISR-NSGA-II,1,4,False
+Troesch_1D,12,PySR best,2,4,False
+Troesch_1D,13,PISR-NSGA-II,1,4,False
+Troesch_1D,13,PySR best,0,4,False
+Troesch_1D,14,PISR-NSGA-II,1,4,False
+Troesch_1D,14,PySR best,2,4,False
+Troesch_1D,15,PISR-NSGA-II,1,5,False
+Troesch_1D,15,PySR best,1,4,False
+Troesch_1D,16,PISR-NSGA-II,1,2,False
+Troesch_1D,16,PySR best,7,3,True
+Troesch_1D,17,PISR-NSGA-II,2,5,False
+Troesch_1D,17,PySR best,0,4,False
+Troesch_1D,18,PISR-NSGA-II,2,2,False
+Troesch_1D,18,PySR best,0,6,False
+Troesch_1D,19,PISR-NSGA-II,2,4,False
+Troesch_1D,19,PySR best,2,3,False
+Troesch_1D,20,PISR-NSGA-II,2,3,False
+Troesch_1D,20,PySR best,4,2,True
+Troesch_1D,21,PISR-NSGA-II,0,3,False
+Troesch_1D,21,PySR best,1,4,True
+Troesch_1D,22,PISR-NSGA-II,2,3,False
+Troesch_1D,22,PySR best,3,3,False
+Troesch_1D,23,PISR-NSGA-II,2,4,False
+Troesch_1D,23,PySR best,5,3,False
+Troesch_1D,24,PISR-NSGA-II,2,2,False
+Troesch_1D,24,PySR best,1,2,True
+Troesch_1D,25,PISR-NSGA-II,2,3,False
+Troesch_1D,25,PySR best,1,4,True
+Troesch_1D,26,PISR-NSGA-II,1,2,False
+Troesch_1D,26,PySR best,1,4,False
+Troesch_1D,27,PISR-NSGA-II,2,2,False
+Troesch_1D,27,PySR best,2,4,False
+Troesch_1D,28,PISR-NSGA-II,1,3,False
+Troesch_1D,28,PySR best,0,5,False
+Troesch_1D,29,PISR-NSGA-II,1,3,False
+Troesch_1D,29,PySR best,1,3,False
+Ginzburg-Landau_1D,0,PISR-NSGA-II,2,2,False
+Ginzburg-Landau_1D,0,PySR best,2,6,False
+Ginzburg-Landau_1D,1,PISR-NSGA-II,2,3,False
+Ginzburg-Landau_1D,1,PySR best,1,5,False
+Ginzburg-Landau_1D,2,PISR-NSGA-II,2,3,False
+Ginzburg-Landau_1D,2,PySR best,3,5,False
+Ginzburg-Landau_1D,3,PISR-NSGA-II,2,2,False
+Ginzburg-Landau_1D,3,PySR best,3,5,False
+Ginzburg-Landau_1D,4,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,4,PySR best,2,6,True
+Ginzburg-Landau_1D,5,PISR-NSGA-II,2,2,False
+Ginzburg-Landau_1D,5,PySR best,3,3,False
+Ginzburg-Landau_1D,6,PISR-NSGA-II,1,2,False
+Ginzburg-Landau_1D,6,PySR best,13,1,False
+Ginzburg-Landau_1D,7,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,7,PySR best,4,5,False
+Ginzburg-Landau_1D,8,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,8,PySR best,4,5,False
+Ginzburg-Landau_1D,9,PISR-NSGA-II,1,7,False
+Ginzburg-Landau_1D,9,PySR best,5,4,False
+Ginzburg-Landau_1D,10,PISR-NSGA-II,2,2,False
+Ginzburg-Landau_1D,10,PySR best,3,2,False
+Ginzburg-Landau_1D,11,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,11,PySR best,7,4,True
+Ginzburg-Landau_1D,12,PISR-NSGA-II,1,3,False
+Ginzburg-Landau_1D,12,PySR best,8,5,False
+Ginzburg-Landau_1D,13,PISR-NSGA-II,1,5,False
+Ginzburg-Landau_1D,13,PySR best,3,4,False
+Ginzburg-Landau_1D,14,PISR-NSGA-II,1,2,False
+Ginzburg-Landau_1D,14,PySR best,4,4,False
+Ginzburg-Landau_1D,15,PISR-NSGA-II,2,3,False
+Ginzburg-Landau_1D,15,PySR best,8,3,False
+Ginzburg-Landau_1D,16,PISR-NSGA-II,2,4,False
+Ginzburg-Landau_1D,16,PySR best,5,5,False
+Ginzburg-Landau_1D,17,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,17,PySR best,4,5,False
+Ginzburg-Landau_1D,18,PISR-NSGA-II,2,4,False
+Ginzburg-Landau_1D,18,PySR best,5,3,False
+Ginzburg-Landau_1D,19,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,19,PySR best,3,4,True
+Ginzburg-Landau_1D,20,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,20,PySR best,11,6,True
+Ginzburg-Landau_1D,21,PISR-NSGA-II,2,2,False
+Ginzburg-Landau_1D,21,PySR best,19,1,False
+Ginzburg-Landau_1D,22,PISR-NSGA-II,2,2,False
+Ginzburg-Landau_1D,22,PySR best,3,4,False
+Ginzburg-Landau_1D,23,PISR-NSGA-II,1,4,False
+Ginzburg-Landau_1D,23,PySR best,4,5,False
+Ginzburg-Landau_1D,24,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,24,PySR best,7,4,False
+Ginzburg-Landau_1D,25,PISR-NSGA-II,1,1,False
+Ginzburg-Landau_1D,25,PySR best,2,3,False
+Ginzburg-Landau_1D,26,PISR-NSGA-II,2,4,False
+Ginzburg-Landau_1D,26,PySR best,6,4,False
+Ginzburg-Landau_1D,27,PISR-NSGA-II,2,4,False
+Ginzburg-Landau_1D,27,PySR best,8,1,False
+Ginzburg-Landau_1D,28,PISR-NSGA-II,2,2,False
+Ginzburg-Landau_1D,28,PySR best,2,5,False
+Ginzburg-Landau_1D,29,PISR-NSGA-II,2,4,False
+Ginzburg-Landau_1D,29,PySR best,4,3,False
+Painleve-I_1D,0,PISR-NSGA-II,1,3,False
+Painleve-I_1D,0,PySR best,6,3,False
+Painleve-I_1D,1,PISR-NSGA-II,1,4,False
+Painleve-I_1D,1,PySR best,1,4,False
+Painleve-I_1D,2,PISR-NSGA-II,2,9,False
+Painleve-I_1D,2,PySR best,3,4,False
+Painleve-I_1D,3,PISR-NSGA-II,1,3,False
+Painleve-I_1D,3,PySR best,1,3,False
+Painleve-I_1D,4,PISR-NSGA-II,1,3,False
+Painleve-I_1D,4,PySR best,0,4,False
+Painleve-I_1D,5,PISR-NSGA-II,1,3,False
+Painleve-I_1D,5,PySR best,2,3,False
+Painleve-I_1D,6,PISR-NSGA-II,0,4,False
+Painleve-I_1D,6,PySR best,1,3,False
+Painleve-I_1D,7,PISR-NSGA-II,1,3,False
+Painleve-I_1D,7,PySR best,3,4,False
+Painleve-I_1D,8,PISR-NSGA-II,1,3,False
+Painleve-I_1D,8,PySR best,1,4,False
+Painleve-I_1D,9,PISR-NSGA-II,1,6,False
+Painleve-I_1D,9,PySR best,1,3,False
+Painleve-I_1D,10,PISR-NSGA-II,1,4,False
+Painleve-I_1D,10,PySR best,6,3,False
+Painleve-I_1D,11,PISR-NSGA-II,0,6,False
+Painleve-I_1D,11,PySR best,1,3,False
+Painleve-I_1D,12,PISR-NSGA-II,0,3,False
+Painleve-I_1D,12,PySR best,1,3,False
+Painleve-I_1D,13,PISR-NSGA-II,1,4,False
+Painleve-I_1D,13,PySR best,1,5,False
+Painleve-I_1D,14,PISR-NSGA-II,1,5,False
+Painleve-I_1D,14,PySR best,4,3,False
+Painleve-I_1D,15,PISR-NSGA-II,1,3,False
+Painleve-I_1D,15,PySR best,3,3,False
+Painleve-I_1D,16,PISR-NSGA-II,0,3,False
+Painleve-I_1D,16,PySR best,1,3,False
+Painleve-I_1D,17,PISR-NSGA-II,2,4,False
+Painleve-I_1D,17,PySR best,12,3,False
+Painleve-I_1D,18,PISR-NSGA-II,0,3,False
+Painleve-I_1D,18,PySR best,1,4,False
+Painleve-I_1D,19,PISR-NSGA-II,1,4,False
+Painleve-I_1D,19,PySR best,2,5,False
+Painleve-I_1D,20,PISR-NSGA-II,1,7,False
+Painleve-I_1D,20,PySR best,5,4,False
+Painleve-I_1D,21,PISR-NSGA-II,1,4,False
+Painleve-I_1D,21,PySR best,1,3,False
+Painleve-I_1D,22,PISR-NSGA-II,1,3,False
+Painleve-I_1D,22,PySR best,2,4,False
+Painleve-I_1D,23,PISR-NSGA-II,1,6,False
+Painleve-I_1D,23,PySR best,1,3,False
+Painleve-I_1D,24,PISR-NSGA-II,1,3,False
+Painleve-I_1D,24,PySR best,0,4,False
+Painleve-I_1D,25,PISR-NSGA-II,1,5,False
+Painleve-I_1D,25,PySR best,5,3,False
+Painleve-I_1D,26,PISR-NSGA-II,1,4,False
+Painleve-I_1D,26,PySR best,1,3,False
+Painleve-I_1D,27,PISR-NSGA-II,1,5,False
+Painleve-I_1D,27,PySR best,1,3,False
+Painleve-I_1D,28,PISR-NSGA-II,1,3,False
+Painleve-I_1D,28,PySR best,5,6,False
+Painleve-I_1D,29,PISR-NSGA-II,1,5,False
+Painleve-I_1D,29,PySR best,1,4,False
+Laplace_1D,0,PySR pars.,1,3,False
+Laplace_1D,1,PySR pars.,1,3,False
+Laplace_1D,2,PySR pars.,3,3,False
+Laplace_1D,3,PySR pars.,1,2,False
+Laplace_1D,4,PySR pars.,3,3,False
+Laplace_1D,5,PySR pars.,0,0,False
+Laplace_1D,6,PySR pars.,1,2,False
+Laplace_1D,7,PySR pars.,2,2,False
+Laplace_1D,8,PySR pars.,1,4,False
+Laplace_1D,9,PySR pars.,2,3,False
+Laplace_1D,10,PySR pars.,1,3,False
+Laplace_1D,11,PySR pars.,1,3,False
+Laplace_1D,12,PySR pars.,1,2,False
+Laplace_1D,13,PySR pars.,5,3,False
+Laplace_1D,14,PySR pars.,5,2,False
+Laplace_1D,15,PySR pars.,2,2,False
+Laplace_1D,16,PySR pars.,5,4,True
+Laplace_1D,17,PySR pars.,1,2,False
+Laplace_1D,18,PySR pars.,1,2,False
+Laplace_1D,19,PySR pars.,1,6,False
+Laplace_1D,20,PySR pars.,1,4,False
+Laplace_1D,21,PySR pars.,2,2,False
+Laplace_1D,22,PySR pars.,2,3,False
+Laplace_1D,23,PySR pars.,1,3,False
+Laplace_1D,24,PySR pars.,3,3,False
+Laplace_1D,25,PySR pars.,1,4,False
+Laplace_1D,26,PySR pars.,1,5,False
+Laplace_1D,27,PySR pars.,2,3,False
+Laplace_1D,28,PySR pars.,1,3,False
+Laplace_1D,29,PySR pars.,2,4,False
+Poisson_1D,0,PySR pars.,1,2,False
+Poisson_1D,1,PySR pars.,1,3,False
+Poisson_1D,2,PySR pars.,1,2,False
+Poisson_1D,3,PySR pars.,1,4,False
+Poisson_1D,4,PySR pars.,1,1,False
+Poisson_1D,5,PySR pars.,1,1,False
+Poisson_1D,6,PySR pars.,1,2,False
+Poisson_1D,7,PySR pars.,1,1,False
+Poisson_1D,8,PySR pars.,1,1,False
+Poisson_1D,9,PySR pars.,1,2,False
+Poisson_1D,10,PySR pars.,1,1,False
+Poisson_1D,11,PySR pars.,3,4,False
+Poisson_1D,12,PySR pars.,1,2,False
+Poisson_1D,13,PySR pars.,1,1,False
+Poisson_1D,14,PySR pars.,1,1,False
+Poisson_1D,15,PySR pars.,1,2,False
+Poisson_1D,16,PySR pars.,1,2,False
+Poisson_1D,17,PySR pars.,1,3,False
+Poisson_1D,18,PySR pars.,1,2,False
+Poisson_1D,19,PySR pars.,1,1,False
+Poisson_1D,20,PySR pars.,1,2,False
+Poisson_1D,21,PySR pars.,1,1,False
+Poisson_1D,22,PySR pars.,1,2,False
+Poisson_1D,23,PySR pars.,1,2,False
+Poisson_1D,24,PySR pars.,1,2,False
+Poisson_1D,25,PySR pars.,1,1,False
+Poisson_1D,26,PySR pars.,1,2,False
+Poisson_1D,27,PySR pars.,3,4,False
+Poisson_1D,28,PySR pars.,1,1,False
+Poisson_1D,29,PySR pars.,1,1,False
+HarmonicOscillator_1D,0,PySR pars.,3,2,False
+HarmonicOscillator_1D,1,PySR pars.,3,3,False
+HarmonicOscillator_1D,2,PySR pars.,2,3,False
+HarmonicOscillator_1D,3,PySR pars.,3,5,False
+HarmonicOscillator_1D,4,PySR pars.,1,4,False
+HarmonicOscillator_1D,5,PySR pars.,3,2,False
+HarmonicOscillator_1D,6,PySR pars.,3,2,False
+HarmonicOscillator_1D,7,PySR pars.,4,4,False
+HarmonicOscillator_1D,8,PySR pars.,3,3,False
+HarmonicOscillator_1D,9,PySR pars.,3,2,False
+HarmonicOscillator_1D,10,PySR pars.,1,1,False
+HarmonicOscillator_1D,11,PySR pars.,2,2,False
+HarmonicOscillator_1D,12,PySR pars.,2,3,False
+HarmonicOscillator_1D,13,PySR pars.,1,2,False
+HarmonicOscillator_1D,14,PySR pars.,1,1,False
+HarmonicOscillator_1D,15,PySR pars.,1,1,False
+HarmonicOscillator_1D,16,PySR pars.,1,2,False
+HarmonicOscillator_1D,17,PySR pars.,2,3,False
+HarmonicOscillator_1D,18,PySR pars.,1,2,False
+HarmonicOscillator_1D,19,PySR pars.,3,2,False
+HarmonicOscillator_1D,20,PySR pars.,3,2,False
+HarmonicOscillator_1D,21,PySR pars.,3,2,False
+HarmonicOscillator_1D,22,PySR pars.,1,2,False
+HarmonicOscillator_1D,23,PySR pars.,5,2,False
+HarmonicOscillator_1D,24,PySR pars.,2,2,False
+HarmonicOscillator_1D,25,PySR pars.,1,2,False
+HarmonicOscillator_1D,26,PySR pars.,1,1,False
+HarmonicOscillator_1D,27,PySR pars.,3,3,False
+HarmonicOscillator_1D,28,PySR pars.,2,3,False
+HarmonicOscillator_1D,29,PySR pars.,1,1,False
+Airy_1D,0,PySR pars.,1,4,False
+Airy_1D,1,PySR pars.,2,3,False
+Airy_1D,2,PySR pars.,5,3,False
+Airy_1D,3,PySR pars.,5,3,False
+Airy_1D,4,PySR pars.,1,5,False
+Airy_1D,5,PySR pars.,5,2,False
+Airy_1D,6,PySR pars.,6,3,False
+Airy_1D,7,PySR pars.,1,3,False
+Airy_1D,8,PySR pars.,2,4,False
+Airy_1D,9,PySR pars.,5,2,False
+Airy_1D,10,PySR pars.,4,2,False
+Airy_1D,11,PySR pars.,2,3,False
+Airy_1D,12,PySR pars.,1,3,False
+Airy_1D,13,PySR pars.,5,2,False
+Airy_1D,14,PySR pars.,4,3,False
+Airy_1D,15,PySR pars.,5,3,False
+Airy_1D,16,PySR pars.,8,3,False
+Airy_1D,17,PySR pars.,7,4,False
+Airy_1D,18,PySR pars.,5,5,False
+Airy_1D,19,PySR pars.,5,3,False
+Airy_1D,20,PySR pars.,7,3,False
+Airy_1D,21,PySR pars.,1,4,False
+Airy_1D,22,PySR pars.,3,3,False
+Airy_1D,23,PySR pars.,2,3,False
+Airy_1D,24,PySR pars.,6,4,False
+Airy_1D,25,PySR pars.,3,2,False
+Airy_1D,26,PySR pars.,5,2,False
+Airy_1D,27,PySR pars.,2,3,False
+Airy_1D,28,PySR pars.,10,3,False
+Airy_1D,29,PySR pars.,1,4,False
+Airy_2D,0,PySR pars.,5,2,False
+Airy_2D,1,PySR pars.,2,3,False
+Airy_2D,2,PySR pars.,7,1,False
+Airy_2D,3,PySR pars.,2,2,False
+Airy_2D,4,PySR pars.,3,4,False
+Airy_2D,5,PySR pars.,7,1,False
+Airy_2D,6,PySR pars.,4,3,False
+Airy_2D,7,PySR pars.,2,3,False
+Airy_2D,8,PySR pars.,4,3,False
+Airy_2D,9,PySR pars.,2,2,False
+Airy_2D,10,PySR pars.,5,3,False
+Airy_2D,11,PySR pars.,0,4,False
+Airy_2D,12,PySR pars.,7,1,False
+Airy_2D,13,PySR pars.,9,2,False
+Airy_2D,14,PySR pars.,6,3,False
+Airy_2D,15,PySR pars.,2,2,False
+Airy_2D,16,PySR pars.,2,2,False
+Airy_2D,17,PySR pars.,2,5,False
+Airy_2D,18,PySR pars.,2,3,False
+Airy_2D,19,PySR pars.,7,4,False
+Airy_2D,20,PySR pars.,3,2,False
+Airy_2D,21,PySR pars.,4,2,False
+Airy_2D,22,PySR pars.,7,1,False
+Airy_2D,23,PySR pars.,3,2,False
+Airy_2D,24,PySR pars.,2,2,False
+Airy_2D,25,PySR pars.,2,2,False
+Airy_2D,26,PySR pars.,2,2,False
+Airy_2D,27,PySR pars.,1,2,False
+Airy_2D,28,PySR pars.,7,1,False
+Airy_2D,29,PySR pars.,1,3,False
+Fisher_1D,0,PySR pars.,5,3,False
+Fisher_1D,1,PySR pars.,3,3,False
+Fisher_1D,2,PySR pars.,8,2,False
+Fisher_1D,3,PySR pars.,9,3,False
+Fisher_1D,4,PySR pars.,11,2,False
+Fisher_1D,5,PySR pars.,3,2,False
+Fisher_1D,6,PySR pars.,4,3,False
+Fisher_1D,7,PySR pars.,1,5,False
+Fisher_1D,8,PySR pars.,4,4,False
+Fisher_1D,9,PySR pars.,9,3,False
+Fisher_1D,10,PySR pars.,3,3,False
+Fisher_1D,11,PySR pars.,3,4,False
+Fisher_1D,12,PySR pars.,0,4,False
+Fisher_1D,13,PySR pars.,2,4,False
+Fisher_1D,14,PySR pars.,2,5,False
+Fisher_1D,15,PySR pars.,3,3,False
+Fisher_1D,16,PySR pars.,1,5,False
+Fisher_1D,17,PySR pars.,6,4,False
+Fisher_1D,18,PySR pars.,1,5,False
+Fisher_1D,19,PySR pars.,2,5,False
+Fisher_1D,20,PySR pars.,3,5,False
+Fisher_1D,21,PySR pars.,4,5,False
+Fisher_1D,22,PySR pars.,2,3,False
+Fisher_1D,23,PySR pars.,2,4,False
+Fisher_1D,24,PySR pars.,3,5,False
+Fisher_1D,25,PySR pars.,6,1,False
+Fisher_1D,26,PySR pars.,5,5,False
+Fisher_1D,27,PySR pars.,3,3,False
+Fisher_1D,28,PySR pars.,0,4,False
+Fisher_1D,29,PySR pars.,2,3,False
+Fisher_2D,0,PySR pars.,3,1,False
+Fisher_2D,1,PySR pars.,1,3,False
+Fisher_2D,2,PySR pars.,2,2,False
+Fisher_2D,3,PySR pars.,1,3,False
+Fisher_2D,4,PySR pars.,1,3,False
+Fisher_2D,5,PySR pars.,4,3,False
+Fisher_2D,6,PySR pars.,3,1,False
+Fisher_2D,7,PySR pars.,2,2,False
+Fisher_2D,8,PySR pars.,3,1,False
+Fisher_2D,9,PySR pars.,2,2,False
+Fisher_2D,10,PySR pars.,3,1,False
+Fisher_2D,11,PySR pars.,3,2,False
+Fisher_2D,12,PySR pars.,2,4,False
+Fisher_2D,13,PySR pars.,2,2,False
+Fisher_2D,14,PySR pars.,3,1,False
+Fisher_2D,15,PySR pars.,1,3,False
+Fisher_2D,16,PySR pars.,1,3,False
+Fisher_2D,17,PySR pars.,3,1,False
+Fisher_2D,18,PySR pars.,2,2,False
+Fisher_2D,19,PySR pars.,1,3,False
+Fisher_2D,20,PySR pars.,3,1,False
+Fisher_2D,21,PySR pars.,3,2,False
+Fisher_2D,22,PySR pars.,2,2,False
+Fisher_2D,23,PySR pars.,3,2,False
+Fisher_2D,24,PySR pars.,4,0,False
+Fisher_2D,25,PySR pars.,6,2,False
+Fisher_2D,26,PySR pars.,2,3,False
+Fisher_2D,27,PySR pars.,2,2,False
+Fisher_2D,28,PySR pars.,1,3,False
+Fisher_2D,29,PySR pars.,4,0,False
+Duffing_1D,0,PySR pars.,2,3,True
+Duffing_1D,1,PySR pars.,1,5,False
+Duffing_1D,2,PySR pars.,2,2,False
+Duffing_1D,3,PySR pars.,2,3,False
+Duffing_1D,4,PySR pars.,5,3,True
+Duffing_1D,5,PySR pars.,4,4,False
+Duffing_1D,6,PySR pars.,8,2,False
+Duffing_1D,7,PySR pars.,2,4,False
+Duffing_1D,8,PySR pars.,3,2,False
+Duffing_1D,9,PySR pars.,4,5,False
+Duffing_1D,10,PySR pars.,2,4,False
+Duffing_1D,11,PySR pars.,2,6,False
+Duffing_1D,12,PySR pars.,7,5,False
+Duffing_1D,13,PySR pars.,4,5,False
+Duffing_1D,14,PySR pars.,4,3,False
+Duffing_1D,15,PySR pars.,4,2,False
+Duffing_1D,16,PySR pars.,5,3,False
+Duffing_1D,17,PySR pars.,3,3,False
+Duffing_1D,18,PySR pars.,1,3,False
+Duffing_1D,19,PySR pars.,1,3,False
+Duffing_1D,20,PySR pars.,4,4,False
+Duffing_1D,21,PySR pars.,1,3,False
+Duffing_1D,22,PySR pars.,4,4,False
+Duffing_1D,23,PySR pars.,2,5,False
+Duffing_1D,24,PySR pars.,7,3,False
+Duffing_1D,25,PySR pars.,4,4,False
+Duffing_1D,26,PySR pars.,2,1,False
+Duffing_1D,27,PySR pars.,3,6,False
+Duffing_1D,28,PySR pars.,2,3,False
+Duffing_1D,29,PySR pars.,1,4,False
+Duffing_2D,0,PySR pars.,2,1,False
+Duffing_2D,1,PySR pars.,2,3,False
+Duffing_2D,2,PySR pars.,2,5,False
+Duffing_2D,3,PySR pars.,2,2,False
+Duffing_2D,4,PySR pars.,2,1,False
+Duffing_2D,5,PySR pars.,2,3,False
+Duffing_2D,6,PySR pars.,1,2,False
+Duffing_2D,7,PySR pars.,2,3,False
+Duffing_2D,8,PySR pars.,1,3,False
+Duffing_2D,9,PySR pars.,3,1,False
+Duffing_2D,10,PySR pars.,2,2,False
+Duffing_2D,11,PySR pars.,2,2,False
+Duffing_2D,12,PySR pars.,2,1,False
+Duffing_2D,13,PySR pars.,2,1,False
+Duffing_2D,14,PySR pars.,2,2,False
+Duffing_2D,15,PySR pars.,4,1,False
+Duffing_2D,16,PySR pars.,2,2,False
+Duffing_2D,17,PySR pars.,2,2,False
+Duffing_2D,18,PySR pars.,2,3,False
+Duffing_2D,19,PySR pars.,4,2,False
+Duffing_2D,20,PySR pars.,1,3,False
+Duffing_2D,21,PySR pars.,2,2,False
+Duffing_2D,22,PySR pars.,2,2,False
+Duffing_2D,23,PySR pars.,1,3,False
+Duffing_2D,24,PySR pars.,1,3,False
+Duffing_2D,25,PySR pars.,2,3,False
+Duffing_2D,26,PySR pars.,3,2,False
+Duffing_2D,27,PySR pars.,2,2,False
+Duffing_2D,28,PySR pars.,2,1,False
+Duffing_2D,29,PySR pars.,2,2,False
+Thomas-Fermi_1D,0,PySR pars.,4,3,False
+Thomas-Fermi_1D,1,PySR pars.,2,3,False
+Thomas-Fermi_1D,2,PySR pars.,3,4,False
+Thomas-Fermi_1D,3,PySR pars.,2,3,False
+Thomas-Fermi_1D,4,PySR pars.,4,2,False
+Thomas-Fermi_1D,5,PySR pars.,3,3,False
+Thomas-Fermi_1D,6,PySR pars.,0,2,False
+Thomas-Fermi_1D,7,PySR pars.,8,3,False
+Thomas-Fermi_1D,8,PySR pars.,2,3,False
+Thomas-Fermi_1D,9,PySR pars.,1,4,False
+Thomas-Fermi_1D,10,PySR pars.,3,3,False
+Thomas-Fermi_1D,11,PySR pars.,4,4,False
+Thomas-Fermi_1D,12,PySR pars.,3,3,False
+Thomas-Fermi_1D,13,PySR pars.,3,4,False
+Thomas-Fermi_1D,14,PySR pars.,2,4,False
+Thomas-Fermi_1D,15,PySR pars.,2,4,False
+Thomas-Fermi_1D,16,PySR pars.,5,3,False
+Thomas-Fermi_1D,17,PySR pars.,4,4,False
+Thomas-Fermi_1D,18,PySR pars.,2,4,False
+Thomas-Fermi_1D,19,PySR pars.,1,3,True
+Thomas-Fermi_1D,20,PySR pars.,3,2,False
+Thomas-Fermi_1D,21,PySR pars.,0,3,False
+Thomas-Fermi_1D,22,PySR pars.,3,3,False
+Thomas-Fermi_1D,23,PySR pars.,3,4,False
+Thomas-Fermi_1D,24,PySR pars.,3,3,False
+Thomas-Fermi_1D,25,PySR pars.,3,3,False
+Thomas-Fermi_1D,26,PySR pars.,5,2,False
+Thomas-Fermi_1D,27,PySR pars.,0,3,False
+Thomas-Fermi_1D,28,PySR pars.,0,3,False
+Thomas-Fermi_1D,29,PySR pars.,1,3,False
+Thomas-Fermi_2D,0,PySR pars.,1,1,False
+Thomas-Fermi_2D,1,PySR pars.,1,1,False
+Thomas-Fermi_2D,2,PySR pars.,1,2,False
+Thomas-Fermi_2D,3,PySR pars.,0,3,False
+Thomas-Fermi_2D,4,PySR pars.,1,2,False
+Thomas-Fermi_2D,5,PySR pars.,1,1,False
+Thomas-Fermi_2D,6,PySR pars.,1,2,False
+Thomas-Fermi_2D,7,PySR pars.,1,1,False
+Thomas-Fermi_2D,8,PySR pars.,1,2,False
+Thomas-Fermi_2D,9,PySR pars.,2,2,False
+Thomas-Fermi_2D,10,PySR pars.,1,1,False
+Thomas-Fermi_2D,11,PySR pars.,1,1,False
+Thomas-Fermi_2D,12,PySR pars.,1,1,False
+Thomas-Fermi_2D,13,PySR pars.,1,1,False
+Thomas-Fermi_2D,14,PySR pars.,2,1,False
+Thomas-Fermi_2D,15,PySR pars.,1,1,False
+Thomas-Fermi_2D,16,PySR pars.,1,1,False
+Thomas-Fermi_2D,17,PySR pars.,1,1,False
+Thomas-Fermi_2D,18,PySR pars.,1,1,False
+Thomas-Fermi_2D,19,PySR pars.,2,1,False
+Thomas-Fermi_2D,20,PySR pars.,1,1,False
+Thomas-Fermi_2D,21,PySR pars.,2,1,False
+Thomas-Fermi_2D,22,PySR pars.,1,2,False
+Thomas-Fermi_2D,23,PySR pars.,1,1,False
+Thomas-Fermi_2D,24,PySR pars.,2,1,False
+Thomas-Fermi_2D,25,PySR pars.,1,2,False
+Thomas-Fermi_2D,26,PySR pars.,1,1,False
+Thomas-Fermi_2D,27,PySR pars.,2,1,False
+Thomas-Fermi_2D,28,PySR pars.,1,1,False
+Thomas-Fermi_2D,29,PySR pars.,2,2,False
+Schrodinger_1D,0,PySR pars.,2,4,False
+Schrodinger_1D,1,PySR pars.,1,3,False
+Schrodinger_1D,2,PySR pars.,1,3,False
+Schrodinger_1D,3,PySR pars.,1,2,False
+Schrodinger_1D,4,PySR pars.,1,1,False
+Schrodinger_1D,5,PySR pars.,1,4,False
+Schrodinger_1D,6,PySR pars.,1,2,False
+Schrodinger_1D,7,PySR pars.,2,3,False
+Schrodinger_1D,8,PySR pars.,1,3,False
+Schrodinger_1D,9,PySR pars.,1,2,False
+Schrodinger_1D,10,PySR pars.,2,4,False
+Schrodinger_1D,11,PySR pars.,4,6,False
+Schrodinger_1D,12,PySR pars.,2,6,False
+Schrodinger_1D,13,PySR pars.,1,2,False
+Schrodinger_1D,14,PySR pars.,1,2,False
+Schrodinger_1D,15,PySR pars.,1,2,False
+Schrodinger_1D,16,PySR pars.,1,2,False
+Schrodinger_1D,17,PySR pars.,1,4,False
+Schrodinger_1D,18,PySR pars.,1,3,False
+Schrodinger_1D,19,PySR pars.,1,2,False
+Schrodinger_1D,20,PySR pars.,1,3,False
+Schrodinger_1D,21,PySR pars.,1,1,False
+Schrodinger_1D,22,PySR pars.,1,3,False
+Schrodinger_1D,23,PySR pars.,1,3,False
+Schrodinger_1D,24,PySR pars.,4,5,False
+Schrodinger_1D,25,PySR pars.,1,2,False
+Schrodinger_1D,26,PySR pars.,1,3,False
+Schrodinger_1D,27,PySR pars.,1,2,False
+Schrodinger_1D,28,PySR pars.,1,2,False
+Schrodinger_1D,29,PySR pars.,1,2,False
+Schrodinger_2D,0,PySR pars.,1,3,False
+Schrodinger_2D,1,PySR pars.,1,3,False
+Schrodinger_2D,2,PySR pars.,1,1,False
+Schrodinger_2D,3,PySR pars.,1,2,False
+Schrodinger_2D,4,PySR pars.,1,2,False
+Schrodinger_2D,5,PySR pars.,1,3,False
+Schrodinger_2D,6,PySR pars.,1,3,False
+Schrodinger_2D,7,PySR pars.,1,2,False
+Schrodinger_2D,8,PySR pars.,1,2,False
+Schrodinger_2D,9,PySR pars.,1,2,False
+Schrodinger_2D,10,PySR pars.,1,1,False
+Schrodinger_2D,11,PySR pars.,1,2,False
+Schrodinger_2D,12,PySR pars.,1,2,False
+Schrodinger_2D,13,PySR pars.,1,5,False
+Schrodinger_2D,14,PySR pars.,1,2,False
+Schrodinger_2D,15,PySR pars.,1,2,False
+Schrodinger_2D,16,PySR pars.,1,2,False
+Schrodinger_2D,17,PySR pars.,1,2,False
+Schrodinger_2D,18,PySR pars.,1,3,False
+Schrodinger_2D,19,PySR pars.,1,3,False
+Schrodinger_2D,20,PySR pars.,1,3,False
+Schrodinger_2D,21,PySR pars.,1,2,False
+Schrodinger_2D,22,PySR pars.,1,2,False
+Schrodinger_2D,23,PySR pars.,1,2,False
+Schrodinger_2D,24,PySR pars.,1,3,False
+Schrodinger_2D,25,PySR pars.,1,2,False
+Schrodinger_2D,26,PySR pars.,1,4,False
+Schrodinger_2D,27,PySR pars.,1,3,False
+Schrodinger_2D,28,PySR pars.,1,0,False
+Schrodinger_2D,29,PySR pars.,1,2,False
+Schrodinger-Unsteady_1D,0,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,1,PySR pars.,1,6,False
+Schrodinger-Unsteady_1D,2,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,3,PySR pars.,5,7,False
+Schrodinger-Unsteady_1D,4,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,5,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,6,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,7,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,8,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,9,PySR pars.,5,4,False
+Schrodinger-Unsteady_1D,10,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,11,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,12,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,13,PySR pars.,6,4,False
+Schrodinger-Unsteady_1D,14,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,15,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,16,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,17,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,18,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,19,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,20,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,21,PySR pars.,5,4,False
+Schrodinger-Unsteady_1D,22,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,23,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,24,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,25,PySR pars.,1,5,False
+Schrodinger-Unsteady_1D,26,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,27,PySR pars.,1,4,False
+Schrodinger-Unsteady_1D,28,PySR pars.,1,6,False
+Schrodinger-Unsteady_1D,29,PySR pars.,1,6,False
+Schrodinger-Unsteady_2D,0,PySR pars.,1,6,False
+Schrodinger-Unsteady_2D,1,PySR pars.,1,5,False
+Schrodinger-Unsteady_2D,2,PySR pars.,1,3,False
+Schrodinger-Unsteady_2D,3,PySR pars.,1,3,False
+Schrodinger-Unsteady_2D,4,PySR pars.,1,5,False
+Schrodinger-Unsteady_2D,5,PySR pars.,1,7,False
+Schrodinger-Unsteady_2D,6,PySR pars.,1,7,False
+Schrodinger-Unsteady_2D,7,PySR pars.,1,7,False
+Schrodinger-Unsteady_2D,8,PySR pars.,4,6,False
+Schrodinger-Unsteady_2D,9,PySR pars.,0,2,False
+Schrodinger-Unsteady_2D,10,PySR pars.,1,5,False
+Schrodinger-Unsteady_2D,11,PySR pars.,1,4,False
+Schrodinger-Unsteady_2D,12,PySR pars.,0,2,False
+Schrodinger-Unsteady_2D,13,PySR pars.,1,5,False
+Schrodinger-Unsteady_2D,14,PySR pars.,0,2,False
+Schrodinger-Unsteady_2D,15,PySR pars.,1,4,False
+Schrodinger-Unsteady_2D,16,PySR pars.,2,6,False
+Schrodinger-Unsteady_2D,17,PySR pars.,1,6,False
+Schrodinger-Unsteady_2D,18,PySR pars.,1,6,False
+Schrodinger-Unsteady_2D,19,PySR pars.,2,5,True
+Schrodinger-Unsteady_2D,20,PySR pars.,1,6,False
+Schrodinger-Unsteady_2D,21,PySR pars.,2,6,False
+Schrodinger-Unsteady_2D,22,PySR pars.,1,3,False
+Schrodinger-Unsteady_2D,23,PySR pars.,1,5,False
+Schrodinger-Unsteady_2D,24,PySR pars.,2,4,False
+Schrodinger-Unsteady_2D,25,PySR pars.,1,5,False
+Schrodinger-Unsteady_2D,26,PySR pars.,1,7,False
+Schrodinger-Unsteady_2D,27,PySR pars.,3,8,False
+Schrodinger-Unsteady_2D,28,PySR pars.,1,5,False
+Schrodinger-Unsteady_2D,29,PySR pars.,1,6,True
+Navier-Stokes_2D,0,PySR pars.,2,2,False
+Navier-Stokes_2D,1,PySR pars.,1,2,False
+Navier-Stokes_2D,2,PySR pars.,1,1,False
+Navier-Stokes_2D,3,PySR pars.,1,2,False
+Navier-Stokes_2D,4,PySR pars.,1,3,False
+Navier-Stokes_2D,5,PySR pars.,2,2,False
+Navier-Stokes_2D,6,PySR pars.,1,1,False
+Navier-Stokes_2D,7,PySR pars.,1,2,False
+Navier-Stokes_2D,8,PySR pars.,3,1,False
+Navier-Stokes_2D,9,PySR pars.,2,1,False
+Navier-Stokes_2D,10,PySR pars.,1,3,False
+Navier-Stokes_2D,11,PySR pars.,2,2,False
+Navier-Stokes_2D,12,PySR pars.,1,1,False
+Navier-Stokes_2D,13,PySR pars.,1,3,False
+Navier-Stokes_2D,14,PySR pars.,1,2,False
+Navier-Stokes_2D,15,PySR pars.,1,2,False
+Navier-Stokes_2D,16,PySR pars.,1,3,False
+Navier-Stokes_2D,17,PySR pars.,1,1,False
+Navier-Stokes_2D,18,PySR pars.,2,2,False
+Navier-Stokes_2D,19,PySR pars.,1,2,False
+Navier-Stokes_2D,20,PySR pars.,1,1,False
+Navier-Stokes_2D,21,PySR pars.,1,1,False
+Navier-Stokes_2D,22,PySR pars.,1,1,False
+Navier-Stokes_2D,23,PySR pars.,1,1,False
+Navier-Stokes_2D,24,PySR pars.,2,2,False
+Navier-Stokes_2D,25,PySR pars.,1,1,False
+Navier-Stokes_2D,26,PySR pars.,1,2,False
+Navier-Stokes_2D,27,PySR pars.,2,2,False
+Navier-Stokes_2D,28,PySR pars.,1,2,False
+Navier-Stokes_2D,29,PySR pars.,1,1,False
+Navier-Stokes-Unsteady_2D,0,PySR pars.,3,1,False
+Navier-Stokes-Unsteady_2D,1,PySR pars.,1,3,False
+Navier-Stokes-Unsteady_2D,2,PySR pars.,3,2,False
+Navier-Stokes-Unsteady_2D,3,PySR pars.,2,2,False
+Navier-Stokes-Unsteady_2D,4,PySR pars.,1,3,False
+Navier-Stokes-Unsteady_2D,5,PySR pars.,3,1,False
+Navier-Stokes-Unsteady_2D,6,PySR pars.,2,2,False
+Navier-Stokes-Unsteady_2D,7,PySR pars.,2,2,False
+Navier-Stokes-Unsteady_2D,8,PySR pars.,1,3,False
+Navier-Stokes-Unsteady_2D,9,PySR pars.,2,2,False
+Navier-Stokes-Unsteady_2D,10,PySR pars.,3,2,False
+Navier-Stokes-Unsteady_2D,11,PySR pars.,2,2,False
+Navier-Stokes-Unsteady_2D,12,PySR pars.,1,2,False
+Navier-Stokes-Unsteady_2D,13,PySR pars.,1,3,False
+Navier-Stokes-Unsteady_2D,14,PySR pars.,2,3,False
+Navier-Stokes-Unsteady_2D,15,PySR pars.,2,3,False
+Navier-Stokes-Unsteady_2D,16,PySR pars.,1,4,False
+Navier-Stokes-Unsteady_2D,17,PySR pars.,3,2,False
+Navier-Stokes-Unsteady_2D,18,PySR pars.,2,2,False
+Navier-Stokes-Unsteady_2D,19,PySR pars.,1,3,False
+Navier-Stokes-Unsteady_2D,20,PySR pars.,1,2,False
+Navier-Stokes-Unsteady_2D,21,PySR pars.,1,3,False
+Navier-Stokes-Unsteady_2D,22,PySR pars.,2,2,False
+Navier-Stokes-Unsteady_2D,23,PySR pars.,1,3,False
+Navier-Stokes-Unsteady_2D,24,PySR pars.,3,2,False
+Navier-Stokes-Unsteady_2D,25,PySR pars.,2,1,False
+Navier-Stokes-Unsteady_2D,26,PySR pars.,1,4,False
+Navier-Stokes-Unsteady_2D,27,PySR pars.,2,2,False
+Navier-Stokes-Unsteady_2D,28,PySR pars.,0,2,False
+Navier-Stokes-Unsteady_2D,29,PySR pars.,1,4,False
+Lane-Emden_1D,0,PySR pars.,2,2,False
+Lane-Emden_1D,1,PySR pars.,5,5,False
+Lane-Emden_1D,2,PySR pars.,2,2,False
+Lane-Emden_1D,3,PySR pars.,5,4,False
+Lane-Emden_1D,4,PySR pars.,3,2,False
+Lane-Emden_1D,5,PySR pars.,2,1,False
+Lane-Emden_1D,6,PySR pars.,3,2,False
+Lane-Emden_1D,7,PySR pars.,2,1,False
+Lane-Emden_1D,8,PySR pars.,2,2,False
+Lane-Emden_1D,9,PySR pars.,2,2,False
+Lane-Emden_1D,10,PySR pars.,2,2,False
+Lane-Emden_1D,11,PySR pars.,3,2,False
+Lane-Emden_1D,12,PySR pars.,2,2,False
+Lane-Emden_1D,13,PySR pars.,6,2,False
+Lane-Emden_1D,14,PySR pars.,2,2,False
+Lane-Emden_1D,15,PySR pars.,5,2,False
+Lane-Emden_1D,16,PySR pars.,2,2,False
+Lane-Emden_1D,17,PySR pars.,4,5,False
+Lane-Emden_1D,18,PySR pars.,3,3,False
+Lane-Emden_1D,19,PySR pars.,2,2,False
+Lane-Emden_1D,20,PySR pars.,2,2,False
+Lane-Emden_1D,21,PySR pars.,3,2,False
+Lane-Emden_1D,22,PySR pars.,2,4,False
+Lane-Emden_1D,23,PySR pars.,3,3,False
+Lane-Emden_1D,24,PySR pars.,2,2,False
+Lane-Emden_1D,25,PySR pars.,2,2,False
+Lane-Emden_1D,26,PySR pars.,2,2,False
+Lane-Emden_1D,27,PySR pars.,3,4,False
+Lane-Emden_1D,28,PySR pars.,3,3,False
+Lane-Emden_1D,29,PySR pars.,2,2,False
+Troesch_1D,0,PySR pars.,4,3,False
+Troesch_1D,1,PySR pars.,2,3,False
+Troesch_1D,2,PySR pars.,3,3,False
+Troesch_1D,3,PySR pars.,2,4,False
+Troesch_1D,4,PySR pars.,1,2,True
+Troesch_1D,5,PySR pars.,2,2,False
+Troesch_1D,6,PySR pars.,0,5,False
+Troesch_1D,7,PySR pars.,3,3,True
+Troesch_1D,8,PySR pars.,2,3,True
+Troesch_1D,9,PySR pars.,1,3,False
+Troesch_1D,10,PySR pars.,2,3,False
+Troesch_1D,11,PySR pars.,3,3,True
+Troesch_1D,12,PySR pars.,2,3,True
+Troesch_1D,13,PySR pars.,0,3,False
+Troesch_1D,14,PySR pars.,2,3,False
+Troesch_1D,15,PySR pars.,1,3,False
+Troesch_1D,16,PySR pars.,5,2,True
+Troesch_1D,17,PySR pars.,0,3,False
+Troesch_1D,18,PySR pars.,1,4,False
+Troesch_1D,19,PySR pars.,2,3,False
+Troesch_1D,20,PySR pars.,4,2,True
+Troesch_1D,21,PySR pars.,1,3,True
+Troesch_1D,22,PySR pars.,2,2,False
+Troesch_1D,23,PySR pars.,2,3,False
+Troesch_1D,24,PySR pars.,0,4,True
+Troesch_1D,25,PySR pars.,0,4,True
+Troesch_1D,26,PySR pars.,0,5,False
+Troesch_1D,27,PySR pars.,2,4,False
+Troesch_1D,28,PySR pars.,0,4,False
+Troesch_1D,29,PySR pars.,1,3,False
+Ginzburg-Landau_1D,0,PySR pars.,2,4,False
+Ginzburg-Landau_1D,1,PySR pars.,1,1,False
+Ginzburg-Landau_1D,2,PySR pars.,3,2,False
+Ginzburg-Landau_1D,3,PySR pars.,3,4,False
+Ginzburg-Landau_1D,4,PySR pars.,2,3,False
+Ginzburg-Landau_1D,5,PySR pars.,4,2,False
+Ginzburg-Landau_1D,6,PySR pars.,8,3,False
+Ginzburg-Landau_1D,7,PySR pars.,3,4,False
+Ginzburg-Landau_1D,8,PySR pars.,3,4,False
+Ginzburg-Landau_1D,9,PySR pars.,3,3,False
+Ginzburg-Landau_1D,10,PySR pars.,3,3,False
+Ginzburg-Landau_1D,11,PySR pars.,5,3,False
+Ginzburg-Landau_1D,12,PySR pars.,6,3,False
+Ginzburg-Landau_1D,13,PySR pars.,2,3,False
+Ginzburg-Landau_1D,14,PySR pars.,4,3,False
+Ginzburg-Landau_1D,15,PySR pars.,5,3,False
+Ginzburg-Landau_1D,16,PySR pars.,4,4,False
+Ginzburg-Landau_1D,17,PySR pars.,3,2,False
+Ginzburg-Landau_1D,18,PySR pars.,1,1,False
+Ginzburg-Landau_1D,19,PySR pars.,1,3,False
+Ginzburg-Landau_1D,20,PySR pars.,1,2,False
+Ginzburg-Landau_1D,21,PySR pars.,10,2,False
+Ginzburg-Landau_1D,22,PySR pars.,2,2,False
+Ginzburg-Landau_1D,23,PySR pars.,2,4,False
+Ginzburg-Landau_1D,24,PySR pars.,4,3,False
+Ginzburg-Landau_1D,25,PySR pars.,1,2,False
+Ginzburg-Landau_1D,26,PySR pars.,3,3,False
+Ginzburg-Landau_1D,27,PySR pars.,6,2,False
+Ginzburg-Landau_1D,28,PySR pars.,1,3,False
+Ginzburg-Landau_1D,29,PySR pars.,2,2,False
+Painleve-I_1D,0,PySR pars.,2,3,False
+Painleve-I_1D,1,PySR pars.,1,4,False
+Painleve-I_1D,2,PySR pars.,3,2,False
+Painleve-I_1D,3,PySR pars.,1,3,False
+Painleve-I_1D,4,PySR pars.,1,4,False
+Painleve-I_1D,5,PySR pars.,3,3,False
+Painleve-I_1D,6,PySR pars.,0,3,False
+Painleve-I_1D,7,PySR pars.,4,3,False
+Painleve-I_1D,8,PySR pars.,1,3,False
+Painleve-I_1D,9,PySR pars.,0,3,False
+Painleve-I_1D,10,PySR pars.,6,2,False
+Painleve-I_1D,11,PySR pars.,0,3,False
+Painleve-I_1D,12,PySR pars.,1,3,False
+Painleve-I_1D,13,PySR pars.,1,3,False
+Painleve-I_1D,14,PySR pars.,3,4,False
+Painleve-I_1D,15,PySR pars.,3,2,False
+Painleve-I_1D,16,PySR pars.,1,3,False
+Painleve-I_1D,17,PySR pars.,2,2,False
+Painleve-I_1D,18,PySR pars.,0,3,False
+Painleve-I_1D,19,PySR pars.,1,4,False
+Painleve-I_1D,20,PySR pars.,2,3,False
+Painleve-I_1D,21,PySR pars.,1,3,False
+Painleve-I_1D,22,PySR pars.,2,4,False
+Painleve-I_1D,23,PySR pars.,1,3,False
+Painleve-I_1D,24,PySR pars.,0,3,False
+Painleve-I_1D,25,PySR pars.,4,3,False
+Painleve-I_1D,26,PySR pars.,1,3,False
+Painleve-I_1D,27,PySR pars.,1,3,False
+Painleve-I_1D,28,PySR pars.,4,3,False
+Painleve-I_1D,29,PySR pars.,0,4,False

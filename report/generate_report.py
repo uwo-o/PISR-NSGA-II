@@ -542,6 +542,13 @@ def interpretability_section():
               r"encontró, no un método aplicable; PISR-NSGA-II se reporta por su único campeón, sin un oráculo "
               r"comparable sobre su propio frente.",
               r"\input{tables/pysr_front_table.tex}"]
+    if os.path.exists(os.path.join(TABLES_DIR, "readability_table.tex")):
+        L += [r"\subsection*{Legibilidad}",
+              r"El número de nodos no captura todo lo que hace legible una fórmula. La "
+              r"Tabla~\ref{tab:readability} agrega tres medidas objetivas: cuántas funciones van anidadas una "
+              r"dentro de otra, cuántas constantes ajustó el método, y si la fórmula tiene singularidades o "
+              r"explota en $[0,1.5]^d$, algo que no corresponde a la física de estos problemas.",
+              r"\input{tables/readability_table.tex}"]
     return L
 
 
@@ -600,7 +607,8 @@ def make_latex_report(df, ext, stale):
 def clean_stale_outputs():
     """Borra tablas/figuras con nombres de versiones anteriores del reporte."""
     keep_tables = {"suite_table.tex", "results_table.tex", "comparison_table.tex", "formulas_table.tex", "extrapolation_table.tex", "extrapolation_methods_table.tex",
-                   "physics_checks.tex", "interpretability_table.tex", "pysr_front_table.tex"}
+                   "physics_checks.tex", "interpretability_table.tex", "pysr_front_table.tex",
+                   "readability_table.tex"}
     for f in glob.glob(os.path.join(TABLES_DIR, "*.tex")):
         if os.path.basename(f) not in keep_tables:
             os.remove(f)

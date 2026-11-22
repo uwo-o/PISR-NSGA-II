@@ -38,6 +38,7 @@ $PY report/extrapolation.py
 $PY report/physics_checks.py
 $PY report/interpretability.py
 $PY report/pysr_front_analysis.py
+$PY report/readability.py
 $PY report/generate_report.py
 $PY report/generate_formulas_table.py
 
