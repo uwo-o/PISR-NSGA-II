@@ -487,11 +487,16 @@ def extrapolation_section():
          r"polinomial): igual de bueno adentro, sin conocimiento de la ecuación afuera. La grilla de RK4/FDM "
          r"ni siquiera se puede evaluar fuera de $[0,1]$.",
          r"\input{tables/extrapolation_table.tex}"]
-    for fig, cap in [("extrapolation_solutions.pdf", r"Campeón (discontinua), polinomio de Chebyshev de igual "
-                      r"precisión (punteada) y referencia (gris) en $[0,1.5]$; región sombreada: fuera del "
-                      r"dominio de entrenamiento."),
-                     ("extrapolation_errors.pdf", r"Error puntual del campeón y del polinomio de Chebyshev de "
-                      r"igual precisión en $[0,1.5]$.")]:
+    if os.path.exists(os.path.join(TABLES_DIR, "extrapolation_methods_table.tex")):
+        L += [r"\subsection*{Los tres métodos fuera del dominio}",
+              r"La misma prueba para los competidores: la red del PINN evaluada fuera de $[0,1]$ y la fórmula de "
+              r"PINN+PySR, contra la fórmula de PISR-NSGA-II, sobre todas las semillas "
+              r"(Tabla~\ref{tab:extrapolation_methods}). Las figuras muestran a cada método en su semilla mediana.",
+              r"\input{tables/extrapolation_methods_table.tex}"]
+    for fig, cap in [("extrapolation_solutions.pdf", r"Campeón de PISR-NSGA-II (discontinua), polinomio de "
+                      r"Chebyshev de igual precisión (punteada), PINN y PINN+PySR (semilla mediana) y referencia "
+                      r"(gris) en $[0,1.5]$; región sombreada: fuera del dominio de entrenamiento."),
+                     ("extrapolation_errors.pdf", r"Error puntual de cada método en $[0,1.5]$.")]:
         if os.path.exists(os.path.join(FIGS_DIR, fig)):
             L += figure(fig, cap, place="H")
     return L
@@ -594,7 +599,7 @@ def make_latex_report(df, ext, stale):
 
 def clean_stale_outputs():
     """Borra tablas/figuras con nombres de versiones anteriores del reporte."""
-    keep_tables = {"suite_table.tex", "results_table.tex", "comparison_table.tex", "formulas_table.tex", "extrapolation_table.tex",
+    keep_tables = {"suite_table.tex", "results_table.tex", "comparison_table.tex", "formulas_table.tex", "extrapolation_table.tex", "extrapolation_methods_table.tex",
                    "physics_checks.tex", "interpretability_table.tex", "pysr_front_table.tex"}
     for f in glob.glob(os.path.join(TABLES_DIR, "*.tex")):
         if os.path.basename(f) not in keep_tables:

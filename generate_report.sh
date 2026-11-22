@@ -30,6 +30,10 @@ $PY scripts/plot_extra_report_figures.py
 
 echo ">>> 3/4 Simplificacion simbolica, tablas y documento"
 $PY report/simplify_expressions.py
+# Red del PINN evaluada fuera de [0,1] (necesita PyTorch: .venv-competitors de run_competitors.sh)
+if ./.venv-competitors/bin/python3 -c "import torch" >/dev/null 2>&1; then
+    ./.venv-competitors/bin/python3 competitors/pinn_extrapolate.py
+fi
 $PY report/extrapolation.py
 $PY report/physics_checks.py
 $PY report/interpretability.py

@@ -35,7 +35,7 @@ from numpy.polynomial import chebyshev as C
 from scipy.integrate import solve_bvp, solve_ivp
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from benchmarks import BENCHMARKS, BOUNDARY, latest_result  # noqa: E402
+from benchmarks import BENCHMARKS, BOUNDARY, BY_LABEL, latest_result  # noqa: E402
 
 warnings.filterwarnings("ignore")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -43,6 +43,7 @@ RESULTS = os.path.join(ROOT, "results")
 TABLES = os.path.join(ROOT, "report", "tables")
 FIGS = os.path.join(ROOT, "report", "figures")
 X_MAX = 1.5
+COMP_STYLE = {"PINN": ("#27AE60", "-."), "PINN+PySR": ("#8E44AD", (0, (3, 1, 1, 1)))}
 x = sp.Symbol("x", nonnegative=True)
 
 # EDO u'' = f(x, u, u') de cada problema sin forma cerrada (mismas ecuaciones
@@ -119,6 +120,142 @@ def eval_expr(e, xs):
     return np.full_like(xs, complex(v), dtype=complex) if v.shape == () else v
 
 
+
+# ─── Competidores (PINN, PINN+PySR) ──────────────────────────────────────────
+def _median_file(pattern):
+    import glob as _g
+    from benchmarks import is_fresh
+    rows = []
+    for f in _g.glob(pattern):
+        if not is_fresh(f):
+            continue
+        try:
+            v = float(pd.read_csv(f)["solution_mse"].iloc[0])
+        except Exception:
+            continue
+        if np.isfinite(v):
+            rows.append((v, f))
+    rows.sort()
+    return rows[(len(rows) - 1) // 2][1] if rows else None
+
+
+def pinn_curve(path_csv):
+    """Prediccion del PINN en XS (de competitors/pinn_extrapolate.py), o None."""
+    p = path_csv.replace("_pinn.csv", "_pinn_extrap.csv")
+    if not os.path.exists(p):
+        return None
+    d = pd.read_csv(p)
+    return d["u_re"].to_numpy() + 1j * d["u_im"].to_numpy()
+
+
+def pysr_curve(path_csv, xs):
+    r = pd.read_csv(path_csv).iloc[0]
+    if not isinstance(r.get("expr_srepr"), str):
+        return None
+    try:
+        e = sp.sympify(eval(r["expr_srepr"], sp.__dict__.copy()))
+        e = e.subs({s: x for s in e.free_symbols if s.name == "x"})
+        e = e.subs({s: 0 for s in e.free_symbols if s.name in ("y", "t")})
+        return eval_expr(e, xs)
+    except Exception:
+        return None
+
+
+def competitor_curves(b, xs):
+    out = {}
+    f = _median_file(os.path.join(RESULTS, "run_*", f"{b.label}_pinn.csv"))
+    if f is not None and (c := pinn_curve(f)) is not None:
+        out["PINN"] = c
+    f = _median_file(os.path.join(RESULTS, "run_*", f"{b.label}_pinn_pysr.csv"))
+    if f is not None and (c := pysr_curve(f, xs)) is not None:
+        out["PINN+PySR"] = c
+    return out
+
+
+def band_err(u, ref, xs, lo, hi):
+    m = (xs > lo) & (xs <= hi) & np.isfinite(ref)
+    if not m.any() or u is None:
+        return np.nan
+    if not np.all(np.isfinite(u[m])):
+        return np.inf
+    return float(np.max(np.abs(u[m] - ref[m]))) / float(np.nanmax(np.abs(ref)))
+
+
+def three_methods(refs, xs):
+    """Error de extrapolacion de PISR, PINN y PINN+PySR en cada semilla."""
+    import glob as _g
+    import interpretability as I  # import tardio: interpretability importa este modulo
+    rows = []
+    for b, ref in refs:
+        for d in sorted(_g.glob(os.path.join(RESULTS, "run_*"))):
+            if not os.path.basename(d).replace("run_", "").isdigit():
+                continue
+            run = int(d.rsplit("_", 1)[1])
+            curves = {}
+            e = I.pisr_formula(b, d)
+            if e is not None:
+                try:
+                    curves["PISR-NSGA-II"] = eval_expr(e.subs({s: x for s in e.free_symbols if s.name == "x"})
+                                                       .subs({s: 0 for s in e.free_symbols if s.name in ("y", "t")}), xs)
+                except Exception:
+                    pass
+            pc = os.path.join(d, f"{b.label}_pinn.csv")
+            if os.path.exists(pc):
+                curves["PINN"] = pinn_curve(pc)
+            qc = os.path.join(d, f"{b.label}_pinn_pysr.csv")
+            if os.path.exists(qc):
+                curves["PINN+PySR"] = pysr_curve(qc, xs)
+            for m, u in curves.items():
+                if u is None:
+                    continue
+                rows.append({"problem": b.label, "method": m, "run": run,
+                             "in": band_err(u, ref, xs, -1.0, 1.0),
+                             "out125": band_err(u, ref, xs, 1.0, 1.25),
+                             "out150": band_err(u, ref, xs, 1.0, 1.5)})
+    return pd.DataFrame(rows)
+
+
+def make_methods_table(df):
+    methods = ["PISR-NSGA-II", "PINN", "PINN+PySR"]
+    short = {"PISR-NSGA-II": "PISR", "PINN": "PINN", "PINN+PySR": "P+P"}
+
+    def med(label, m, col):
+        v = df[(df.problem == label) & (df.method == m)][col].replace([np.inf], np.nan).dropna()
+        return float(v.median()) if len(v) else np.nan
+
+    rows = []
+    for label in dict.fromkeys(df.problem):
+        b = BY_LABEL[label]
+        cells = []
+        for col in ("out125", "out150"):
+            vals = [med(label, m, col) for m in methods]
+            fin = [v for v in vals if np.isfinite(v)]
+            best = min(fin) if fin else None
+            for v in vals:
+                c = sci(v)
+                if best is not None and v == best and len(fin) > 1:
+                    c = "$\\mathbf{" + c[1:-1] + "}$" if c.startswith("$") else c
+                cells.append(c)
+        rows.append(rf"{b.label_tex} & " + " & ".join(cells) + r" \\")
+    head = " & ".join(short[m] for m in methods)
+    lines = [
+        r"\begin{table}[H]", r"\centering\small",
+        r"\caption{Extrapolación de los tres métodos: error relativo máximo (respecto de $\max|u|$) fuera "
+        r"del dominio de entrenamiento $[0,1]$, mediana sobre las semillas. Cada método se evalúa tal como "
+        r"lo entrega: la fórmula de PISR-NSGA-II y la de PINN+PySR, y la red del PINN evaluada fuera de "
+        r"$[0,1]$. Menor error de cada intervalo en negrita.}",
+        r"\label{tab:extrapolation_methods}",
+        r"\begin{tabular}{@{}lcccccc@{}}", r"\toprule",
+        r" & \multicolumn{3}{c}{\textbf{$(1,1.25]$}} & \multicolumn{3}{c}{\textbf{$(1,1.5]$}} \\",
+        r"\cmidrule(lr){2-4}\cmidrule(l){5-7}",
+        rf"\textbf{{Problema}} & {head} & {head} \\", r"\midrule",
+        *rows, r"\bottomrule", r"\end{tabular}", r"\end{table}",
+    ]
+    with open(os.path.join(TABLES, "extrapolation_methods_table.tex"), "w") as f:
+        f.write("\n".join(lines) + "\n")
+    print("  [OK] report/tables/extrapolation_methods_table.tex")
+
+
 def matched_chebyshev(xs_in, u_in, target, max_deg=30):
     """Menor grado cuyo error maximo en [0,1] es <= target (el de PISR)."""
     t = 2 * xs_in - 1
@@ -141,7 +278,7 @@ def main():
     probs = [b for b in BENCHMARKS if b.dim == 1 and not b.unsteady]
     xs = np.linspace(0, X_MAX, 601)
     xin = xs <= 1.0 + 1e-12
-    rows, panels = [], []
+    rows, panels, refs = [], [], []
     for b in probs:
         F = pisr_formula(b, report)
         if F is None:
@@ -175,7 +312,8 @@ def main():
                      "out125_pisr": band(err_p, 1.0, 1.25), "out125_cheb": band(err_c, 1.0, 1.25),
                      "out150_pisr": band(err_p, 1.0, 1.5), "out150_cheb": band(err_c, 1.0, 1.5),
                      "x_end": x_end, "ref_check": ref_check})
-        panels.append((b, ref, pisr, cheb, deg, err_p, err_c, valid))
+        panels.append((b, ref, pisr, cheb, deg, err_p, err_c, valid, competitor_curves(b, xs)))
+        refs.append((b, ref))
         print(f"  [OK] {b.label:<24} dentro: PISR {in_err/scale:.1e} | x<=1.5: PISR {rows[-1]['out150_pisr']:.1e} "
               f"vs Chebyshev(g{deg}) {rows[-1]['out150_cheb']:.1e}"
               + (f"  [ref vs binario {ref_check:.1e}]" if np.isfinite(ref_check) else ""))
@@ -183,6 +321,10 @@ def main():
     df.to_csv(os.path.join(RESULTS, "extrapolation.csv"), index=False)
     make_table(df)
     make_figures(panels)
+    tm = three_methods(refs, xs)
+    if not tm.empty:
+        tm.to_csv(os.path.join(RESULTS, "extrapolation_methods.csv"), index=False)
+        make_methods_table(tm)
 
 
 def sci(v):
@@ -239,7 +381,7 @@ def make_figures(panels):
     for kind in ("solutions", "errors"):
         fig, axes = plt.subplots(rows, cols, figsize=(4.2 * cols, 3.1 * rows), layout="constrained")
         axes = np.atleast_1d(axes).ravel()
-        for ax, (b, ref, pisr, cheb, deg, ep, ec, valid) in zip(axes, panels):
+        for ax, (b, ref, pisr, cheb, deg, ep, ec, valid, comp) in zip(axes, panels):
             xs = np.linspace(0, X_MAX, len(ref))
             ax.axvspan(1.0, X_MAX, color="#F4D03F", alpha=0.12, lw=0)
             ax.axvline(1.0, color="#B7950B", lw=0.8, ls=":")
@@ -249,11 +391,16 @@ def make_figures(panels):
                 ax.plot(xs, ref.real, color="#1B1B1B", lw=3, alpha=0.3, label="referencia")
                 ax.plot(xs, pisr.real, color="#2E86C1", lw=1.6, ls="--", label="PISR-NSGA-II")
                 ax.plot(xs, cheb.real, color="#E67E22", lw=1.3, ls=":", label=f"Chebyshev (grado {deg})")
+                for name, u in comp.items():
+                    ax.plot(xs, u.real, color=COMP_STYLE[name][0], lw=1.2, ls=COMP_STYLE[name][1], label=name)
                 ax.set_ylim(lo - pad, hi + pad)
                 ax.set_ylabel("Re u" if b.complex_field else "u")
             else:
                 ax.semilogy(xs, np.clip(ep, 1e-16, None), color="#2E86C1", lw=1.4, label="PISR-NSGA-II")
                 ax.semilogy(xs, np.clip(ec, 1e-16, None), color="#E67E22", lw=1.2, ls=":", label=f"Chebyshev (grado {deg})")
+                for name, u in comp.items():
+                    ax.semilogy(xs, np.clip(np.abs(u - ref), 1e-16, None), color=COMP_STYLE[name][0], lw=1.1,
+                                ls=COMP_STYLE[name][1], label=name)
                 ax.set_ylabel("|error|")
             ax.set_title(nice(b))
             ax.set_xlabel("x")
