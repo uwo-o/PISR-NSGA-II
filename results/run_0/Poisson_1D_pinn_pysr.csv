@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Poisson_1D,1000,9.478898415254421e-11,6.829669305392059e-12,17,1143.2669501304626,28.73725986480713,True,sin(x*3.141583) + cos(cos(x*10.665428 + 0.6749279))*tanh(x)*(-3.211302e-5),"Add(sin(Mul(Float('3.1415829999999998', precision=53), Symbol('x'))), Mul(Float('-3.2113019999999997e-5', precision=53), cos(cos(Add(Mul(Float('10.665428', precision=53), Symbol('x')), Float('0.67492790000000003', precision=53)))), tanh(Symbol('x'))))"

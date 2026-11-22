@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Troesch_1D,1007,9.449861134864894e-08,9.231316404588429e-08,15,936.4799010753633,15.579351425170898,True,x*0.2552781/(cos(x/0.84294796)*cos(sin(sin(x/0.77240735)))),"Mul(Float('0.25527810000000001', precision=53), Symbol('x'), Pow(cos(Mul(Pow(Float('0.84294796000000005', precision=53), Integer(-1)), Symbol('x'))), Integer(-1)), Pow(cos(sin(sin(Mul(Pow(Float('0.77240735000000005', precision=53), Integer(-1)), Symbol('x'))))), Integer(-1)))"

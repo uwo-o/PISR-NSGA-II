@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Lane-Emden_1D,1020,1.5353013948902013e-08,3.313201019017027e-10,19,1201.4381527900696,13.741002321243286,True,cos(x*(-0.5718916)*(x*(-0.061271746)*tanh(x*(x + 0.014213158)) + x/x)),"cos(Mul(Float('-0.57189160000000006', precision=53), Symbol('x'), Add(Mul(Float('-0.061271746000000002', precision=53), Symbol('x'), tanh(Mul(Symbol('x'), Add(Symbol('x'), Float('0.014213158', precision=53))))), Mul(Pow(Symbol('x'), Integer(-1)), Symbol('x')))))"

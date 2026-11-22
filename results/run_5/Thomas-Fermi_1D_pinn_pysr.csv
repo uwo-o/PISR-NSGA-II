@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Thomas-Fermi_1D,1005,5.074829098912285e-07,2.4636107629840444e-07,18,962.9692406654358,20.560398817062378,True,exp(x*(cos(exp(x*(sin(cos(x*x)) - 1.9230881))) - 1.8286719))/1.0042845,"Mul(Pow(Float('1.0042845', precision=53), Integer(-1)), exp(Mul(Symbol('x'), Add(cos(exp(Mul(Symbol('x'), Add(sin(cos(Mul(Symbol('x'), Symbol('x')))), Float('-1.9230881', precision=53))))), Float('-1.8286719', precision=53)))))"

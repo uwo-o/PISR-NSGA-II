@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Poisson_1D,1020,2.5559045922916288e-11,3.015870619780578e-12,17,1050.653361082077,14.264822721481323,True,sin(x*3.1415899) + sin(x*(tanh(sin(x/(-0.031971965))) + 3.570965))*7.1088857e-6,"Add(sin(Mul(Float('3.1415899', precision=53), Symbol('x'))), Mul(Float('7.1088857e-6', precision=53), sin(Mul(Symbol('x'), Add(tanh(sin(Mul(Pow(Float('-0.031971964999999998', precision=53), Integer(-1)), Symbol('x')))), Float('3.5709650000000002', precision=53))))))"

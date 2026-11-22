@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Schrodinger_2D,1029,6.711271726126631e-10,4.463878862907187e-09,16,1693.4999601840973,19.67046880722046,True,I*(sin(x + x + y + y) + 1.940215e-5) + cos((x + y)*2.000025),"Add(Mul(I, Add(sin(Add(Symbol('x'), Symbol('x'), Symbol('y'), Symbol('y'))), Float('1.9402149999999999e-5', precision=53))), cos(Mul(Float('2.0000249999999999', precision=53), Add(Symbol('x'), Symbol('y')))))"

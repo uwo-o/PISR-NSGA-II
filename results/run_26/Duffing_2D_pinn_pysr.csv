@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Duffing_2D,1026,1.8287024635191087e-05,1.3115117894170999e-05,22,1473.8387920856476,14.208824872970581,True,sin(tanh(tanh(exp(-(x + y) + tanh(exp(-0.9154213*(x + y) + tanh(x*y)))))))*1.4637065,"Mul(Float('1.4637065', precision=53), sin(tanh(tanh(exp(Add(Mul(Integer(-1), Add(Symbol('x'), Symbol('y'))), tanh(exp(Add(Mul(Integer(-1), Mul(Float('0.91542129999999999', precision=53), Add(Symbol('x'), Symbol('y')))), tanh(Mul(Symbol('x'), Symbol('y'))))))))))))"

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Duffing_2D,1000,3.9258988982078986e-05,4.056843579693402e-05,16,1830.2088520526886,28.534590005874634,True,cos(-0.27478787*y - sin(x))*cos(sin(y - (-0.27836907)*tanh(x))),"Mul(cos(Add(Mul(Integer(-1), Float('0.27478786999999999', precision=53), Symbol('y')), Mul(Integer(-1), sin(Symbol('x'))))), cos(sin(Add(Symbol('y'), Mul(Integer(-1), Mul(Float('-0.27836907', precision=53), tanh(Symbol('x'))))))))"

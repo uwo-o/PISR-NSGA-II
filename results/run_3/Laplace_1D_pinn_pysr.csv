@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Laplace_1D,1003,4.659523407281456e-10,8.396035252191855e-13,16,879.7477760314941,10.358481645584106,True,x*cos(-0.047129475*x*(x - cos(tanh(-0.047129475/x**2)))),"Mul(Symbol('x'), cos(Mul(Integer(-1), Float('0.047129474999999997', precision=53), Symbol('x'), Add(Symbol('x'), Mul(Integer(-1), cos(tanh(Mul(Integer(-1), Float('0.047129474999999997', precision=53), Pow(Mul(Symbol('x'), Symbol('x')), Integer(-1))))))))))"

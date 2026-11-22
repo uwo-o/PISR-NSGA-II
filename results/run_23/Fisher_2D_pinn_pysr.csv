@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Fisher_2D,1023,4.200093355794304e-07,5.578824137603718e-07,16,1487.9705927371979,13.065219163894653,True,tanh((x + y)*0.38534406 + cos(cos((x + y - 0.50369614)*(-0.27092597)))),"tanh(Add(Mul(Float('0.38534405999999999', precision=53), Add(Symbol('x'), Symbol('y'))), cos(cos(Mul(Float('-0.27092597000000002', precision=53), Add(Symbol('x'), Symbol('y'), Float('-0.50369613999999996', precision=53)))))))"

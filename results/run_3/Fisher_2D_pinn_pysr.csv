@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Fisher_2D,1003,3.358997746457972e-07,3.4043726604642194e-07,19,1460.042128324509,10.442359924316406,True,tanh((x + y)*((x + y + tanh(x*y))*0.018647688 + 0.36434942) + 0.546417),"tanh(Add(Mul(Add(Symbol('x'), Symbol('y')), Add(Mul(Float('0.018647687999999999', precision=53), Add(Symbol('x'), Symbol('y'), tanh(Mul(Symbol('x'), Symbol('y'))))), Float('0.36434941999999998', precision=53))), Float('0.54641700000000004', precision=53)))"

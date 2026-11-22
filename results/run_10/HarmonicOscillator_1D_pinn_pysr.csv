@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,HarmonicOscillator_1D,1010,3.3351758742311914e-11,5.986479767870078e-12,17,964.1539304256439,28.50591516494751,True,exp(x*x*tanh(sin(tanh(exp(exp(sin(exp(sin(exp(x))))))))*(-0.65281856))),"exp(Mul(Symbol('x'), Symbol('x'), tanh(Mul(Float('-0.65281856000000005', precision=53), sin(tanh(exp(exp(sin(exp(sin(exp(Symbol('x')))))))))))))"

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Fisher_2D,1022,2.626962592828202e-07,2.2492692824542728e-07,21,1422.8227486610415,11.9611337184906,True,sin(sin(sin((x + y*(x + tanh(x/y))*0.026906062 + y)*0.3042631)) + 0.52305007),"sin(Add(sin(sin(Mul(Float('0.30426310000000001', precision=53), Add(Symbol('x'), Mul(Float('0.026906062000000001', precision=53), Symbol('y'), Add(Symbol('x'), tanh(Mul(Symbol('x'), Pow(Symbol('y'), Integer(-1)))))), Symbol('y'))))), Float('0.52305007000000003', precision=53)))"

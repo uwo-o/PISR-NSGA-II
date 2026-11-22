@@ -1,0 +1,19 @@
+part,complexity,loss,equation
+re,1,0.023608308,0.5110847
+re,4,0.01337072,cos(y) * 0.6132432
+re,5,0.0038168633,cos(x) / exp(y)
+re,6,0.002647193,sin(cos(x) / exp(y))
+re,7,0.00045327542,tanh(exp(0.3915784 - (y + x)))
+re,8,0.00020873053,exp(-0.07331021 - (y + x)) - -0.13969895
+re,9,0.0001306713,sin(exp(0.07174172 - (x + y))) - -0.10231509
+re,10,0.00013063324,sin(exp(0.07174172 - (x + y))) - sin(-0.10231509)
+re,13,7.247703e-05,sin((1.2832582 / exp(y / exp(x * 0.42726377))) / exp(x))
+re,14,7.199487e-05,sin((1.282788 / exp(x)) / exp(y / exp(tanh(x * 0.4375637))))
+re,16,5.746042e-05,sin((1.2778014 / exp(x)) / (exp(y) / exp(tanh(y * x) * 0.42495418)))
+re,17,5.18761e-05,sin((1.2778014 / (exp(y) / exp(tanh(sin(x * y)) * 0.42495418))) / exp(x))
+re,18,5.140407e-05,sin((1.2778014 / (exp(y) / exp(sin(sin(sin(y * x))) * 0.42495418))) / exp(x))
+re,19,5.1355953e-05,sin((1.2778014 / (exp(y) / exp(sin(sin(sin(sin(x * y))) * 0.42495418)))) / exp(x))
+re,20,4.2187956e-05,sin((1.2863101 / exp(y / exp(sin(y * exp(x)) * (x / exp(y))))) / exp(x))
+re,21,3.8386046e-05,sin((1.2863101 / exp(y / exp(tanh(sin((x * y) * exp(x))) / exp(y)))) / exp(x))
+re,25,3.435694e-05,sin((1.2924691 / exp(y / exp(tanh(exp(x)) * (tanh(sin((x * y) * exp(x))) / exp(y))))) / exp(x))
+re,26,3.42245e-05,sin((1.2924691 / exp(x)) / exp(y / exp(tanh(exp(sin(x))) * (tanh(sin((x * exp(x)) * y)) / exp(y)))))

@@ -1,0 +1,16 @@
+part,complexity,loss,equation
+re,1,0.024633149,0.6389042
+re,3,0.010799263,tanh(cos(x))
+re,4,0.00056288164,exp(x * -0.949774)
+re,5,3.3003063e-05,exp(sin(-0.023624625 - x))
+re,7,2.3275932e-05,exp(tanh(x) * -1.0384921) - 0.01620629
+re,8,3.4518725e-06,exp(sin(x / sin(-0.8077323 - x)))
+re,9,2.2432923e-06,exp(sin(x / sin(-0.8211051 - tanh(x))))
+re,10,1.2716654e-06,exp(sin(x / tanh(-0.84479433 - (x / 0.46482724))))
+re,12,1.1714552e-06,exp(sin(x / sin(-1.3741589 - exp(sin(x) / -0.66751426))))
+re,14,1.0625129e-06,exp(sin(x) / tanh((-0.86395544 / exp(sin(x) / -0.89721644)) - x))
+re,15,3.4205533e-07,exp(sin(x / sin(-1.3425782 - exp(sin(x / (cos(x) / -1.2720237))))))
+re,17,1.8970795e-07,exp(sin(x / sin(-1.3421965 - exp(sin(x / sin(sin(sin(x) + -1.3381628)))))))
+re,22,1.7208879e-07,exp(sin(x / sin(-1.3437686 - exp(sin(x / sin(cos(sin(x / sin(cos(sin(x))))) / -1.0918586))))))
+re,24,1.5079623e-07,exp(sin(x / sin(-1.3442916 - exp(sin(x / sin(cos(sin(x / sin(cos(cos(0.58246887 / x))))) / -1.0917777))))))
+re,29,1.4926589e-07,exp(sin(x / sin(-1.3441284 - exp(sin(x / sin(cos(sin(x / sin(cos(cos(cos(cos(x / exp(x))) / x))))) / -1.0918092))))))

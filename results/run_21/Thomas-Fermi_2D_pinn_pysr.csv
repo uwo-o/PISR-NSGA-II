@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Thomas-Fermi_2D,1021,6.385167262287329e-05,5.480304236198064e-05,20,1822.9183609485624,11.610952854156494,True,sin(cos(sin(x))/(-(-0.43892956)*y*y*y + y + tanh(tanh(x)) + 0.72385734)),"sin(Mul(Pow(Add(Mul(Integer(-1), Mul(Float('-0.43892956', precision=53), Symbol('y'), Symbol('y'), Symbol('y'))), Symbol('y'), tanh(tanh(Symbol('x'))), Float('0.72385734000000002', precision=53)), Integer(-1)), cos(sin(Symbol('x')))))"

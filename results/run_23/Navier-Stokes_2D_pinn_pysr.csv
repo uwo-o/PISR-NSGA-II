@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Navier-Stokes_2D,1023,0.00019303970079874617,0.0001443162099966689,22,1819.2354907989504,12.497992038726807,True,sin(y*(y + sin(y*sin(x + y + y) + (x + y)*1.0804368)*0.5881804)),"sin(Mul(Symbol('y'), Add(Symbol('y'), Mul(Float('0.58818040000000005', precision=53), sin(Add(Mul(Symbol('y'), sin(Add(Symbol('x'), Symbol('y'), Symbol('y')))), Mul(Float('1.0804368', precision=53), Add(Symbol('x'), Symbol('y')))))))))"

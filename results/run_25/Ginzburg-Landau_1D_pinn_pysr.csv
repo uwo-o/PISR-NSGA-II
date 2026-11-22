@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Ginzburg-Landau_1D,1025,3.8899717085270265e-12,7.516407875021774e-13,16,857.8192322254181,13.840005159378052,True,tanh(x*0.7071004)/cos(-0.021435488*(x - 1*0.7071004)*sin(x + x)),"Mul(Pow(cos(Mul(Integer(-1), Float('0.021435487999999999', precision=53), Add(Symbol('x'), Mul(Integer(-1), Float('0.70710039999999996', precision=53))), sin(Add(Symbol('x'), Symbol('x'))))), Integer(-1)), tanh(Mul(Float('0.70710039999999996', precision=53), Symbol('x'))))"

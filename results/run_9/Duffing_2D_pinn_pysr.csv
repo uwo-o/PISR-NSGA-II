@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Duffing_2D,1009,8.09687530823749e-06,8.629815337735137e-06,16,1820.7387161254885,10.647560119628906,True,exp((x + y)*(x*y*0.5020962 - x - y)*0.44313103),"exp(Mul(Float('0.44313102999999998', precision=53), Add(Symbol('x'), Symbol('y')), Add(Mul(Float('0.50209619999999999', precision=53), Symbol('x'), Symbol('y')), Mul(Integer(-1), Symbol('x')), Mul(Integer(-1), Symbol('y')))))"

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Ginzburg-Landau_1D,1021,4.77394540173355e-12,1.6131393887628932e-13,27,996.9518747329712,26.353761672973633,True,tanh(x*tanh(cos(tanh(tanh(tanh(tanh(cos(sin(tanh(cos(tanh(sin(sin(cos(tanh(tanh(cos(cos(x)*tanh(x)))))))))))*0.8442884)))))))),"tanh(Mul(Symbol('x'), tanh(cos(tanh(tanh(tanh(tanh(cos(Mul(Float('0.84428840000000005', precision=53), sin(tanh(cos(tanh(sin(sin(cos(tanh(tanh(cos(Mul(cos(Symbol('x')), tanh(Symbol('x')))))))))))))))))))))))"

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Thomas-Fermi_1D,1002,0.054339084430483374,2.3317077102619995e-07,13,949.1653847694396,12.691132068634033,True,(0.6710649 - tanh(tanh(x)))*0.42794597*(0.4591572 - x) + 0.42045516,"Add(Mul(Float('0.42794597000000001', precision=53), Add(Float('0.45915719999999999', precision=53), Mul(Integer(-1), Symbol('x'))), Add(Float('0.67106489999999996', precision=53), Mul(Integer(-1), tanh(tanh(Symbol('x')))))), Float('0.42045515999999999', precision=53))"

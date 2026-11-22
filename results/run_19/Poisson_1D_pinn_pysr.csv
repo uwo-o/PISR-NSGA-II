@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Poisson_1D,1019,8.416368528201053e-12,1.9354873201457045e-11,13,862.3676147460938,18.208176851272583,True,sin(3.1415935*x*tanh(exp(exp(cos(sin(x*(-3.1421342))))))),"sin(Mul(Float('3.1415934999999999', precision=53), Symbol('x'), tanh(exp(exp(cos(sin(Mul(Float('-3.1421342000000001', precision=53), Symbol('x')))))))))"

@@ -1,0 +1,18 @@
+part,complexity,loss,equation
+re,1,0.003691494,0.17779961
+re,4,0.0019372209,0.27767694 / exp(y)
+re,5,0.0018935998,0.27172506 / exp(sin(y))
+re,6,0.00019080278,exp((-0.83608884 - y) - x)
+re,7,6.252904e-05,((2.2042022 - x) - y) / 6.7624164
+re,9,8.7725186e-07,tanh(exp((0.14289242 - y) - x)) / 2.3527884
+re,10,6.574147e-07,tanh(tanh(exp((-0.17142299 - x) - y))) / 1.7111715
+re,11,6.0628753e-07,tanh(tanh(tanh(exp((-0.36685908 - y) - x)))) / 1.4063473
+re,12,5.6152993e-07,tanh(tanh(tanh(tanh(tanh(tanh(exp((-0.70734173 - x) - y)))))))
+re,16,5.52168e-07,tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(exp((-0.9538072 - x) - y)))))) / 0.780978)))
+re,17,5.505525e-07,tanh(tanh(tanh(tanh(tanh(tanh(tanh(sin(tanh(exp((-1.0053318 - y) - x))))))) / 0.74202085)))
+re,19,5.491573e-07,tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(exp((-0.924071 - x) - y)))))) / 1.2639947)) / 0.6366015))
+re,21,5.4671585e-07,tanh(tanh(tanh(sin(tanh(tanh(tanh(tanh(tanh(tanh(tanh(exp((-1.1084385 - y) - x))))))) / 1.4076933)) / 0.47550339)))
+re,22,5.4571507e-07,tanh(tanh(tanh(sin(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(exp((-1.1084385 - x) - y)))))) / 1.4076933)))) / 0.47550339)))
+re,23,5.4475106e-07,tanh(tanh(tanh(sin(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(exp((-1.1168814 - x) - y)))) / 1.2914563))))))) / 0.5138264)))
+re,25,5.432533e-07,tanh(tanh(tanh(sin(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(exp((-1.1168814 - x) - y) / 1.2914563)))))))))))) / 0.5138264)))
+re,28,5.423918e-07,sin(tanh(tanh(tanh(sin(sin(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(tanh(exp((-1.126583 - x) - y))))) / 1.4216638)))))))) / 0.513792)))) / 0.8995276

@@ -1,0 +1,23 @@
+part,complexity,loss,equation
+re,1,0.0044838204,0.63456887
+re,3,0.0023270287,cos(cos(x))
+re,4,0.00023682049,cos(cos(tanh(x)))
+re,5,0.00010365839,tanh(tanh(x + 0.5631208))
+re,6,5.245178e-06,tanh(tanh(exp(x - 0.4853699)))
+re,7,3.1171808e-06,tanh(tanh(exp(sin(x - 0.48849273))))
+re,8,8.7230654e-07,tanh(tanh(exp((x * 0.965056) - 0.4731533)))
+re,9,7.0514335e-07,tanh(tanh(tanh(exp(x - 0.6355832)))) * 1.1901318
+re,12,5.926526e-07,tanh(tanh(exp(x - 0.47618112) + (x * (x * -0.05675666))))
+re,13,4.655305e-07,tanh(tanh(exp(x - 0.4754537) + (tanh(x * x) * -0.06524582)))
+re,14,4.513946e-07,tanh(tanh(exp(x - 0.47518715) + (tanh(sin(x * x)) * -0.06875879)))
+re,15,4.4831057e-07,tanh(tanh(exp(x - 0.47518343) + (sin(sin(sin(x * x))) * -0.068943664)))
+re,16,3.6742986e-07,tanh(tanh(exp(x + (((tanh(x * x) * -0.069405116) * cos(x)) - 0.4759858))))
+re,17,3.431774e-07,tanh(tanh(exp(((tanh(sin(x * x)) * (cos(x) * -0.0730783)) - 0.47575516) + x)))
+re,18,1.0701251e-07,tanh(tanh(exp(x - tanh(tanh(tanh(tanh(tanh(cos(sin(cos(x / 0.53980684))))))))) - 0.03963705))
+re,22,1.03191766e-07,tanh(tanh(exp(x - tanh(tanh(tanh(tanh(tanh(cos(sin(cos(x / cos(cos(-0.029938748 / x))))))))))) - 0.039635744))
+re,23,4.3640753e-08,tanh(tanh(exp(x - tanh(tanh(tanh(tanh(cos(tanh(exp((x + -0.7969857) + cos(exp(x / 0.61036485) - x)))))))))))
+re,24,4.141683e-08,tanh(tanh(exp(x - tanh(tanh(tanh(tanh(cos(tanh(exp((cos(exp(x / 0.6126403) - x) + sin(x)) + -0.79275286))))))))))
+re,25,3.5937713e-08,tanh(tanh(exp(x - tanh(tanh(tanh(tanh(cos(tanh(exp(cos(exp(x / 0.6126403) - x) + (x + -0.79275286))))))))))) + -0.00012422598
+re,26,2.698565e-08,tanh(tanh(exp(x - tanh(tanh(tanh(tanh(cos(tanh(exp((tanh(x) * 1.1004328) + (cos(exp(x / 0.60245985) - x) + -0.7966564)))))))))))
+re,28,2.0307462e-08,tanh(tanh(exp(x - tanh(tanh(tanh(tanh(cos(tanh(exp(cos((tanh(x * 1.4195938) + ((x + -1.0039414) * 0.8370397)) - exp(x / 0.6049993))))))))))))
+re,29,1.4525421e-08,tanh(tanh(exp(x - tanh(tanh(tanh(tanh(cos(tanh(exp(cos((((x + -1.0022149) * 0.83701396) + tanh(tanh(x * 1.4206889))) - exp(x / 0.6211291))))))))))))

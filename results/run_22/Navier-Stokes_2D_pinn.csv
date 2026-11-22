@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Navier-Stokes_2D,1022,1.8545049515411576e-05,0.00016614721614501403,2.5277454876425e-05,1823.635880947113,7851,1216,400,30.0

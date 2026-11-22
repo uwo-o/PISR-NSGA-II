@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Ginzburg-Landau_1D,1029,3.3799192700814215e-11,1.4691923649479025e-07,3.414402445348383e-13,854.5476112365723,7801,10000,31,30.0

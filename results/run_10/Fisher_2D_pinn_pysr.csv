@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Fisher_2D,1010,1.6026077200772327e-05,1.6875535983375396e-05,18,1513.3950805664062,16.614375352859497,True,cos(cos(sin(y*cos(sin(sin(x + y*(x + 0.71999854)))) + tanh(x)))),"cos(cos(sin(Add(Mul(Symbol('y'), cos(sin(sin(Add(Symbol('x'), Mul(Symbol('y'), Add(Symbol('x'), Float('0.71999853999999996', precision=53)))))))), tanh(Symbol('x'))))))"

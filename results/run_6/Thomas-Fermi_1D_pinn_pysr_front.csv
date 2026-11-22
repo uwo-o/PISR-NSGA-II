@@ -1,0 +1,22 @@
+part,complexity,loss,equation
+re,1,0.023751337,0.63873345
+re,3,0.010366946,tanh(cos(x))
+re,4,0.00068940164,exp(x / -1.0562124)
+re,5,4.422652e-06,0.77508605 / (x - -0.7812182)
+re,9,3.4865263e-06,exp(sin(x / sin(-0.7962165 - sin(x))))
+re,11,2.9876308e-06,exp(sin(x / sin(-0.81204784 - sin(x)))) * 0.99788487
+re,12,2.3198745e-06,exp(sin(x / sin(-0.76416975 - (sin(sin(x)) / 0.8836975))))
+re,13,1.8359823e-06,exp(sin(x) / sin(sin(sin(-0.9656146 - x)) - tanh(x)))
+re,14,1.7148715e-06,exp(sin(x) / sin(sin(sin(-0.9724992 - tanh(x))) - tanh(x)))
+re,15,1.710916e-06,exp(sin(x) / sin(sin(sin(-0.97501713 - tanh(sin(x)))) - tanh(x)))
+re,16,1.5291033e-06,exp(sin(x) / sin(sin(sin(sin(-1.1578425 - x) - x)) - tanh(x)))
+re,17,9.718244e-07,exp(sin(x / sin(sin(sin(-0.7772398 - sin(x * 3.01817))) - (x * 0.8836975))))
+re,18,8.2542294e-07,exp(sin(x / sin(sin(sin(-0.780518 - sin(sin(x * 3.0303109)))) - (x * 0.87518996))))
+re,19,8.10282e-07,exp(sin(x / sin(sin(sin(-0.78004026 - sin(sin(x * exp(1.1258026))))) - (x * 0.8765709))))
+re,23,6.6997745e-07,exp(sin(x / sin(sin(sin(-0.7095939 - tanh(sin((x + x) + tanh(x + x))))) - (x * 0.8850613))))
+re,24,6.685916e-07,exp(sin(x / sin(sin(sin(-0.7139874 - sin(sin(sin((x + x) + tanh(x + x)))))) - (x * 0.88560593))))
+re,25,6.584431e-07,exp(sin(x / sin(sin(sin(-0.7095939 - tanh(sin((x + tanh((x / 0.8850613) + x)) + x)))) - (x * 0.8850613))))
+re,26,6.5823195e-07,exp(sin(x / sin(sin(sin(-0.7095939 - tanh(sin((x + tanh((sin(x) / 0.8850613) + x)) + x)))) - (x * 0.8850613))))
+re,27,6.3762315e-07,exp(sin(x / sin(sin(sin(sin(sin(-0.7737236 - tanh(x * 4.5622625))) - tanh(sin(x + (x * 2.1359072))))) - (x * 0.87288797))))
+re,28,5.9642485e-07,exp(sin(x / sin(sin(sin(sin(sin(-0.7738921 - tanh(x * 4.5622463))) - tanh(tanh(sin(x + (x * 2.1359415)))))) - (x * 0.882845))))
+re,29,5.953997e-07,exp(sin(x / sin(sin(sin(sin(sin(-0.77395064 - tanh(tanh(x) * 4.5622687))) - tanh(tanh(sin(x + (x * 2.13607)))))) - (x * 0.88186264))))

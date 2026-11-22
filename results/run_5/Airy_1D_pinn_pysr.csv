@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Airy_1D,1005,5.738132136934689e-10,5.98390963421105e-10,15,941.8264944553374,12.925039768218994,True,sin(sin(sin(tanh(tanh((exp((-x - 0.61378676)*0.95264006) - 0.049631964)*0.8359624))))),"sin(sin(sin(tanh(tanh(Mul(Float('0.83596239999999999', precision=53), Add(exp(Mul(Float('0.95264006000000001', precision=53), Add(Mul(Integer(-1), Symbol('x')), Float('-0.61378675999999999', precision=53)))), Float('-0.049631964000000001', precision=53))))))))"

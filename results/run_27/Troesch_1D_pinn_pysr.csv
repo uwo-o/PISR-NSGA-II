@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Troesch_1D,1027,1.451663635709785e-07,1.466048811866734e-07,22,1000.462287902832,10.854097366333008,True,(x*(-1.4055576)*exp(exp(x*x)*x*0.30995148)*sin(x) - 0.93557477)*x*(-0.27093413),"Mul(Float('-0.27093413', precision=53), Symbol('x'), Add(Mul(Float('-1.4055576000000001', precision=53), Symbol('x'), exp(Mul(Float('0.30995148', precision=53), Symbol('x'), exp(Mul(Symbol('x'), Symbol('x'))))), sin(Symbol('x'))), Float('-0.93557477', precision=53)))"

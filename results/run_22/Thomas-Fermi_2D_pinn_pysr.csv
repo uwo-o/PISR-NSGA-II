@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Thomas-Fermi_2D,1022,4.3461121599468914e-05,4.218797802332082e-05,20,1823.681768655777,15.892060279846191,True,sin(1.2863101/(exp(x)*exp(y/exp(x*sin(y*exp(x))/exp(y))))),"sin(Mul(Float('1.2863100999999999', precision=53), Pow(exp(Symbol('x')), Integer(-1)), Pow(exp(Mul(Symbol('y'), Pow(exp(Mul(Symbol('x'), Pow(exp(Symbol('y')), Integer(-1)), sin(Mul(Symbol('y'), exp(Symbol('x')))))), Integer(-1)))), Integer(-1))))"

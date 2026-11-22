@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Troesch_1D,1021,1.9701793507080147e-07,1.9217481933614623e-07,14,949.290405035019,13.034820079803467,True,x*0.48962298/(-x + tanh(-0.15683815 + 0.7024038/x) + 0.9937432),"Mul(Float('0.48962297999999999', precision=53), Symbol('x'), Pow(Add(Mul(Integer(-1), Symbol('x')), tanh(Add(Float('-0.15683815000000001', precision=53), Mul(Float('0.70240380000000002', precision=53), Pow(Symbol('x'), Integer(-1))))), Float('0.99374320000000005', precision=53)), Integer(-1)))"

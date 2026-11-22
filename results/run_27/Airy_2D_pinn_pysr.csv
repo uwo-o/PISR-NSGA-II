@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Airy_2D,1027,7.664654391447685e-06,7.668408709453852e-06,15,1820.0589904785156,10.51229453086853,True,cos(x*y - 0.1784218)*(-0.16506873)/(cos(x + y) - 1.508854),"Mul(Float('-0.16506873', precision=53), Pow(Add(cos(Add(Symbol('x'), Symbol('y'))), Float('-1.5088539999999999', precision=53)), Integer(-1)), cos(Add(Mul(Symbol('x'), Symbol('y')), Float('-0.17842179999999999', precision=53))))"

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,HarmonicOscillator_1D,1002,6.917161414537755e-10,6.630427322062249e-07,1.0808663939377872e-09,932.4643261432648,7801,10000,49,30.0
