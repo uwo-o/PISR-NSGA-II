@@ -505,6 +505,26 @@ def physics_section():
             r"\input{tables/physics_checks.tex}"]
 
 
+def interpretability_section():
+    if not os.path.exists(os.path.join(TABLES_DIR, "interpretability_table.tex")):
+        return []
+    L = [r"\clearpage", r"\section{Interpretability: PISR-NSGA-II versus PINN+PySR}\label{sec:interpretability}",
+         r"The central claim of this work is that PISR-NSGA-II trades precision for interpretability. The fair "
+         r"test of that claim is not the PINN (which is more precise but returns no formula) but the other route "
+         r"to a formula without solution data: train a PINN on the same residual and boundary data, then distil "
+         r"its prediction with symbolic regression (PySR). Table~\ref{tab:interpretability} compares both on "
+         r"what a reader of the formula cares about: how small it is, whether it is \emph{the} analytic "
+         r"solution when one exists, and whether it stays correct outside the domain where it was found.",
+         r"The formula size counts the complete expression each method returns. For PISR-NSGA-II this includes "
+         r"the boundary construction of the ansatz; in 2D that is the transfinite (Coons) interpolation of the "
+         r"boundary data, which by itself accounts for most of the roughly 100 nodes of those formulas.",
+         r"\input{tables/interpretability_table.tex}"]
+    if os.path.exists(os.path.join(FIGS_DIR, "interpretability_tradeoff.pdf")):
+        L += figure("interpretability_tradeoff.pdf", r"Median formula size against median solution error per "
+                    r"problem. Each grey segment joins the two methods on the same problem.", place="H")
+    return L
+
+
 def make_latex_report(df, ext, stale):
     today = datetime.date.today().strftime("%B %d, %Y")
     L = [PREAMBLE, r"\begin{document}",
@@ -533,6 +553,7 @@ def make_latex_report(df, ext, stale):
     L += ablation_section(df)
     L += extrapolation_section()
     L += physics_section()
+    L += interpretability_section()
     L += [r"\clearpage", r"\section{Search dynamics}"]
     for fig, cap in [
         ("convergence_history.pdf", r"Hall-of-fame champion per generation. Solid: validation score (PDE "
@@ -559,13 +580,13 @@ def clean_stale_outputs():
     """Borra tablas/figuras con nombres de versiones anteriores del reporte."""
     keep_tables = {"suite_table.tex", "results_table.tex", "comparison_table.tex", "formulas_table.tex",
                    "data_efficiency_comparison.tex", "noise_robustness.tex", "extrapolation_table.tex",
-                   "physics_checks.tex"}
+                   "physics_checks.tex", "interpretability_table.tex"}
     for f in glob.glob(os.path.join(TABLES_DIR, "*.tex")):
         if os.path.basename(f) not in keep_tables:
             os.remove(f)
     valid = {f"solution_{b.label}.pdf" for b in BENCHMARKS} | {f"pareto_pairs_{b.label}.pdf" for b in BENCHMARKS}
     valid |= {"convergence_history.pdf", "parsimony_pressure.pdf", "pareto_fronts_3d.pdf", "noise_robustness.pdf",
-              "extrapolation_solutions.pdf", "extrapolation_errors.pdf"}
+              "extrapolation_solutions.pdf", "extrapolation_errors.pdf", "interpretability_tradeoff.pdf"}
     for f in glob.glob(os.path.join(FIGS_DIR, "*")):
         if os.path.basename(f) not in valid:
             os.remove(f)
