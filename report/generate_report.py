@@ -522,6 +522,14 @@ def interpretability_section():
     if os.path.exists(os.path.join(FIGS_DIR, "interpretability_tradeoff.pdf")):
         L += figure("interpretability_tradeoff.pdf", r"Median formula size against median solution error per "
                     r"problem. Each grey segment joins the two methods on the same problem.", place="H")
+    if os.path.exists(os.path.join(TABLES_DIR, "pysr_front_table.tex")):
+        L += [r"\subsection*{What PySR finds versus what it returns}",
+              r"PySR's default criterion (\emph{best}) is only one way to pick a formula from its Pareto front. "
+              r"To be fair to PINN+PySR, Table~\ref{tab:pysrfront} also reports a parsimonious selection that "
+              r"uses only the PINN data, and an oracle that checks whether the exact solution appears anywhere on "
+              r"the front. The oracle is an upper bound on what PySR found, not an applicable method; PISR-NSGA-II "
+              r"is reported by its single champion, with no comparable oracle over its own front.",
+              r"\input{tables/pysr_front_table.tex}"]
     return L
 
 
@@ -580,7 +588,7 @@ def clean_stale_outputs():
     """Borra tablas/figuras con nombres de versiones anteriores del reporte."""
     keep_tables = {"suite_table.tex", "results_table.tex", "comparison_table.tex", "formulas_table.tex",
                    "data_efficiency_comparison.tex", "noise_robustness.tex", "extrapolation_table.tex",
-                   "physics_checks.tex", "interpretability_table.tex"}
+                   "physics_checks.tex", "interpretability_table.tex", "pysr_front_table.tex"}
     for f in glob.glob(os.path.join(TABLES_DIR, "*.tex")):
         if os.path.basename(f) not in keep_tables:
             os.remove(f)

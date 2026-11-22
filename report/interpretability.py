@@ -136,7 +136,7 @@ def _candidates(v, exact_consts):
             if k:
                 out.append(sp.Float(k, 17))
     out = [c for c in out if abs(float(c) - v) <= CONST_TOL * max(abs(v), 1e-6)]
-    if abs(v) <= 1e-6:  # residuo numerico (p. ej. tanh(x/sqrt 2) + 1e-10): cuenta como 0
+    if abs(v) <= CONST_TOL:  # residuo numerico (p. ej. sin(pi x) - 8e-6 del PINN): puede ir a 0
         out.insert(0, sp.Integer(0))
     return out
 
@@ -145,8 +145,9 @@ def recovered(e, exact, pts):
     """La ESTRUCTURA es la de la solucion analitica: redondeando cada constante
     al valor exacto mas cercano (a CONST_TOL relativo; enteros, fracciones
     simples, pi, sqrt 2, ... o constantes de la propia solucion; las de
-    magnitud <= 1e-6 pueden ir a 0), la formula coincide con ella a
-    RECOVERY_TOL."""
+    magnitud <= CONST_TOL pueden ir a 0), la formula coincide con ella a
+    RECOVERY_TOL. Que el resultado final iguale a la solucion exacta es lo
+    que garantiza que ningun redondeo sea indebido."""
     ue = pts.eval(exact)
     scale = max(float(np.max(np.abs(ue))), 1e-12)
     dev = lambda f: float(np.max(np.abs(pts.eval(f) - ue))) / scale
