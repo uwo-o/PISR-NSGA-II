@@ -143,12 +143,12 @@ def make_suite_table():
         rows.append(r"\addlinespace[2pt]")
     write("suite_table.tex", [
         r"\begin{longtable}{@{}L{0.21\linewidth}L{0.34\linewidth}L{0.21\linewidth}L{0.19\linewidth}@{}}",
-        r"\caption{Benchmark suite. Every problem is posed on $[0,1]^d$ (and $t\in[0,1]$ when unsteady). "
-        r"Problems marked \emph{numerical} have no closed form; their reference is a high-resolution "
-        r"numerical solution of exactly the same boundary-value problem.}\label{tab:suite}\\",
-        r"\toprule \textbf{Problem} & \textbf{Equation} & \textbf{Conditions} & \textbf{Reference} \\ \midrule",
+        r"\caption{Suite de problemas. Todos se plantean en $[0,1]^d$ (y $t\in[0,1]$ si no son estacionarios). "
+        r"Los marcados como \emph{numérica} no tienen forma cerrada; su referencia es una solución numérica de "
+        r"alta resolución del mismo problema de contorno.}\label{tab:suite}\\",
+        r"\toprule \textbf{Problema} & \textbf{Ecuación} & \textbf{Condiciones} & \textbf{Referencia} \\ \midrule",
         r"\endfirsthead",
-        r"\toprule \textbf{Problem} & \textbf{Equation} & \textbf{Conditions} & \textbf{Reference} \\ \midrule",
+        r"\toprule \textbf{Problema} & \textbf{Ecuación} & \textbf{Condiciones} & \textbf{Referencia} \\ \midrule",
         r"\endhead",
         r"\bottomrule",
         r"\endlastfoot",
@@ -159,9 +159,9 @@ def make_suite_table():
 
 def make_results_table(df):
     n_runs = int(df["run"].nunique()) if not df.empty else 0
-    metrics = [("solution_mse", "Solution MSE", "sci"), ("best_mse_domain", "Domain residual", "sci"),
-               ("best_mse_boundary", "Boundary MSE", "sci"), ("pareto_size", "Front size", "int"),
-               ("runtime_s", "Time", "time")]
+    metrics = [("solution_mse", "MSE de solución", "sci"), ("best_mse_domain", "Residuo de dominio", "sci"),
+               ("best_mse_boundary", "MSE de frontera", "sci"), ("pareto_size", "Tamaño del frente", "int"),
+               ("runtime_s", "Tiempo", "time")]
     # columnas sin ningun dato (p. ej. resumen reconstruido desde logs) se omiten
     sub = df[df["method"] == PISR] if not df.empty else df
     metrics = [m for m in metrics if not sub.empty and m[0] in sub.columns and sub[m[0]].notna().any()]
@@ -180,20 +180,20 @@ def make_results_table(df):
                     cells.append(seconds(m))
             sol = stats(df, PISR, b.label, "solution_mse")[0]
             rows.append(rf"{status(sol)}\ {b.label_tex} & " + " & ".join(cells) + r" \\")
-    runs_txt = "one run" if n_runs == 1 else f"mean $\\pm$ standard deviation over {n_runs} independent runs"
+    runs_txt = "una corrida" if n_runs == 1 else f"media $\\pm$ desviación estándar sobre {n_runs} corridas independientes"
     spec = "l" + "c" * (len(metrics) - 1) + "r"
     head = " & ".join(rf"\textbf{{{h}}}" for _, h, _ in metrics)
     write("results_table.tex", [
         r"\begin{table}[H]",
         r"\centering\small",
-        rf"\caption{{PISR-NSGA-II results ({runs_txt}). \emph{{Solution MSE}} is measured against the "
-        r"reference after the search; the search itself only uses the PDE residual and the boundary data. "
-        r"Status: \stgood\ $<10^{-6}$, \stfair\ $<10^{-3}$, \stpoor\ $\geq10^{-3}$.}",
+        rf"\caption{{Resultados de PISR-NSGA-II ({runs_txt}). El \emph{{MSE de solución}} se mide contra la "
+        r"referencia después de la búsqueda; la búsqueda solo usa el residuo de la EDP y los datos de borde. "
+        r"Estado: \stgood\ $<10^{-6}$, \stfair\ $<10^{-3}$, \stpoor\ $\geq10^{-3}$.}",
         r"\label{tab:results}",
         r"\begin{adjustbox}{max width=\linewidth}",
         rf"\begin{{tabular}}{{@{{}}{spec}@{{}}}}",
         r"\toprule",
-        rf"\textbf{{Problem}} & {head} \\",
+        rf"\textbf{{Problema}} & {head} \\",
         r"\midrule",
         *rows,
         r"\bottomrule",
@@ -222,21 +222,20 @@ def make_comparison_table(df, ext):
     write("comparison_table.tex", [
         r"\begin{table}[H]",
         r"\centering\small",
-        r"\caption{Solution MSE against the reference and wall-clock time. RK4/FDM is the numerical solver "
-        r"of the same problem at low resolution (50 nodes per axis); it returns a grid, not a formula. "
-        r"PINN is a physics-informed neural network trained on the same residual and boundary data "
-        r"(no reference data); it returns network weights, not a formula. PINN+PySR distils the PINN "
-        r"prediction into a formula with PySR, the data-free interpretable alternative (its time includes "
-        r"training the PINN). All methods are "
-        r"scored on the same points against the same reference; mean $\pm$ standard deviation over seeds. "
-        r"Best MSE per row in bold.}",
+        r"\caption{MSE de solución contra la referencia y tiempo de pared. RK4/FDM es el solver numérico del "
+        r"mismo problema a baja resolución (50 nodos por eje); entrega una grilla, no una fórmula. "
+        r"PINN es una red neuronal informada por la física entrenada con el mismo residuo y los mismos datos "
+        r"de borde (sin datos de la referencia); entrega pesos de una red, no una fórmula. PINN+PySR destila "
+        r"la predicción del PINN en una fórmula con PySR, la alternativa interpretable sin datos (su tiempo "
+        r"incluye entrenar el PINN). Todos los métodos se miden en los mismos puntos contra la misma "
+        r"referencia; media $\pm$ desviación estándar sobre las semillas. Mejor MSE de cada fila en negrita.}",
         r"\label{tab:comparison}",
         r"\begin{adjustbox}{max width=\linewidth}",
         rf"\begin{{tabular}}{{@{{}}l{'c' * k}{'r' * k}@{{}}}}",
         r"\toprule",
-        rf" & \multicolumn{{{k}}}{{c}}{{\textbf{{Solution MSE}}}} & \multicolumn{{{k}}}{{c}}{{\textbf{{Time}}}} \\",
+        rf" & \multicolumn{{{k}}}{{c}}{{\textbf{{MSE de solución}}}} & \multicolumn{{{k}}}{{c}}{{\textbf{{Tiempo}}}} \\",
         rf"\cmidrule(lr){{2-{1 + k}}}\cmidrule(l){{{2 + k}-{1 + 2 * k}}}",
-        rf"\textbf{{Problem}} & {head} & {head} \\",
+        rf"\textbf{{Problema}} & {head} & {head} \\",
         r"\midrule",
         *rows,
         r"\bottomrule",
@@ -250,6 +249,7 @@ def make_comparison_table(df, ext):
 PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[spanish,es-noshorthands,es-tabla,es-nodecimaldot]{babel}
 \usepackage{lmodern}
 \usepackage{microtype}
 \usepackage[margin=2.2cm,headheight=14pt]{geometry}
@@ -284,71 +284,73 @@ PREAMBLE = r"""\documentclass[11pt,a4paper]{article}
 
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small\textcolor{muted}{PISR-NSGA-II --- Benchmark report}}
+\fancyhead[L]{\small\textcolor{muted}{PISR-NSGA-II --- Reporte de resultados}}
 \fancyhead[R]{\small\textcolor{muted}{\nouppercase{\leftmark}}}
 \fancyfoot[C]{\small\thepage}
 \renewcommand{\headrulewidth}{0.3pt}
 """
 
 
-GLOSSARY = r"""\section{Notation and glossary}
-\subsection*{Solution representation}
+GLOSSARY = r"""\section{Notación y glosario}
+\subsection*{Representación de la solución}
 \begin{description}[leftmargin=1.2em,itemsep=3pt,font=\normalfont\bfseries]
-\item[$\hat u$] The discovered closed-form solution: the hall-of-fame champion, after constant polishing and
-  symbolic simplification. Real-valued problems report $\operatorname{Re}(\hat u)$, which is exactly the
-  quantity optimised (complex constants are only a representation device).
-\item[$N$] The expression tree evolved by the algorithm when the boundary ansatz is used; $\hat u$ is built from it.
-\item[Boundary ansatz] Construction that satisfies the boundary data \emph{exactly} for any $N$:
+\item[$\hat u$] La solución en forma cerrada descubierta: el campeón del Hall of Fame, después del pulido de
+  constantes y la simplificación simbólica. En problemas de campo real se reporta $\operatorname{Re}(\hat u)$,
+  que es exactamente la cantidad optimizada (las constantes complejas son solo un recurso de representación).
+\item[$N$] El árbol de expresión que evoluciona el algoritmo cuando se usa el ansatz de frontera; $\hat u$ se construye a partir de él.
+\item[Ansatz de frontera] Construcción que satisface los datos de borde \emph{exactamente} para cualquier $N$:
   \begin{itemize}[leftmargin=1.2em,itemsep=1pt]
   \item 1D Dirichlet: $\hat u = g(0) + x\,[g(1)-g(0)] + x(x-1)\,N(x)$.
-  \item 1D initial-value problem: $\hat u = u_0 + u_0'\,x + x^2 N(x)$.
+  \item 1D problema de valor inicial: $\hat u = u_0 + u_0'\,x + x^2 N(x)$.
   \item 2D Dirichlet: $\hat u = \mathcal{C}[g](x,y) + x(1-x)\,y(1-y)\,N(x,y)$.
   \end{itemize}
-  The factor multiplying $N$ vanishes on the boundary, so $\hat u = g$ there by construction.
-\item[$g$] Boundary data of the problem (the conditions listed in Table~\ref{tab:suite}).
-\item[{$\mathcal{C}[g]$}] Transfinite (Coons) interpolation of the boundary data on $[0,1]^2$: the surface that
-  matches $g$ on all four edges,
+  El factor que multiplica a $N$ se anula en la frontera, así que ahí $\hat u = g$ por construcción.
+\item[$g$] Datos de borde del problema (las condiciones de la Tabla~\ref{tab:suite}).
+\item[{$\mathcal{C}[g]$}] Interpolación transfinita (de Coons) de los datos de borde en $[0,1]^2$: la superficie
+  que coincide con $g$ en las cuatro aristas,
   \[
   \begin{aligned}
   \mathcal{C}[g](x,y) ={}& (1-x)\,g(0,y) + x\,g(1,y) + (1-y)\,g(x,0) + y\,g(x,1)\\
   &- \big[(1-x)(1-y)\,g(0,0) + x(1-y)\,g(1,0) + (1-x)y\,g(0,1) + xy\,g(1,1)\big].
   \end{aligned}
   \]
-  It contains no learned information; all of the learning is in $N$.
-\item[Direct representation] Individuals whose tree is $\hat u$ itself (no ansatz); the boundary error is then an
-  objective. Both representations compete in the same population (hybrid search).
-\item[$\mathrm{Ai}$, $L_n$, $P_n$, $H_n$, $T_n$] Airy function; Laguerre, Legendre, Hermite and Chebyshev polynomials of degree $n$.
+  No contiene información aprendida; todo el aprendizaje está en $N$.
+\item[Representación directa] Individuos cuyo árbol es $\hat u$ mismo (sin ansatz); el error de frontera pasa a
+  ser un objetivo. Ambas representaciones compiten en la misma población (búsqueda híbrida).
+\item[$\mathrm{Ai}$, $L_n$, $P_n$, $H_n$, $T_n$] Función de Airy; polinomios de Laguerre, Legendre, Hermite y Chebyshev de grado $n$.
 \end{description}
 
-\subsection*{Metrics}
+\subsection*{Métricas}
 \begin{description}[leftmargin=1.2em,itemsep=3pt,font=\normalfont\bfseries]
-\item[Solution MSE] Mean squared difference between $\hat u$ and the reference solution on a validation grid.
-  Computed \emph{after} the search, for evaluation only.
-\item[Domain residual] Mean squared PDE residual of $\hat u$ at the collocation points (the physics objective).
-\item[Boundary MSE] Mean squared mismatch with the boundary data; identically $0$ under the ansatz.
-\item[Validation score] Domain residual plus boundary error on a fixed validation grid. The only criterion used
-  to choose the champion and to stop early; it never uses the reference solution.
-\item[Front size] Number of non-dominated individuals (rank~1) in the final population.
-\item[Grid MSE, $\max|\text{error}|$] Error of the champion on the exported plotting grid (figure annotations).
-\item[Status] \stgood\ solution MSE $<10^{-6}$, \stfair\ $<10^{-3}$, \stpoor\ $\geq 10^{-3}$, \stnone\ no result.
+\item[MSE de solución] Diferencia cuadrática media entre $\hat u$ y la solución de referencia en una grilla de
+  validación. Se calcula \emph{después} de la búsqueda, solo para evaluar.
+\item[Residuo de dominio] Residuo cuadrático medio de la EDP para $\hat u$ en los puntos de colocación (el objetivo físico).
+\item[MSE de frontera] Desajuste cuadrático medio con los datos de borde; idénticamente $0$ con el ansatz.
+\item[Puntaje de validación] Residuo de dominio más error de frontera en una grilla fija de validación. Es el
+  único criterio para elegir el campeón y para la parada temprana; nunca usa la solución de referencia.
+\item[Tamaño del frente] Número de individuos no dominados (rango~1) en la población final.
+\item[MSE en grilla, $\max|\text{error}|$] Error del campeón en la grilla exportada para gráficos (anotaciones de las figuras).
+\item[Estado] \stgood\ MSE de solución $<10^{-6}$, \stfair\ $<10^{-3}$, \stpoor\ $\geq 10^{-3}$, \stnone\ sin resultado.
 \end{description}
 
-\subsection*{Methods}
+\subsection*{Métodos}
 \begin{description}[leftmargin=1.2em,itemsep=3pt,font=\normalfont\bfseries]
-\item[PISR-NSGA-II] Physics-informed symbolic regression with NSGA-II over three objectives: domain residual,
-  boundary error and expression size.
-\item[RK4/FDM] Numerical solver of the same problem at low resolution (50 nodes per axis): Runge--Kutta shooting
-  in 1D, finite differences in 2D. It returns values on a grid, not a formula.
-\item[Reference] Closed-form solution when one exists; otherwise a high-resolution numerical solution of exactly
-  the same problem, marked \emph{numerical}.
-\item[Hall of fame] Best individual seen during the whole run according to the validation score.
+\item[PISR-NSGA-II] Regresión simbólica informada por la física con NSGA-II sobre tres objetivos: residuo de
+  dominio, error de frontera y tamaño de la expresión.
+\item[RK4/FDM] Solver numérico del mismo problema a baja resolución (50 nodos por eje): Runge--Kutta y
+  diferencias finitas en 1D, diferencias finitas en 2D. Entrega valores en una grilla, no una fórmula.
+\item[PINN] Red neuronal informada por la física, entrenada con el mismo residuo y los mismos datos de borde.
+\item[PINN+PySR] La predicción del PINN destilada en una fórmula con regresión simbólica (PySR).
+\item[Referencia] Solución en forma cerrada cuando existe; si no, una solución numérica de alta resolución del
+  mismo problema, marcada como \emph{numérica}.
+\item[Hall of Fame] Mejor individuo visto durante toda la corrida según el puntaje de validación.
 \end{description}
 
-\subsection*{Simplification of the reported expressions}
-Each champion is simplified symbolically (SymPy). Constants are shown with 4 significant figures and are
-replaced by exact values ($2$, $\tfrac12$, $\pi$, $\sqrt2$, \dots) only when the resulting expression stays within
-$10^{-3}$ (relative) of the champion on its whole export grid; e.g.\ a constant reported as $\pi$ agrees with $\pi$
-to that tolerance, it is not claimed to be exactly $\pi$.
+\subsection*{Simplificación de las expresiones reportadas}
+Cada campeón se simplifica simbólicamente (SymPy). Las constantes se muestran con 4 cifras significativas y se
+reemplazan por valores exactos ($2$, $\tfrac12$, $\pi$, $\sqrt2$, \dots) solo si la expresión resultante queda a
+$10^{-3}$ (relativo) del campeón en toda su grilla de exportación; por ejemplo, una constante reportada como $\pi$
+coincide con $\pi$ a esa tolerancia, no se afirma que sea exactamente $\pi$.
 """
 
 
@@ -368,48 +370,49 @@ def overview(df, ext, stale):
     poor = [BY_LABEL[k].label_tex for k, v in sols.items() if np.isfinite(v) and v >= FAIR]
     missing = [b.label_tex for b in BENCHMARKS if not np.isfinite(sols[b.label])]
 
-    L = [r"\section{Overview}",
-         r"PISR-NSGA-II searches for closed-form solutions of differential equations using only the "
-         r"equation residual and the boundary data; the reference solution is never seen during the search "
-         r"and is used only to score the result afterwards.",
-         r"\paragraph{Goal.} Help physicists understand how differential equations \emph{without an analytic "
-         r"solution} behave. A numerical solver returns numbers on a grid; PISR-NSGA-II returns a short formula "
-         r"that can be read, differentiated, analysed for limits and asymptotics, and evaluated anywhere. The "
-         r"method deliberately trades some precision for interpretability: it is not meant to beat numerical "
-         r"solvers on accuracy, but to explain the solution. When a closed form exists the algorithm should "
-         r"recover it; when it does not, it should produce a compact expression that is accurate inside the "
-         r"domain and retains the structure of the equation (Section~\ref{sec:extrapolation}).",
+    L = [r"\section{Resumen}",
+         r"PISR-NSGA-II busca soluciones en forma cerrada de ecuaciones diferenciales usando solo el residuo de "
+         r"la ecuación y los datos de borde; la solución de referencia nunca se ve durante la búsqueda y solo "
+         r"se usa para evaluar el resultado al final.",
+         r"\paragraph{Objetivo.} Ayudar a los físicos a entender cómo se comportan las ecuaciones diferenciales "
+         r"\emph{sin solución analítica}. Un solver numérico entrega números en una grilla; PISR-NSGA-II entrega "
+         r"una fórmula corta que se puede leer, derivar, analizar en sus límites y asintóticas, y evaluar en "
+         r"cualquier punto. El método cambia deliberadamente algo de precisión por interpretabilidad: no busca "
+         r"superar a los solvers numéricos en exactitud, sino explicar la solución. Si existe una forma cerrada, "
+         r"el algoritmo debería recuperarla; si no, debería producir una expresión compacta, precisa dentro del "
+         r"dominio y que conserve la estructura de la ecuación (Sección~\ref{sec:extrapolation}).",
          r"\begin{itemize}[leftmargin=1.5em,itemsep=2pt]",
-         rf"\item \textbf{{{len(BENCHMARKS)}}} benchmark problems in {len(by_family())} families "
-         rf"(Table~\ref{{tab:suite}}); \textbf{{{n_runs}}} run{'s' if n_runs != 1 else ''} per problem.",
-         *([r"\item Accuracy tables and convergence curves aggregate all seeds. Anything that needs a single "
-            r"formula (discovered expressions, per-problem figures, extrapolation, physical consistency) uses the "
-            r"\emph{median seed} of each problem: the seed whose solution error ranks in the middle, i.e.\ the "
-            r"typical outcome, neither the best run nor an arbitrary one."] if n_runs > 1 else []),
-         rf"\item Solution MSE: \stgood\ \textbf{{{n_good}}} below $10^{{-6}}$, "
-         rf"\stfair\ \textbf{{{n_fair}}} below $10^{{-3}}$, \stpoor\ \textbf{{{n_poor}}} at or above $10^{{-3}}$.",
+         rf"\item \textbf{{{len(BENCHMARKS)}}} problemas en {len(by_family())} familias "
+         rf"(Tabla~\ref{{tab:suite}}); \textbf{{{n_runs}}} corrida{'s' if n_runs != 1 else ''} por problema.",
+         *([r"\item Las tablas de precisión y las curvas de convergencia agregan todas las semillas. Todo lo que "
+            r"necesita una sola fórmula (expresiones descubiertas, figuras por problema, extrapolación, "
+            r"consistencia física) usa la \emph{semilla mediana} de cada problema: la semilla cuyo error queda "
+            r"al medio del orden, es decir, el resultado típico, ni la mejor corrida ni una arbitraria."]
+           if n_runs > 1 else []),
+         rf"\item MSE de solución: \stgood\ \textbf{{{n_good}}} bajo $10^{{-6}}$, "
+         rf"\stfair\ \textbf{{{n_fair}}} bajo $10^{{-3}}$, \stpoor\ \textbf{{{n_poor}}} en o sobre $10^{{-3}}$.",
          ]
     if np.isfinite(total_t):
-        L.append(rf"\item Total search time per run: {seconds(total_t)}.")
+        L.append(rf"\item Tiempo total de búsqueda por corrida: {seconds(total_t)}.")
     if poor:
-        L.append(r"\item Problems not yet solved to $10^{-3}$: " + ", ".join(poor) + ".")
+        L.append(r"\item Problemas aún no resueltos a $10^{-3}$: " + ", ".join(poor) + ".")
     if missing:
-        L.append(r"\item Problems without results: " + ", ".join(missing) + ".")
+        L.append(r"\item Problemas sin resultados: " + ", ".join(missing) + ".")
     L.append(r"\end{itemize}")
     if stale and ext.empty:
-        L.append(r"\paragraph{External baselines.} "
-                 rf"{stale} result files from the old DeepXDE, PySR and PySINDy baselines were found, but "
-                 rf"they were produced before the problems were redefined ({PROBLEMS_REDEFINED:%Y-%m-%d}) and "
-                 r"solve different equations; they are excluded. Only the numerical solver (RK4/FDM) is "
-                 r"compared until \texttt{run\_competitors.sh} (PINN and PINN+PySR) has been run.")
+        L.append(r"\paragraph{Líneas base externas.} "
+                 rf"Se encontraron {stale} archivos de las líneas base antiguas (DeepXDE, PySR y PySINDy), pero "
+                 rf"son anteriores a la redefinición de los problemas ({PROBLEMS_REDEFINED:%Y-%m-%d}) y resuelven "
+                 r"otras ecuaciones; se excluyen. Solo se compara con el solver numérico (RK4/FDM) hasta correr "
+                 r"\texttt{run\_competitors.sh} (PINN y PINN+PySR).")
     return L
 
 
 def per_problem():
-    L = [r"\clearpage", r"\section{Per-problem analysis}",
-         r"For each problem: the champion against the reference (top) and the Pareto trade-offs of the "
-         r"final population (bottom). Unsteady problems are shown at $t=0.5$; complex-valued ones show "
-         r"real and imaginary parts."]
+    L = [r"\clearpage", r"\section{Análisis por problema}",
+         r"Para cada problema: el campeón contra la referencia (arriba) y los compromisos de Pareto de la "
+         r"población final (abajo). Los problemas no estacionarios se muestran en $t=0.5$; los de campo "
+         r"complejo muestran la parte real y la imaginaria."]
     for _, title, items in by_family():
         L.append(rf"\subsection{{{title}}}")
         for b in items:
@@ -418,30 +421,30 @@ def per_problem():
                 continue
             L += [r"\clearpage", rf"\subsubsection{{{b.label_tex}}}",
                   r"\begin{center}\small\begin{tabular}{@{}ll@{}}",
-                  rf"\textcolor{{muted}}{{Equation}} & ${b.equation}$ \\",
-                  rf"\textcolor{{muted}}{{Conditions}} & {b.conditions} \\",
-                  rf"\textcolor{{muted}}{{Reference}} & ${b.reference}$ \\",
-                  *([rf"\textcolor{{muted}}{{Discovered}} & \adjustbox{{max width=0.75\linewidth}}{{$\hat u = {f}$}} \\"]
+                  rf"\textcolor{{muted}}{{Ecuación}} & ${b.equation}$ \\",
+                  rf"\textcolor{{muted}}{{Condiciones}} & {b.conditions} \\",
+                  rf"\textcolor{{muted}}{{Referencia}} & ${b.reference}$ \\",
+                  *([rf"\textcolor{{muted}}{{Descubierta}} & \adjustbox{{max width=0.75\linewidth}}{{$\hat u = {f}$}} \\"]
                     if (f := pisr_formula(b)) else []),
                   r"\end{tabular}\end{center}"]
-            L += figure(sol, rf"{b.label_tex}: PISR-NSGA-II champion vs.\ reference.", r"0.8\linewidth", "H")
+            L += figure(sol, rf"{b.label_tex}: campeón de PISR-NSGA-II contra la referencia.", r"0.8\linewidth", "H")
             if os.path.exists(os.path.join(FIGS_DIR, pairs)):
-                L += figure(pairs, rf"{b.label_tex}: pairwise Pareto trade-offs of the final population.", r"\linewidth", "H")
+                L += figure(pairs, rf"{b.label_tex}: compromisos de Pareto por pares en la población final.", r"\linewidth", "H")
     return L
 
 
 def ablation_section(df):
     """Representacion hibrida (por defecto) vs. solo ansatz (--no-hybrid)."""
     path = os.path.join(RESULTS_DIR, "ablation_no_hybrid", "comparison_summary.csv")
-    L = [r"\subsection{Hybrid representation vs.\ ansatz only}",
-         r"By default both representations compete in the same population: trees that are the solution itself "
-         r"(\emph{direct}) and trees $N$ wrapped by the boundary ansatz. This widens the search (some solutions are "
-         r"much shorter in one representation than in the other) but it can also mislead it: a direct tree can "
-         r"satisfy the equation in the interior while missing the boundary, and compete with good ansatz trees. "
-         r"The ansatz-only variant (\texttt{--no-hybrid}) is kept as an option so each problem can be checked "
-         r"with both."]
+    L = [r"\subsection{Representación híbrida frente a solo ansatz}",
+         r"Por defecto ambas representaciones compiten en la misma población: árboles que son la solución misma "
+         r"(\emph{directos}) y árboles $N$ envueltos por el ansatz de frontera. Esto amplía la búsqueda (algunas "
+         r"soluciones son mucho más cortas en una representación que en la otra), pero también puede desviarla: "
+         r"un árbol directo puede satisfacer la ecuación en el interior sin cumplir la frontera y competir con "
+         r"buenos árboles de ansatz. La variante solo ansatz (\texttt{-{}-no-hybrid}) se mantiene como opción "
+         r"para revisar cada problema con ambas."]
     if not os.path.exists(path):
-        L.append(r"No ansatz-only runs are available yet.")
+        L.append(r"Todavía no hay corridas solo ansatz.")
         return L
     ab = pd.read_csv(path)
     ab = ab[ab["method"] == PISR]
@@ -458,12 +461,12 @@ def ablation_section(df):
                     rf"{seconds(th)} & {seconds(tn)} \\")
     if rows:
         L += [r"\begin{table}[H]", r"\centering\small",
-              r"\caption{Solution MSE with the hybrid representation (default) and with the ansatz only "
-              r"(\texttt{--no-hybrid}). Better value in bold.}", r"\label{tab:ablation_hybrid}",
+              r"\caption{MSE de solución con la representación híbrida (por defecto) y solo con ansatz "
+              r"(\texttt{-{}-no-hybrid}). Mejor valor en negrita.}", r"\label{tab:ablation_hybrid}",
               r"\begin{tabular}{@{}lcccc@{}}", r"\toprule",
-              r" & \multicolumn{2}{c}{\textbf{Solution MSE}} & \multicolumn{2}{c}{\textbf{Time}} \\",
+              r" & \multicolumn{2}{c}{\textbf{MSE de solución}} & \multicolumn{2}{c}{\textbf{Tiempo}} \\",
               r"\cmidrule(lr){2-3}\cmidrule(l){4-5}",
-              r"\textbf{Problem} & Hybrid & Ansatz only & Hybrid & Ansatz only \\", r"\midrule",
+              r"\textbf{Problema} & Híbrida & Solo ansatz & Híbrida & Solo ansatz \\", r"\midrule",
               *rows, r"\bottomrule", r"\end{tabular}", r"\end{table}"]
     return L
 
@@ -471,22 +474,24 @@ def ablation_section(df):
 def extrapolation_section():
     if not os.path.exists(os.path.join(TABLES_DIR, "extrapolation_table.tex")):
         return []
-    L = [r"\clearpage", r"\section{Extrapolation beyond the training domain}\label{sec:extrapolation}",
-         r"A formula that encodes the structure of the solution should remain meaningful outside the region it "
-         r"was found in; an interpolant of data does not. Every 1D steady problem is posed on $[0,1]$. Here the "
-         r"champion \emph{as found} (before rounding constants to exact values) is evaluated on $[0,1.5]$ and "
-         r"compared with the reference: the closed form when it exists, otherwise the numerical solution of the "
-         r"same problem continued past $x=1$ by integrating the equation from $u(1),u'(1)$.",
-         r"The comparison is a Chebyshev polynomial fitted to the reference on $[0,1]$ with the lowest degree "
-         r"that is as accurate as PISR-NSGA-II inside the domain. It stands for any surrogate that only "
-         r"interpolates values (a numerical grid plus an interpolant, a neural network, a polynomial "
-         r"regression): equally good inside, with no knowledge of the equation outside. The RK4/FDM grid itself "
-         r"cannot be evaluated outside $[0,1]$ at all.",
+    L = [r"\clearpage", r"\section{Extrapolación fuera del dominio de entrenamiento}\label{sec:extrapolation}",
+         r"Una fórmula que codifica la estructura de la solución debería seguir teniendo sentido fuera de la "
+         r"región donde se encontró; un interpolante de datos no. Todos los problemas 1D estacionarios se "
+         r"plantean en $[0,1]$. Aquí el campeón \emph{tal como se encontró} (antes de redondear constantes a "
+         r"valores exactos) se evalúa en $[0,1.5]$ y se compara con la referencia: la forma cerrada si existe; "
+         r"si no, la solución numérica del mismo problema continuada más allá de $x=1$ integrando la ecuación "
+         r"desde $u(1),u'(1)$.",
+         r"La comparación es un polinomio de Chebyshev ajustado a la referencia en $[0,1]$, con el menor grado "
+         r"que iguala la precisión de PISR-NSGA-II dentro del dominio. Representa a cualquier sustituto que solo "
+         r"interpola valores (una grilla numérica con un interpolante, una red neuronal, una regresión "
+         r"polinomial): igual de bueno adentro, sin conocimiento de la ecuación afuera. La grilla de RK4/FDM "
+         r"ni siquiera se puede evaluar fuera de $[0,1]$.",
          r"\input{tables/extrapolation_table.tex}"]
-    for fig, cap in [("extrapolation_solutions.pdf", r"Champion (dashed), matched-accuracy Chebyshev polynomial "
-                      r"(dotted) and reference (grey) on $[0,1.5]$; shaded region: outside the training domain."),
-                     ("extrapolation_errors.pdf", r"Pointwise error of the champion and of the matched-accuracy "
-                      r"Chebyshev polynomial on $[0,1.5]$.")]:
+    for fig, cap in [("extrapolation_solutions.pdf", r"Campeón (discontinua), polinomio de Chebyshev de igual "
+                      r"precisión (punteada) y referencia (gris) en $[0,1.5]$; región sombreada: fuera del "
+                      r"dominio de entrenamiento."),
+                     ("extrapolation_errors.pdf", r"Error puntual del campeón y del polinomio de Chebyshev de "
+                      r"igual precisión en $[0,1.5]$.")]:
         if os.path.exists(os.path.join(FIGS_DIR, fig)):
             L += figure(fig, cap, place="H")
     return L
@@ -495,88 +500,91 @@ def extrapolation_section():
 def physics_section():
     if not os.path.exists(os.path.join(TABLES_DIR, "physics_checks.tex")):
         return []
-    return [r"\clearpage", r"\section{Physical consistency of the formulas}\label{sec:physics}",
-            r"A small MSE says the formula is close to the solution; it does not say the formula is physically "
-            r"right. A physicist reads specific quantities off a solution: an energy, a slope at the origin, a "
-            r"wavenumber and its dispersion relation, a decay rate, the radius of a star. Table~\ref{tab:physics} "
-            r"extracts them from each discovered formula and compares them with their known values. This is the "
-            r"measure that matters for the goal of this work (interpretability), and it can disagree with the "
-            r"MSE: a formula can be accurate on $[0,1]$ and still give a wrong slope or a wrong far field.",
+    return [r"\clearpage", r"\section{Consistencia física de las fórmulas}\label{sec:physics}",
+            r"Un MSE pequeño dice que la fórmula está cerca de la solución; no dice que sea físicamente correcta. "
+            r"Un físico lee cantidades específicas de una solución: una energía, una pendiente en el origen, un "
+            r"número de onda y su relación de dispersión, una tasa de decaimiento, el radio de una estrella. La "
+            r"Tabla~\ref{tab:physics} las extrae de cada fórmula descubierta y las compara con sus valores "
+            r"conocidos. Es la medida que importa para el objetivo de este trabajo (interpretabilidad), y puede "
+            r"discrepar del MSE: una fórmula puede ser precisa en $[0,1]$ y aun así dar una pendiente o un campo "
+            r"lejano equivocados.",
             r"\input{tables/physics_checks.tex}"]
 
 
 def interpretability_section():
     if not os.path.exists(os.path.join(TABLES_DIR, "interpretability_table.tex")):
         return []
-    L = [r"\clearpage", r"\section{Interpretability: PISR-NSGA-II versus PINN+PySR}\label{sec:interpretability}",
-         r"The central claim of this work is that PISR-NSGA-II trades precision for interpretability. The fair "
-         r"test of that claim is not the PINN (which is more precise but returns no formula) but the other route "
-         r"to a formula without solution data: train a PINN on the same residual and boundary data, then distil "
-         r"its prediction with symbolic regression (PySR). Table~\ref{tab:interpretability} compares both on "
-         r"what a reader of the formula cares about: how small it is, whether it is \emph{the} analytic "
-         r"solution when one exists, and whether it stays correct outside the domain where it was found.",
-         r"The formula size counts the complete expression each method returns. For PISR-NSGA-II this includes "
-         r"the boundary construction of the ansatz; in 2D that is the transfinite (Coons) interpolation of the "
-         r"boundary data, which by itself accounts for most of the roughly 100 nodes of those formulas.",
+    L = [r"\clearpage", r"\section{Interpretabilidad: PISR-NSGA-II frente a PINN+PySR}\label{sec:interpretability}",
+         r"La tesis central de este trabajo es que PISR-NSGA-II cambia precisión por interpretabilidad. La prueba "
+         r"justa de esa tesis no es el PINN (más preciso, pero sin fórmula), sino la otra vía hacia una fórmula "
+         r"sin datos de la solución: entrenar un PINN con el mismo residuo y los mismos datos de borde, y destilar "
+         r"su predicción con regresión simbólica (PySR). La Tabla~\ref{tab:interpretability} compara ambos en lo "
+         r"que le importa a quien lee la fórmula: qué tan corta es, si es \emph{la} solución analítica cuando "
+         r"existe, y si sigue siendo correcta fuera del dominio donde se encontró.",
+         r"El tamaño cuenta la expresión completa que entrega cada método. Para PISR-NSGA-II incluye la "
+         r"construcción de borde del ansatz; en 2D es la interpolación transfinita (de Coons) de los datos de "
+         r"borde, que por sí sola explica la mayor parte de los cerca de 100 nodos de esas fórmulas.",
          r"\input{tables/interpretability_table.tex}"]
     if os.path.exists(os.path.join(FIGS_DIR, "interpretability_tradeoff.pdf")):
-        L += figure("interpretability_tradeoff.pdf", r"Median formula size against median solution error per "
-                    r"problem. Each grey segment joins the two methods on the same problem.", place="H")
+        L += figure("interpretability_tradeoff.pdf", r"Tamaño mediano de la fórmula contra error mediano de "
+                    r"solución por problema. Cada segmento gris une a los dos métodos en el mismo problema.", place="H")
     if os.path.exists(os.path.join(TABLES_DIR, "pysr_front_table.tex")):
-        L += [r"\subsection*{What PySR finds versus what it returns}",
-              r"PySR's default criterion (\emph{best}) is only one way to pick a formula from its Pareto front. "
-              r"To be fair to PINN+PySR, Table~\ref{tab:pysrfront} also reports a parsimonious selection that "
-              r"uses only the PINN data, and an oracle that checks whether the exact solution appears anywhere on "
-              r"the front. The oracle is an upper bound on what PySR found, not an applicable method; PISR-NSGA-II "
-              r"is reported by its single champion, with no comparable oracle over its own front.",
+        L += [r"\subsection*{Lo que PySR encuentra frente a lo que entrega}",
+              r"El criterio por defecto de PySR (\emph{best}) es solo una manera de elegir una fórmula de su "
+              r"frente de Pareto. Para ser justos con PINN+PySR, la Tabla~\ref{tab:pysrfront} reporta además una "
+              r"selección parsimoniosa que usa solo los datos del PINN, y un oráculo que revisa si la solución "
+              r"exacta aparece en alguna parte del frente. El oráculo es una cota superior de lo que PySR "
+              r"encontró, no un método aplicable; PISR-NSGA-II se reporta por su único campeón, sin un oráculo "
+              r"comparable sobre su propio frente.",
               r"\input{tables/pysr_front_table.tex}"]
     return L
 
 
+MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
+         "octubre", "noviembre", "diciembre"]
+
+
 def make_latex_report(df, ext, stale):
-    today = datetime.date.today().strftime("%B %d, %Y")
+    d = datetime.date.today()
+    today = f"{d.day} de {MESES[d.month - 1]} de {d.year}"
     L = [PREAMBLE, r"\begin{document}",
          r"\begin{center}",
          r"{\LARGE\bfseries\color{accent} PISR-NSGA-II}\\[4pt]",
-         r"{\large Physics-informed multi-objective symbolic regression for differential equations}\\[8pt]",
-         rf"{{\small\color{{muted}} Benchmark report --- generated {today}}}",
+         r"{\large Regresión simbólica multiobjetivo informada por la física para ecuaciones diferenciales}\\[8pt]",
+         rf"{{\small\color{{muted}} Reporte de resultados --- generado el {today}}}",
          r"\end{center}",
          r"\vspace{4pt}",
          r"{\small\tableofcontents}",
          r"\vspace{6pt}"]
     L += overview(df, ext, stale)
     L += [GLOSSARY]
-    L += [r"\clearpage", r"\section{Benchmark suite}", r"\input{tables/suite_table.tex}",
-          r"\subsection*{Physical fidelity of the suite}",
+    L += [r"\clearpage", r"\section{Suite de problemas}", r"\input{tables/suite_table.tex}",
+          r"\subsection*{Fidelidad física de la suite}",
           r"\begin{description}[leftmargin=1.2em,itemsep=3pt,font=\normalfont\bfseries]",
           *[rf"\item[{t}] {txt}" for t, txt in PHYSICS_NOTES],
           r"\end{description}"]
-    L += [r"\clearpage", r"\section{Results}",
-          r"\subsection{Accuracy of PISR-NSGA-II}", r"\input{tables/results_table.tex}",
-          r"\subsection{Comparison with baselines}", r"\input{tables/comparison_table.tex}"]
-    if not ext.empty:
-        for name, title in [("data_efficiency_comparison", "Data efficiency"), ("noise_robustness", "Robustness to measurement noise")]:
-            if os.path.exists(os.path.join(TABLES_DIR, f"{name}.tex")):
-                L += [rf"\subsection{{{title}}}", rf"\input{{tables/{name}.tex}}"]
+    L += [r"\clearpage", r"\section{Resultados}",
+          r"\subsection{Precisión de PISR-NSGA-II}", r"\input{tables/results_table.tex}",
+          r"\subsection{Comparación con las líneas base}", r"\input{tables/comparison_table.tex}"]
     L += ablation_section(df)
     L += extrapolation_section()
     L += physics_section()
     L += interpretability_section()
-    L += [r"\clearpage", r"\section{Search dynamics}"]
+    L += [r"\clearpage", r"\section{Dinámica de la búsqueda}"]
     for fig, cap in [
-        ("convergence_history.pdf", r"Hall-of-fame champion per generation. Solid: validation score (PDE "
-                                    r"residual and boundary error on a fixed grid), the only criterion used to "
-                                    r"select the champion. Dashed: error against the reference, logged for "
-                                    r"analysis and never used by the search."),
-        ("parsimony_pressure.pdf", r"Best loss reached by expressions of each size in the final population "
-                                   r"(envelope), with all individuals in grey."),
-        ("pareto_fronts_3d.pdf", r"Final population in objective space; rank-1 individuals coloured by "
-                                 r"complexity, dominated ones in grey."),
+        ("convergence_history.pdf", r"Campeón del Hall of Fame por generación. Continua: puntaje de validación "
+                                    r"(residuo de la EDP y error de frontera en una grilla fija), el único "
+                                    r"criterio para elegir el campeón. Discontinua: error contra la referencia, "
+                                    r"registrado para el análisis y nunca usado por la búsqueda."),
+        ("parsimony_pressure.pdf", r"Mejor pérdida alcanzada por expresiones de cada tamaño en la población "
+                                   r"final (envolvente), con todos los individuos en gris."),
+        ("pareto_fronts_3d.pdf", r"Población final en el espacio de objetivos; individuos de rango 1 coloreados "
+                                 r"por complejidad, los dominados en gris."),
     ]:
         if os.path.exists(os.path.join(FIGS_DIR, fig)):
             L += figure(fig, cap, place="H") + [r"\clearpage"]
     L += per_problem()
-    L += [r"\clearpage", r"\section{Discovered expressions}", r"\input{tables/formulas_table.tex}",
+    L += [r"\clearpage", r"\section{Expresiones descubiertas}", r"\input{tables/formulas_table.tex}",
           r"\end{document}"]
     out = os.path.join(REPORT_DIR, "results.tex")
     with open(out, "w") as f:
@@ -586,14 +594,13 @@ def make_latex_report(df, ext, stale):
 
 def clean_stale_outputs():
     """Borra tablas/figuras con nombres de versiones anteriores del reporte."""
-    keep_tables = {"suite_table.tex", "results_table.tex", "comparison_table.tex", "formulas_table.tex",
-                   "data_efficiency_comparison.tex", "noise_robustness.tex", "extrapolation_table.tex",
+    keep_tables = {"suite_table.tex", "results_table.tex", "comparison_table.tex", "formulas_table.tex", "extrapolation_table.tex",
                    "physics_checks.tex", "interpretability_table.tex", "pysr_front_table.tex"}
     for f in glob.glob(os.path.join(TABLES_DIR, "*.tex")):
         if os.path.basename(f) not in keep_tables:
             os.remove(f)
     valid = {f"solution_{b.label}.pdf" for b in BENCHMARKS} | {f"pareto_pairs_{b.label}.pdf" for b in BENCHMARKS}
-    valid |= {"convergence_history.pdf", "parsimony_pressure.pdf", "pareto_fronts_3d.pdf", "noise_robustness.pdf",
+    valid |= {"convergence_history.pdf", "parsimony_pressure.pdf", "pareto_fronts_3d.pdf",
               "extrapolation_solutions.pdf", "extrapolation_errors.pdf", "interpretability_tradeoff.pdf"}
     for f in glob.glob(os.path.join(FIGS_DIR, "*")):
         if os.path.basename(f) not in valid:

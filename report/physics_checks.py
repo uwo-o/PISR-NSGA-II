@@ -96,41 +96,41 @@ def lane_emden_radius():
 def checks():
     sqrt2 = math.sqrt(2)
     return [
-        ("HarmonicOscillator_1D", r"$E=-u''(0)/2u(0)$", "ground-state energy", 0.5,
+        ("HarmonicOscillator_1D", r"$E=-u''(0)/2u(0)$", "energía del estado base", 0.5,
          lambda e, n: (-deriv_at(e, n, "x", 2, x=0.0) / (2 * num(e, x=0.0))).real),
         ("Airy_1D", r"$u'(0)$", r"$\mathrm{Ai}'(0)$", -0.2588194037928068,
          lambda e, n: deriv_at(e, n, "x", 1, x=0.0).real),
-        ("Thomas-Fermi_1D", r"$u(0)$", "nuclear charge normalisation", 1.0,
+        ("Thomas-Fermi_1D", r"$u(0)$", "normalización de la carga nuclear", 1.0,
          lambda e, n: num(e, x=0.0).real),
-        ("Thomas-Fermi_1D", r"$u'(0)$", "initial slope (energy of the atom)", -1.588071022611375,
+        ("Thomas-Fermi_1D", r"$u'(0)$", "pendiente inicial (energía del átomo)", -1.588071022611375,
          lambda e, n: deriv_at(e, n, "x", 1, x=0.0).real),
-        ("Schrodinger_1D", r"$|u|$", "probability density (constant)", 1.0,
+        ("Schrodinger_1D", r"$|u|$", "densidad de probabilidad (constante)", 1.0,
          lambda e, n: float(np.mean([abs(num(e, x=v)) for v in np.linspace(0, 1, 21)]))),
-        ("Schrodinger_1D", r"$k=\partial_x\arg u$", "wavenumber", 2.0,
+        ("Schrodinger_1D", r"$k=\partial_x\arg u$", "número de onda", 2.0,
          lambda e, n: (deriv_at(e, n, "x", 1, x=0.5) / num(e, x=0.5)).imag),
-        ("Schrodinger_2D", r"$k_x=\partial_x\arg u$", "wavenumber", 2.0,
+        ("Schrodinger_2D", r"$k_x=\partial_x\arg u$", "número de onda", 2.0,
          lambda e, n: (deriv_at(e, n, "x", 1, x=0.5, y=0.5) / num(e, x=0.5, y=0.5)).imag),
-        ("Schrodinger-Unsteady_1D", r"$\omega/k^2$", "free-particle dispersion", 1.0,
+        ("Schrodinger-Unsteady_1D", r"$\omega/k^2$", "dispersión de partícula libre", 1.0,
          lambda e, n: (-(deriv_at(e, n, "t", 1, x=0.5, t=0.5) / num(e, x=0.5, t=0.5)).imag)
          / ((deriv_at(e, n, "x", 1, x=0.5, t=0.5) / num(e, x=0.5, t=0.5)).imag ** 2)),
-        ("Schrodinger-Unsteady_2D", r"$\omega/|k|^2$", "free-particle dispersion", 1.0,
+        ("Schrodinger-Unsteady_2D", r"$\omega/|k|^2$", "dispersión de partícula libre", 1.0,
          lambda e, n: (-(deriv_at(e, n, "t", 1, x=0.5, y=0.5, t=0.5) / num(e, x=0.5, y=0.5, t=0.5)).imag)
          / ((deriv_at(e, n, "x", 1, x=0.5, y=0.5, t=0.5) / num(e, x=0.5, y=0.5, t=0.5)).imag ** 2
             + (deriv_at(e, n, "y", 1, x=0.5, y=0.5, t=0.5) / num(e, x=0.5, y=0.5, t=0.5)).imag ** 2)),
-        ("Navier-Stokes-Unsteady_2D", r"$-\partial_t \ln\|\psi\|$", r"viscous decay rate $2\pi^2\nu$",
+        ("Navier-Stokes-Unsteady_2D", r"$-\partial_t \ln\|\psi\|$", r"tasa de decaimiento viscoso $2\pi^2\nu$",
          2 * math.pi ** 2 * 0.01, lambda e, n: decay_rate(e)),
-        ("Lane-Emden_1D", r"$u''(0)$", "central curvature", -1.0 / 3.0,
+        ("Lane-Emden_1D", r"$u''(0)$", "curvatura central", -1.0 / 3.0,
          lambda e, n: deriv_at(e, n, "x", 2, x=0.0).real),
-        ("Lane-Emden_1D", r"$\xi_1$ (first zero)", "stellar radius", lane_emden_radius(),
+        ("Lane-Emden_1D", r"$\xi_1$ (primer cero)", "radio estelar", lane_emden_radius(),
          lambda e, n: first_zero(e, 1.0, 30.0)),
-        ("Troesch_1D", r"$u'(0)$", "classic Troesch quantity",
+        ("Troesch_1D", r"$u'(0)$", "cantidad clásica de Troesch",
          ode_slope0(lambda s, u: 3 * np.sinh(3 * u), 0.0, 1.0),
          lambda e, n: deriv_at(e, n, "x", 1, x=0.0).real),
-        ("Ginzburg-Landau_1D", r"$u'(0)$", r"wall slope $1/\sqrt2$", 1 / sqrt2,
+        ("Ginzburg-Landau_1D", r"$u'(0)$", r"pendiente de la pared $1/\sqrt2$", 1 / sqrt2,
          lambda e, n: deriv_at(e, n, "x", 1, x=0.0).real),
-        ("Ginzburg-Landau_1D", r"$u(4)$", r"far field $\to 1$ ($\tanh(4/\sqrt2)$)", math.tanh(4 / sqrt2),
+        ("Ginzburg-Landau_1D", r"$u(4)$", r"campo lejano $\to 1$ ($\tanh(4/\sqrt2)$)", math.tanh(4 / sqrt2),
          lambda e, n: num(e, x=4.0).real),
-        ("Painleve-I_1D", r"$u'(0)$", "initial slope", ode_slope0(lambda s, u: u ** 2 + s, 0.0, 0.5),
+        ("Painleve-I_1D", r"$u'(0)$", "pendiente inicial", ode_slope0(lambda s, u: u ** 2 + s, 0.0, 0.5),
          lambda e, n: deriv_at(e, n, "x", 1, x=0.0).real),
     ]
 
@@ -194,21 +194,21 @@ def make_table(df):
         b = BY_LABEL[r["problem"]]
         e = r["rel_error"]
         st = r"\stnone" if not np.isfinite(e) else (r"\stgood" if e < GOOD else (r"\stfair" if e < FAIR else r"\stpoor"))
-        err = r"\textemdash" if not np.isfinite(e) else (f"${100 * e:.1f}\\,\\%$" if e >= 1e-3 else "$<0.1\\,\\%$")
+        err = r"\textemdash" if not np.isfinite(e) else (f"${100 * e:.1f}$\\,\\%" if e >= 1e-3 else "$<0.1$\\,\\%")
         name = b.label_tex if r["problem"] != last else ""
         last = r["problem"]
         rows.append(rf"{name} & {r['quantity']} & {r['meaning']} & {fmt(r['expected'])} & {fmt(r['formula'])} & {st}\ {err} \\")
     lines = [
         r"\begin{table}[H]", r"\centering\small",
-        r"\caption{Physical consistency of the discovered formulas: quantities a physicist would extract from "
-        r"the solution, computed \emph{from the formula} (symbolic derivatives, roots, limits) and compared "
-        r"with their known values. Status by relative error: \stgood\ $<1\,\%$, \stfair\ $<10\,\%$, "
-        r"\stpoor\ $\geq10\,\%$, \stnone\ no result. The Lane--Emden radius and the Ginzburg--Landau far field "
-        r"lie outside the domain $[0,1]$ used in the search.}",
+        r"\caption{Consistencia física de las fórmulas descubiertas: cantidades que un físico extraería de la "
+        r"solución, calculadas \emph{desde la fórmula} (derivadas simbólicas, raíces, límites) y comparadas con "
+        r"sus valores conocidos. Estado según el error relativo: \stgood\ $<1$\,\%, \stfair\ $<10$\,\%, "
+        r"\stpoor\ $\geq10$\,\%, \stnone\ sin resultado. El radio de Lane--Emden y el campo lejano de "
+        r"Ginzburg--Landau quedan fuera del dominio $[0,1]$ usado en la búsqueda.}",
         r"\label{tab:physics}",
         r"\begin{adjustbox}{max width=\linewidth}",
         r"\begin{tabular}{@{}lllccr@{}}", r"\toprule",
-        r"\textbf{Problem} & \textbf{Quantity} & \textbf{Meaning} & \textbf{Known} & \textbf{From formula} & \textbf{Error} \\",
+        r"\textbf{Problema} & \textbf{Cantidad} & \textbf{Significado} & \textbf{Conocido} & \textbf{Desde la fórmula} & \textbf{Error} \\",
         r"\midrule", *rows, r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}",
     ]
     os.makedirs(TABLES, exist_ok=True)

@@ -70,7 +70,7 @@ def title(ax, b):
 def family_legend(fig):
     handles = [plt.Line2D([], [], color=c, lw=6) for c in FAMILY_COLOR.values()]
     labels = [FAMILY_TITLE[k].replace("\\'e", "é") for k in FAMILY_COLOR]
-    fig.legend(handles, labels, loc="outside lower center", ncol=3, fontsize=9, title="Panel title colour = problem family")
+    fig.legend(handles, labels, loc="outside lower center", ncol=3, fontsize=9, title="Color del título del panel = familia del problema")
 
 
 def seed_curves(label, col):
@@ -102,13 +102,13 @@ def plot_convergence():
         if n_seeds and (M0 is None or M0.shape[1] <= 2):
             # Parada temprana en la generacion 0-1: el registro corta antes de
             # anotar la generacion en que se resolvio (solo queda la gen. 0).
-            ax.text(0.5, 0.5, "solved within the first generation\nin every seed (early stop)",
+            ax.text(0.5, 0.5, "resuelto en la primera generación\nen todas las semillas (parada temprana)",
                     ha="center", va="center", transform=ax.transAxes, color="#777", fontsize=8.5)
             ax.set_xticks([]); ax.set_yticks([])
             continue
         drew = False
-        for col, color, label, ls in [("best_val_score", C_VAL, "Validation score (selection)", "-"),
-                                      ("champion_ref_err", C_REF, "Error vs. reference (log only)", "--")]:
+        for col, color, label, ls in [("best_val_score", C_VAL, "Puntaje de validación (selección)", "-"),
+                                      ("champion_ref_err", C_REF, "Error contra la referencia (solo registro)", "--")]:
             M = seed_curves(b.label, col) if n_seeds else None
             if M is None:
                 p = latest_result(f"{b.label}_pi_gn_convergence.csv")  # corrida unica
@@ -126,15 +126,15 @@ def plot_convergence():
                 ax.fill_between(g, q25, q75, color=color, alpha=0.18, lw=0)
             drew = True
         if not drew:
-            ax.text(0.5, 0.5, "no data", ha="center", va="center", transform=ax.transAxes, color="#999", fontsize=8.5)
+            ax.text(0.5, 0.5, "sin datos", ha="center", va="center", transform=ax.transAxes, color="#999", fontsize=8.5)
             continue
         ax.set_yscale("log")
-        ax.set_xlabel("generation")
+        ax.set_xlabel("generación")
     # Leyenda en el primer panel con curvas (Laplace se resuelve en la gen. 0).
     next((ax for ax in axes if ax.get_lines()), axes[0]).legend(loc="upper right")
     family_legend(fig)
-    sub = f"median and interquartile band over {n_seeds} seeds" if n_seeds > 1 else "single run"
-    fig.suptitle(f"Convergence of the hall-of-fame champion ({sub})")
+    sub = f"mediana y banda intercuartil sobre {n_seeds} semillas" if n_seeds > 1 else "una corrida"
+    fig.suptitle(f"Convergencia del campeón del Hall of Fame ({sub})")
     save(fig, "convergence_history.pdf")
 
 
@@ -155,10 +155,10 @@ def plot_parsimony():
         ax.scatter(df["tree_size"], df["total"], s=6, color="#BDC3C7", alpha=0.6)
         ax.step(best["tree_size"], best["envelope"], where="post", color=FAMILY_COLOR.get(b.family, C_VAL), lw=2)
         ax.set_yscale("log")
-        ax.set_xlabel("tree size (nodes)")
-        ax.set_ylabel("domain + boundary MSE")
+        ax.set_xlabel("tamaño del árbol (nodos)")
+        ax.set_ylabel("MSE de dominio + frontera")
     family_legend(fig)
-    fig.suptitle("Parsimony: best attainable loss for a given expression size")
+    fig.suptitle("Parsimonia: mejor pérdida alcanzable para cada tamaño de expresión")
     save(fig, "parsimony_pressure.pdf")
 
 
@@ -180,15 +180,15 @@ def plot_pareto_3d():
         front = df["rank"] == 1
         ax.scatter(x[~front], y[~front], z[~front], c="#D5D8DC", s=6, alpha=0.3)
         sc = ax.scatter(x[front], y[front], z[front], c=z[front], cmap="viridis", s=18, edgecolors="white", linewidth=0.2)
-        ax.set_xlabel("log dom", fontsize=8, labelpad=-2)
-        ax.set_ylabel("log bnd", fontsize=8, labelpad=-2)
-        ax.set_zlabel("nodes", fontsize=8, labelpad=-2)
+        ax.set_xlabel("log dominio", fontsize=8, labelpad=-2)
+        ax.set_ylabel("log frontera", fontsize=8, labelpad=-2)
+        ax.set_zlabel("nodos", fontsize=8, labelpad=-2)
         ax.tick_params(labelsize=7, pad=0)
         ax.view_init(elev=20, azim=-120)
     if sc is not None:
         cb = fig.colorbar(sc, ax=axes, shrink=0.35, aspect=30, location="right")
         cb.set_label("complexity (nodes)")
-    fig.suptitle("Pareto fronts: domain residual vs. boundary error vs. complexity")
+    fig.suptitle("Frentes de Pareto: residuo de dominio, error de frontera y complejidad")
     save(fig, "pareto_fronts_3d.pdf")
 
 

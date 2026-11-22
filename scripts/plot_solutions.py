@@ -8,8 +8,8 @@ por problema de la suite (report/benchmarks.py).
   2D          : referencia | PISR-NSGA-II | mapa de |error| (Re u si es complejo).
 Problemas no estacionarios: corte en t = 0.5 (el que exporta save_best_grid).
 
-Las grillas de lineas base externas (DeepXDE, PySR, PySINDy) se superponen solo
-si son posteriores a la redefinicion de los problemas (benchmarks.is_fresh).
+Se superponen los competidores (PINN y PINN+PySR, de run_competitors.sh), cada
+uno en su semilla mediana, igual que PISR-NSGA-II (benchmarks.latest_result).
 """
 import glob
 import os
@@ -47,11 +47,8 @@ plt.rcParams.update({
 
 C_REF = "#1B1B1B"
 C_PISR = "#2E86C1"
-EXTERNAL = [  # (metodo, sufijos de archivo, color, estilo)
-    ("DeepXDE", ["DeepXDE", "PINN"], "#27AE60", "-."),
-    ("PySR", ["PySR"], "#16A085", ":"),
-    ("PySINDy", ["PySINDy"], "#8E44AD", "--"),
-]
+# Competidores (run_competitors.sh), cada uno en su propia semilla mediana.
+C_PINN, C_PYSR = "#27AE60", "#E67E22"
 CMAP = "viridis"
 CMAP_ERR = "magma"
 
@@ -71,14 +68,91 @@ def load_field(df, which):
     return re + 1j * im
 
 
-def external_grids(b):
+def _median_run(files):
+    """Archivo de la semilla mediana (por solution_mse) entre los CSV de un competidor."""
+    rows = []
+    for f in files:
+        if not is_fresh(f):
+            continue
+        try:
+            v = float(pd.read_csv(f)["solution_mse"].iloc[0])
+        except Exception:
+            continue
+        if np.isfinite(v):
+            rows.append((v, f))
+    if not rows:
+        return None
+    rows.sort()
+    return rows[(len(rows) - 1) // 2][1]
+
+
+def _reference_points(b):
+    p = os.path.join(RESULTS_DIR, "reference", f"{b.label}.csv")
+    if not os.path.exists(p):
+        return None
+    r = pd.read_csv(p)
+    return r[r.kind == "dom"].reset_index(drop=True)
+
+
+def competitor_grids(b, df):
+    """[(nombre, DataFrame con x[,y], u_exact[_im], u_approx[_im], color, estilo)] en el corte que
+    muestra la figura (t = 0.5 si no es estacionario).
+    PINN: su prediccion en los puntos de validacion (en 2D, interpolada a la grilla de la figura).
+    PINN+PySR: su formula evaluada en la grilla de la figura."""
+    import sympy as sp
+    ref = _reference_points(b)
+    if ref is None:
+        return []
     out = []
-    for name, suffixes, color, ls in EXTERNAL:
-        for s in suffixes:
-            p = grid_path(b.label, s)
-            if p and is_fresh(p):
-                out.append((name, pd.read_csv(p), color, ls))
-                break
+    t_cut = 0.5 if b.unsteady else 0.0
+    sel = np.isclose(ref["t"].to_numpy(), t_cut) if b.unsteady else np.ones(len(ref), bool)
+
+    f = _median_run(glob.glob(os.path.join(RESULTS_DIR, "run_*", f"{b.label}_pinn.csv")))
+    if f:
+        pred = pd.read_csv(f.replace("_pinn.csv", "_pinn_pred.csv"))
+        r, q = ref[sel].reset_index(drop=True), pred[sel].reset_index(drop=True)
+        if b.dim == 1:
+            e = pd.DataFrame({"x": r["x"], "u_exact": r["u_re"], "u_exact_im": r["u_im"],
+                              "u_approx": q["u_re"], "u_approx_im": q["u_im"]})
+        else:
+            from scipy.interpolate import RegularGridInterpolator
+            xs, ys = np.unique(r["x"]), np.unique(r["y"])
+            pts = np.column_stack([df["x"], df["y"]])
+            cols = {}
+            for c in ("u_re", "u_im"):
+                Z = q[c].to_numpy().reshape(len(xs), len(ys))
+                cols[c] = RegularGridInterpolator((xs, ys), Z, method="cubic", bounds_error=False,
+                                                  fill_value=None)(pts)
+            e = pd.DataFrame({"x": df["x"], "y": df["y"], "u_exact": df["u_exact"],
+                              "u_exact_im": df.get("u_exact_im", 0.0),
+                              "u_approx": cols["u_re"], "u_approx_im": cols["u_im"]})
+        out.append(("PINN", e, C_PINN, "-."))
+
+    f = _median_run(glob.glob(os.path.join(RESULTS_DIR, "run_*", f"{b.label}_pinn_pysr.csv")))
+    if f:
+        row = pd.read_csv(f).iloc[0]
+        try:
+            expr = sp.sympify(eval(row["expr_srepr"], sp.__dict__.copy()))
+            names = {s.name: s for s in expr.free_symbols}
+            X, Y, T = (names.get(k, sp.Symbol(k)) for k in "xyt")
+            fn = sp.lambdify((X, Y, T), expr, modules=["numpy"])
+            if b.dim == 1:
+                r = ref[sel].reset_index(drop=True)
+                xv, yv = r["x"].to_numpy(float), np.zeros(len(r))
+                ex_re, ex_im = r["u_re"], r["u_im"]
+            else:
+                xv, yv = df["x"].to_numpy(float), df["y"].to_numpy(float)
+                ex_re, ex_im = df["u_exact"], df.get("u_exact_im", 0.0)
+            v = np.asarray(fn(xv.astype(complex), yv.astype(complex), np.full(len(xv), t_cut, complex)),
+                           dtype=complex)
+            v = np.full(len(xv), complex(v)) if v.shape == () else v
+            e = pd.DataFrame({"x": xv, "u_exact": ex_re, "u_exact_im": ex_im,
+                              "u_approx": v.real, "u_approx_im": v.imag if b.complex_field else 0.0})
+            if b.dim == 2:
+                e.insert(1, "y", yv)
+            out.append(("PINN+PySR", e, C_PYSR, ":"))
+        except Exception as ex:
+            print(f"  [WARN] {b.label}: no se pudo evaluar la formula de PINN+PySR ({ex})")
     return out
 
 
@@ -93,8 +167,8 @@ def mse_text(ref, approx):
     err = np.abs(ref - approx)
     err = err[np.isfinite(err)]
     if err.size == 0:
-        return "grid MSE: n/a"
-    return f"grid MSE = {np.mean(err ** 2):.2e}   max|err| = {err.max():.2e}"
+        return "MSE en grilla: n/d"
+    return f"MSE en grilla = {np.mean(err ** 2):.2e}   max|err| = {err.max():.2e}"
 
 
 def plot_1d(b, df, ext):
@@ -104,7 +178,7 @@ def plot_1d(b, df, ext):
 
     fig = plt.figure(figsize=(11 if b.complex_field else 8, 6.2), layout="constrained")
     gs = fig.add_gridspec(2, len(parts), height_ratios=[2.2, 1])
-    ref_label = "Numerical reference" if b.numerical else "Exact solution"
+    ref_label = "Referencia numérica" if b.numerical else "Solución exacta"
 
     for k, (name, f) in enumerate(parts):
         ax = fig.add_subplot(gs[0, k])
@@ -151,19 +225,20 @@ def plot_2d(b, df, ext):
     pisr = load_field(df, "approx").reshape(n, n)
     part = "Re u" if b.complex_field else "u"
 
-    panels = [("Reference" if not b.numerical else "Numerical reference", np.real(ref)),
-              ("PISR-NSGA-II", np.real(pisr))]
+    methods = [("PISR-NSGA-II", pisr)]
     for ename, edf, _, _ in ext:
         if len(edf) == n * n:
-            panels.append((ename, np.real(load_field(edf, "approx")).reshape(n, n)))
+            methods.append((ename, load_field(edf, "approx").reshape(n, n)))
+    panels = [("Referencia" if not b.numerical else "Referencia numérica", ref)] + methods
 
-    ncol = len(panels) + 1
-    fig = plt.figure(figsize=(4.0 * ncol, 7.4), layout="constrained")
-    gs = fig.add_gridspec(2, ncol, height_ratios=[1.15, 1])
-    vmin = min(np.nanmin(p[1]) for p in panels)
-    vmax = max(np.nanmax(p[1]) for p in panels)
+    ncol = len(panels)
+    fig = plt.figure(figsize=(4.0 * ncol, 10.5), layout="constrained")
+    gs = fig.add_gridspec(3, ncol, height_ratios=[1.15, 1, 1])
+    vmin = min(np.nanmin(np.real(p[1])) for p in panels)
+    vmax = max(np.nanmax(np.real(p[1])) for p in panels)
 
-    for k, (name, Z) in enumerate(panels):
+    for k, (name, Zc) in enumerate(panels):
+        Z = np.real(Zc)
         ax3 = fig.add_subplot(gs[0, k], projection="3d")
         ax3.plot_surface(X, Y, Z, cmap=CMAP, vmin=vmin, vmax=vmax, edgecolor="none", antialiased=True)
         ax3.set_title(name)
@@ -171,18 +246,22 @@ def plot_2d(b, df, ext):
         ax3.set_xticks([0, 0.5, 1]); ax3.set_yticks([0, 0.5, 1])
         ax3.view_init(elev=25, azim=-60)
         ax = fig.add_subplot(gs[1, k])
-        im = ax.imshow(Z, origin="lower", extent=[0, 1, 0, 1], cmap=CMAP, vmin=vmin, vmax=vmax)
-        ax.set_title(f"{part} (top view)", fontsize=10, fontweight="normal")
+        im = ax.imshow(Z.T, origin="lower", extent=[0, 1, 0, 1], cmap=CMAP, vmin=vmin, vmax=vmax)
+        ax.set_title(f"{part} (vista superior)", fontsize=10, fontweight="normal")
         ax.grid(False)
         fig.colorbar(im, ax=ax, shrink=0.8)
-
-    E = np.abs(ref - pisr)
-    ax = fig.add_subplot(gs[:, -1])
-    im = ax.imshow(E, origin="lower", extent=[0, 1, 0, 1], cmap=CMAP_ERR)
-    ax.set_title("|error| PISR-NSGA-II")
-    ax.set_xlabel(mse_text(ref, pisr).replace("   ", "\n"), fontsize=9)
-    ax.grid(False)
-    fig.colorbar(im, ax=ax, shrink=0.6)
+        if k == 0:
+            ax = fig.add_subplot(gs[2, 0]); ax.axis("off")
+            ax.text(0.5, 0.5, "Fila inferior:\n|error| de cada método\ncontra la referencia",
+                    ha="center", va="center", fontsize=10, color="#555")
+            continue
+        E = np.abs(ref - Zc)
+        ax = fig.add_subplot(gs[2, k])
+        im = ax.imshow(E.T, origin="lower", extent=[0, 1, 0, 1], cmap=CMAP_ERR)
+        ax.set_title(f"|error| {name}", fontsize=10)
+        ax.set_xlabel(mse_text(ref, Zc).replace("   ", "\n"), fontsize=8.5)
+        ax.grid(False)
+        fig.colorbar(im, ax=ax, shrink=0.8)
 
     fig.suptitle(title_for(b))
     return fig
@@ -196,7 +275,7 @@ def main():
             print(f"  [--] {b.label}: sin grilla, se omite")
             continue
         df = pd.read_csv(p)
-        ext = external_grids(b)
+        ext = competitor_grids(b, df)
         fig = plot_1d(b, df, ext) if b.dim == 1 else plot_2d(b, df, ext)
         if fig is None:
             continue

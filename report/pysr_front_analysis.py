@@ -105,7 +105,7 @@ def make_table(df, interp):
             p = interp[(interp.problem == b.label) & (interp.method == I.PYSR)]
             q = df[df.problem == b.label]
             has = b.label in I.EXACT
-            rec = (lambda s, c: rate(s, c)) if has else (lambda s, c: r"\textemdash")
+            rec = (lambda s, c: rate(s, c)) if has else (lambda s, c: r"{\color{muted}n/a}")
             rows.append(" & ".join([
                 b.label_tex,
                 rec(a, "recovered"), rec(p, "recovered"), rec(q, "pars_recovered"), rec(q, "oracle_recovered"),
@@ -113,18 +113,19 @@ def make_table(df, interp):
             ]) + r" \\")
     lines = [
         r"\begin{table}[H]", r"\centering\small",
-        r"\caption{A fair look at PINN+PySR: what PySR finds on its own Pareto front, not only what its "
-        r"default criterion returns. \emph{best}: PySR's default selection. \emph{pars.}: the shortest "
-        rf"formula on the front whose fit to the PINN is within {PARS_FACTOR:.0f}$\times$ the best loss "
-        r"(uses only PINN data, a rule any PySR user could apply). \emph{oracle}: some formula on the front is "
-        r"the exact solution (uses the reference; an upper bound, not an applicable method). Exact recovery in "
-        r"seeds (problems with a closed form) and median formula size in nodes.}",
+        r"\caption{Una mirada justa a PINN+PySR: lo que PySR encuentra en su propio frente de Pareto, no solo lo "
+        r"que entrega su criterio por defecto. \emph{best}: la selección por defecto de PySR. \emph{pars.}: la "
+        rf"fórmula más corta del frente cuyo ajuste al PINN está a menos de {PARS_FACTOR:.0f}$\times$ la mejor "
+        r"pérdida (usa solo datos del PINN; una regla que cualquier usuario de PySR podría aplicar). "
+        r"\emph{oráculo}: alguna fórmula del frente es la solución exacta (usa la referencia; una cota superior, "
+        r"no un método aplicable). Recuperación exacta en semillas (problemas con forma cerrada) y tamaño "
+        r"mediano de la fórmula en nodos. \emph{n/a}: el problema no tiene una forma cerrada expresable.}",
         r"\label{tab:pysrfront}",
         r"\begin{adjustbox}{max width=\linewidth}",
         r"\begin{tabular}{@{}lccccccc@{}}", r"\toprule",
-        r" & \multicolumn{4}{c}{\textbf{Exact recovery}} & \multicolumn{3}{c}{\textbf{Nodes}} \\",
+        r" & \multicolumn{4}{c}{\textbf{Recuperación exacta}} & \multicolumn{3}{c}{\textbf{Nodos}} \\",
         r"\cmidrule(lr){2-5}\cmidrule(l){6-8}",
-        r"\textbf{Problem} & PISR & best & pars. & oracle & PISR & best & pars. \\", r"\midrule",
+        r"\textbf{Problema} & PISR & best & pars. & oráculo & PISR & best & pars. \\", r"\midrule",
         *rows, r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}",
     ]
     with open(os.path.join(TABLES, "pysr_front_table.tex"), "w") as f:

@@ -210,17 +210,17 @@ def make_table(df):
                     rf"{sci(r['out125_pisr'])} & {sci(r['out125_cheb'])} & {p150} & {c150} \\")
     lines = [
         r"\begin{table}[H]", r"\centering\small",
-        r"\caption{Extrapolation beyond the domain $[0,1]$ used in the search. Maximum error relative to "
-        r"$\max|u|$. The Chebyshev polynomial is fitted to the reference on $[0,1]$ with the \emph{lowest degree "
-        r"that matches PISR-NSGA-II's accuracy inside the domain}, so both start equally accurate; the difference "
-        r"outside is what knowing the equation buys. Lower error in $[1,1.5]$ in bold. "
-        r"$^\dagger$the reference solution blows up before $x=1.5$; the interval is truncated there.}",
+        r"\caption{Extrapolación fuera del dominio $[0,1]$ usado en la búsqueda. Error máximo relativo a "
+        r"$\max|u|$. El polinomio de Chebyshev se ajusta a la referencia en $[0,1]$ con el \emph{menor grado que "
+        r"iguala la precisión de PISR-NSGA-II dentro del dominio}, así que ambos parten igual de precisos; la "
+        r"diferencia afuera es lo que aporta conocer la ecuación. Menor error en $[1,1.5]$ en negrita. "
+        r"$^\dagger$la solución de referencia explota antes de $x=1.5$; el intervalo se trunca ahí.}",
         r"\label{tab:extrapolation}",
         r"\begin{adjustbox}{max width=\linewidth}",
         r"\begin{tabular}{@{}lccccccc@{}}", r"\toprule",
-        r" & \multicolumn{3}{c}{\textbf{Inside $[0,1]$}} & \multicolumn{2}{c}{\textbf{$(1,1.25]$}} & \multicolumn{2}{c}{\textbf{$(1,1.5]$}} \\",
+        r" & \multicolumn{3}{c}{\textbf{Dentro de $[0,1]$}} & \multicolumn{2}{c}{\textbf{$(1,1.25]$}} & \multicolumn{2}{c}{\textbf{$(1,1.5]$}} \\",
         r"\cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(l){7-8}",
-        r"\textbf{Problem} & PISR & degree & Chebyshev & PISR & Chebyshev & PISR & Chebyshev \\", r"\midrule",
+        r"\textbf{Problema} & PISR & grado & Chebyshev & PISR & Chebyshev & PISR & Chebyshev \\", r"\midrule",
         *rows, r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}",
     ]
     os.makedirs(TABLES, exist_ok=True)
@@ -246,14 +246,14 @@ def make_figures(panels):
             if kind == "solutions":
                 lo, hi = np.nanmin(ref.real[valid]), np.nanmax(ref.real[valid])
                 pad = 0.35 * (hi - lo + 1e-9)
-                ax.plot(xs, ref.real, color="#1B1B1B", lw=3, alpha=0.3, label="reference")
+                ax.plot(xs, ref.real, color="#1B1B1B", lw=3, alpha=0.3, label="referencia")
                 ax.plot(xs, pisr.real, color="#2E86C1", lw=1.6, ls="--", label="PISR-NSGA-II")
-                ax.plot(xs, cheb.real, color="#E67E22", lw=1.3, ls=":", label=f"Chebyshev (deg {deg})")
+                ax.plot(xs, cheb.real, color="#E67E22", lw=1.3, ls=":", label=f"Chebyshev (grado {deg})")
                 ax.set_ylim(lo - pad, hi + pad)
                 ax.set_ylabel("Re u" if b.complex_field else "u")
             else:
                 ax.semilogy(xs, np.clip(ep, 1e-16, None), color="#2E86C1", lw=1.4, label="PISR-NSGA-II")
-                ax.semilogy(xs, np.clip(ec, 1e-16, None), color="#E67E22", lw=1.2, ls=":", label=f"Chebyshev (deg {deg})")
+                ax.semilogy(xs, np.clip(ec, 1e-16, None), color="#E67E22", lw=1.2, ls=":", label=f"Chebyshev (grado {deg})")
                 ax.set_ylabel("|error|")
             ax.set_title(nice(b))
             ax.set_xlabel("x")
@@ -261,8 +261,8 @@ def make_figures(panels):
             ax.legend(loc="best", fontsize=7)
         for ax in axes[n:]:
             ax.set_visible(False)
-        title = ("Inside and outside the training domain (shaded: x > 1)" if kind == "solutions"
-                 else "Pointwise error inside and outside the training domain (shaded: x > 1)")
+        title = ("Dentro y fuera del dominio de entrenamiento (sombreado: x > 1)" if kind == "solutions"
+                 else "Error puntual dentro y fuera del dominio de entrenamiento (sombreado: x > 1)")
         fig.suptitle(title, fontsize=13, fontweight="bold")
         out = os.path.join(FIGS, f"extrapolation_{kind}.pdf")
         fig.savefig(out, bbox_inches="tight")

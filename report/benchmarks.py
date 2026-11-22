@@ -47,16 +47,16 @@ class Benchmark:
 
 # Orden de presentacion de las familias.
 FAMILIES = [
-    ("linear",   "Linear calibration problems"),
-    ("nonlin",   "Nonlinear boundary-value problems"),
-    ("complex",  "Complex-valued (quantum) problems"),
-    ("fluids",   "Incompressible fluid dynamics"),
-    ("singular", "Singular, stiff and Painlev\\'e-type problems"),
+    ("linear",   "Problemas lineales de calibración"),
+    ("nonlin",   "Problemas de contorno no lineales"),
+    ("complex",  "Problemas de campo complejo (cuánticos)"),
+    ("fluids",   "Dinámica de fluidos incompresibles"),
+    ("singular", "Problemas singulares, rígidos y de tipo Painlev\\'e"),
 ]
 FAMILY_TITLE = dict(FAMILIES)
 
-_D01 = r"$u(0),\,u(1)$ given"
-_SQ = r"$u$ on $\partial[0,1]^2$"
+_D01 = r"$u(0),\,u(1)$ dados"
+_SQ = r"$u$ en $\partial[0,1]^2$"
 
 BENCHMARKS = [
     # ── Calibracion lineal ──────────────────────────────────────────────────
@@ -64,54 +64,54 @@ BENCHMARKS = [
               r"u'' = 0", _D01, r"x", False),
     Benchmark("Poisson", 1, "linear", "Poisson",
               r"u'' = -\pi^2 \sin(\pi x)", _D01, r"\sin(\pi x)", False),
-    Benchmark("HarmonicOscillator", 1, "linear", "Harmonic oscillator",
+    Benchmark("HarmonicOscillator", 1, "linear", "Oscilador armónico",
               r"u'' - x^2 u + u = 0", _D01, r"e^{-x^2/2}", False),
     Benchmark("Airy", 1, "linear", "Airy",
               r"u'' = x\,u", _D01, r"\mathrm{Ai}(x)", False),
     Benchmark("Airy", 2, "linear", "Airy",
               r"\nabla^2 u = (x+y)\,u", _SQ, r"\mathrm{Ai}\!\left(2^{-1/3}(x+y)\right)", False),
     # ── No lineales ─────────────────────────────────────────────────────────
-    Benchmark("Fisher", 1, "nonlin", "Fisher--KPP (steady)",
-              r"u'' + u(1-u) = 0", _D01, r"\text{numerical}", True),
-    Benchmark("Fisher", 2, "nonlin", "Fisher--KPP (steady)",
-              r"\nabla^2 u + u(1-u) = 0", _SQ, r"\text{numerical}", True),
-    Benchmark("Duffing", 1, "nonlin", "Duffing-type BVP",
-              r"u'' + u + u^3 = \sin(\pi x)", _D01, r"\text{numerical}", True),
-    Benchmark("Duffing", 2, "nonlin", "Duffing-type BVP",
-              r"\nabla^2 u + u + u^3 = \sin(\pi x)\sin(\pi y)", _SQ, r"\text{numerical}", True),
+    Benchmark("Fisher", 1, "nonlin", "Fisher--KPP (estacionaria)",
+              r"u'' + u(1-u) = 0", _D01, r"\text{numérica}", True),
+    Benchmark("Fisher", 2, "nonlin", "Fisher--KPP (estacionaria)",
+              r"\nabla^2 u + u(1-u) = 0", _SQ, r"\text{numérica}", True),
+    Benchmark("Duffing", 1, "nonlin", "Tipo Duffing (contorno)",
+              r"u'' + u + u^3 = \sin(\pi x)", _D01, r"\text{numérica}", True),
+    Benchmark("Duffing", 2, "nonlin", "Tipo Duffing (contorno)",
+              r"\nabla^2 u + u + u^3 = \sin(\pi x)\sin(\pi y)", _SQ, r"\text{numérica}", True),
     Benchmark("Thomas-Fermi", 1, "nonlin", "Thomas--Fermi",
-              r"u'' = u^{3/2}/\sqrt{x}", r"$u(0)=1,\ u(1)=0.424$", r"\text{numerical}", True),
-    Benchmark("Thomas-Fermi", 2, "nonlin", "Thomas--Fermi-type",
-              r"\nabla^2 u = u^{3/2}/\sqrt{r}", _SQ, r"\text{numerical}", True),
+              r"u'' = u^{3/2}/\sqrt{x}", r"$u(0)=1,\ u(1)=0.424$", r"\text{numérica}", True),
+    Benchmark("Thomas-Fermi", 2, "nonlin", "Tipo Thomas--Fermi",
+              r"\nabla^2 u = u^{3/2}/\sqrt{r}", _SQ, r"\text{numérica}", True),
     # ── Complejos ───────────────────────────────────────────────────────────
     Benchmark("Schrodinger", 1, "complex", "Schr\\\"odinger",
               r"u'' + 4u = 0", _D01, r"e^{2ix}", False, complex_field=True),
     Benchmark("Schrodinger", 2, "complex", "Schr\\\"odinger",
               r"\nabla^2 u + 8u = 0", _SQ, r"e^{2i(x+y)}", False, complex_field=True),
-    Benchmark("Schrodinger-Unsteady", 1, "complex", "Schr\\\"odinger (unsteady)",
+    Benchmark("Schrodinger-Unsteady", 1, "complex", "Schr\\\"odinger (no estacionaria)",
               r"i\,u_t + u_{xx} = 0", r"$u(x,0)$, $u(0,t)$, $u(1,t)$",
               r"e^{i\pi(x-\pi t)}", False, unsteady=True, complex_field=True),
-    Benchmark("Schrodinger-Unsteady", 2, "complex", "Schr\\\"odinger (unsteady)",
-              r"i\,u_t + \nabla^2 u = 0", r"$u(x,y,0)$, $u$ on $\partial[0,1]^2$",
+    Benchmark("Schrodinger-Unsteady", 2, "complex", "Schr\\\"odinger (no estacionaria)",
+              r"i\,u_t + \nabla^2 u = 0", r"$u(x,y,0)$, $u$ en $\partial[0,1]^2$",
               r"e^{i\pi(x+y-2\pi t)}", False, unsteady=True, complex_field=True),
     # ── Fluidos ─────────────────────────────────────────────────────────────
     Benchmark("Navier-Stokes", 2, "fluids", "Navier--Stokes (Kovasznay)",
               r"\psi_y \nabla^2\psi_x - \psi_x \nabla^2\psi_y = \nu \nabla^4 \psi",
-              r"$\psi,\ \partial_n\psi$ on $\partial[0,1]^2$, $\nu=0.05$ ($\mathrm{Re}=20$)",
+              r"$\psi,\ \partial_n\psi$ en $\partial[0,1]^2$, $\nu=0.05$ ($\mathrm{Re}=20$)",
               r"y - \tfrac{1}{2\pi}e^{\lambda x}\sin(2\pi y),\ \lambda=\tfrac{\mathrm{Re}}{2}-\sqrt{\tfrac{\mathrm{Re}^2}{4}+4\pi^2}", False),
     Benchmark("Navier-Stokes-Unsteady", 2, "fluids", "Navier--Stokes (Taylor--Green)",
               r"\omega_t + \mathbf{u}\cdot\nabla\omega = \nu \nabla^2 \omega,\ \omega = -\nabla^2\psi",
-              r"$\psi(x,y,0)$, $\psi,\ \partial_n\psi$ on $\partial[0,1]^2$",
+              r"$\psi(x,y,0)$, $\psi,\ \partial_n\psi$ en $\partial[0,1]^2$",
               r"\sin(\pi x)\sin(\pi y)\,e^{-2\pi^2 \nu t}", False, unsteady=True),
     # ── Singulares / rigidos ────────────────────────────────────────────────
     Benchmark("Lane-Emden", 1, "singular", "Lane--Emden ($n=3$)",
-              r"u'' + \tfrac{2}{x}u' + u^3 = 0", r"$u(0)=1,\ u'(0)=0$ (IVP)", r"\text{numerical}", True),
+              r"u'' + \tfrac{2}{x}u' + u^3 = 0", r"$u(0)=1,\ u'(0)=0$ (IVP)", r"\text{numérica}", True),
     Benchmark("Troesch", 1, "singular", "Troesch ($\\lambda=3$)",
-              r"u'' = 3\sinh(3u)", r"$u(0)=0,\ u(1)=1$", r"\text{numerical}", True),
+              r"u'' = 3\sinh(3u)", r"$u(0)=0,\ u(1)=1$", r"\text{numérica}", True),
     Benchmark("Ginzburg-Landau", 1, "singular", "Ginzburg--Landau",
               r"u'' + u - u^3 = 0", _D01, r"\tanh(x/\sqrt{2})", False),
     Benchmark("Painleve-I", 1, "singular", "Painlev\\'e I",
-              r"u'' = u^2 + x", r"$u(0)=0,\ u(1)=\tfrac12$", r"\text{numerical}", True),
+              r"u'' = u^2 + x", r"$u(0)=0,\ u(1)=\tfrac12$", r"\text{numérica}", True),
 ]
 
 BY_LABEL = {b.label: b for b in BENCHMARKS}
@@ -232,21 +232,22 @@ BOUNDARY = {
 # Notas de fidelidad fisica (se imprimen bajo la tabla de la suite). Distinguen
 # los modelos fisicos de las construcciones matematicas con nombre fisico.
 PHYSICS_NOTES = [
-    ("Physical models",
-     r"Harmonic oscillator (ground state, $E=\tfrac12$ in units $\hbar=m=\omega=1$); Schr\"odinger (free "
-     r"particle, stationary and time-dependent); Lane--Emden $n=3$ (relativistic degenerate polytrope); "
-     r"Thomas--Fermi 1D (screened atomic potential; $u(1)=0.424$ is the tabulated value of the semi-infinite "
-     r"solution, so the truncated problem has the same solution on $[0,1]$); Troesch (plasma confinement); "
-     r"Ginzburg--Landau (domain wall)."),
-    ("Mathematical constructions with a physical name",
-     r"\emph{Duffing-type BVP}: the Duffing oscillator is an ODE in time with damping and periodic forcing; "
-     r"here the cubic nonlinearity is used in a spatial boundary-value problem, and its 2D version has no "
-     r"physical counterpart. \emph{Fisher--KPP (steady)}: the physics of Fisher--KPP is the travelling front "
-     r"of $u_t=u_{xx}+u(1-u)$; only the steady equation is solved here. \emph{Thomas--Fermi-type (2D)}: "
-     r"Thomas--Fermi is a radial 3D equation; the Cartesian 2D version is a test problem."),
-    ("Equivalences and caveats",
-     r"Painlev\'e I in standard form is $w''=6w^2+z$; $u''=u^2+x$ is the same equation under "
-     r"$u=6^{3/5}w$, $x=6^{1/5}z$. In both Navier--Stokes solutions the nonlinear term degenerates "
-     r"(Taylor--Green: $J(\psi,\omega)=0$; Kovasznay: $J(\psi,\omega)=\lambda\omega$ is linear), so they are "
-     r"exact Navier--Stokes solutions that do not stress the nonlinearity."),
+    ("Modelos físicos",
+     r"Oscilador armónico (estado base, $E=\tfrac12$ en unidades $\hbar=m=\omega=1$); Schr\"odinger "
+     r"(partícula libre, estacionaria y dependiente del tiempo); Lane--Emden $n=3$ (politropo degenerado "
+     r"relativista); Thomas--Fermi 1D (potencial atómico apantallado; $u(1)=0.424$ es el valor tabulado de la "
+     r"solución semi-infinita, así que el problema truncado tiene la misma solución en $[0,1]$); Troesch "
+     r"(confinamiento de plasma); Ginzburg--Landau (pared de dominio)."),
+    ("Construcciones matemáticas con nombre físico",
+     r"\emph{Tipo Duffing (contorno)}: el oscilador de Duffing es una EDO en el tiempo con amortiguamiento y "
+     r"forzamiento periódico; aquí la no linealidad cúbica se usa en un problema de contorno espacial, y su "
+     r"versión 2D no tiene contraparte física. \emph{Fisher--KPP (estacionaria)}: la física de Fisher--KPP es "
+     r"el frente viajero de $u_t=u_{xx}+u(1-u)$; aquí solo se resuelve la ecuación estacionaria. \emph{Tipo "
+     r"Thomas--Fermi (2D)}: Thomas--Fermi es una ecuación radial en 3D; la versión cartesiana 2D es un "
+     r"problema de prueba."),
+    ("Equivalencias y advertencias",
+     r"Painlev\'e I en forma estándar es $w''=6w^2+z$; $u''=u^2+x$ es la misma ecuación con "
+     r"$u=6^{3/5}w$, $x=6^{1/5}z$. En ambas soluciones de Navier--Stokes el término no lineal degenera "
+     r"(Taylor--Green: $J(\psi,\omega)=0$; Kovasznay: $J(\psi,\omega)=\lambda\omega$ es lineal), así que son "
+     r"soluciones exactas de Navier--Stokes que no ponen a prueba la no linealidad."),
 ]

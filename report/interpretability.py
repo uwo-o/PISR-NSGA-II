@@ -38,6 +38,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TABLES = os.path.join(ROOT, "report", "tables")
 FIGS = os.path.join(ROOT, "report", "figures")
 PISR, PYSR = "PISR-NSGA-II", "PINN+PySR"
+NA = r"{\color{muted}n/a}"  # la metrica no aplica a ese problema
 RECOVERY_TOL = 1e-10
 
 # Solucion analitica de los problemas con forma cerrada (mismas formulas que
@@ -276,26 +277,31 @@ def make_table(df):
             e1, e2 = bold_min(med(df, PISR, b.label, "solution_mse"), med(df, PYSR, b.label, "solution_mse"), sci)
             n1, n2 = bold_min(med(df, PISR, b.label, "nodes"), med(df, PYSR, b.label, "nodes"),
                               lambda v: f"{v:.0f}" if np.isfinite(v) else r"\textemdash")
-            x1, x2 = bold_min(med(df, PISR, b.label, "extrapolation"), med(df, PYSR, b.label, "extrapolation"), sci)
-            r1, r2 = (rate(df, PISR, b.label), rate(df, PYSR, b.label)) if b.label in EXACT else (r"\textemdash",) * 2
+            if b.dim == 1 and not b.unsteady:
+                x1, x2 = bold_min(med(df, PISR, b.label, "extrapolation"), med(df, PYSR, b.label, "extrapolation"), sci)
+            else:
+                x1 = x2 = NA
+            r1, r2 = (rate(df, PISR, b.label), rate(df, PYSR, b.label)) if b.label in EXACT else (NA,) * 2
             rows.append(rf"{b.label_tex} & {e1} & {e2} & {n1} & {n2} & {r1} & {r2} & {x1} & {x2} \\")
-    note = "" if has_pysr else (r" \emph{PINN+PySR results are not available yet "
-                                r"(\texttt{run\_competitors.sh}); only PISR-NSGA-II is shown.}")
+    note = "" if has_pysr else (r" \emph{Todavía no hay resultados de PINN+PySR "
+                                r"(\texttt{run\_competitors.sh}); solo se muestra PISR-NSGA-II.}")
     lines = [
         r"\begin{table}[H]", r"\centering\small",
-        r"\caption{Interpretability: the two methods that return a formula without solution data. "
-        r"Medians over seeds. \emph{Nodes}: size of the symbolic tree of the complete formula as returned "
-        r"(PISR includes its boundary ansatz). \emph{Exact}: seeds whose formula, with constants rounded to "
-        r"exact values, equals the analytic solution to $10^{-10}$ (problems with a closed form). "
-        r"\emph{Extrap.}: maximum relative error on $(1, 1.5]$ (1D steady problems). Better value in bold."
+        r"\caption{Interpretabilidad: los dos métodos que entregan una fórmula sin datos de la solución. "
+        r"Medianas sobre las semillas. \emph{Nodos}: tamaño del árbol simbólico de la fórmula completa tal como "
+        r"se entrega (PISR incluye su ansatz de frontera). \emph{Exacta}: semillas cuya fórmula, con las "
+        r"constantes redondeadas a valores exactos, iguala la solución analítica a $10^{-10}$ (problemas con "
+        r"forma cerrada). \emph{Extrap.}: error relativo máximo en $(1, 1.5]$ (problemas 1D estacionarios). "
+        r"Mejor valor en negrita. \emph{n/a}: la métrica no aplica (sin forma cerrada expresable, o "
+        r"problema 2D o no estacionario para la extrapolación)."
         + note + "}",
         r"\label{tab:interpretability}",
         r"\begin{adjustbox}{max width=\linewidth}",
         r"\begin{tabular}{@{}lcccccccc@{}}", r"\toprule",
-        r" & \multicolumn{2}{c}{\textbf{Solution MSE}} & \multicolumn{2}{c}{\textbf{Nodes}} "
-        r"& \multicolumn{2}{c}{\textbf{Exact}} & \multicolumn{2}{c}{\textbf{Extrap.}} \\",
+        r" & \multicolumn{2}{c}{\textbf{MSE de solución}} & \multicolumn{2}{c}{\textbf{Nodos}} "
+        r"& \multicolumn{2}{c}{\textbf{Exacta}} & \multicolumn{2}{c}{\textbf{Extrap.}} \\",
         r"\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(l){8-9}",
-        r"\textbf{Problem} & PISR & P+P & PISR & P+P & PISR & P+P & PISR & P+P \\", r"\midrule",
+        r"\textbf{Problema} & PISR & P+P & PISR & P+P & PISR & P+P & PISR & P+P \\", r"\midrule",
         *rows, r"\bottomrule", r"\end{tabular}", r"\end{adjustbox}", r"\end{table}",
     ]
     os.makedirs(TABLES, exist_ok=True)
@@ -325,9 +331,9 @@ def make_figure(df):
         if pts:
             ax.scatter(*zip(*pts), color=color, marker=marker, s=34, label=method, zorder=2, edgecolors="white", lw=0.5)
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel("formula size (nodes, median over seeds)")
-    ax.set_ylabel("solution MSE (median over seeds)")
-    ax.set_title("Interpretability vs. accuracy (lower-left is better; grey lines join the same problem)", fontsize=9.5)
+    ax.set_xlabel("tamaño de la fórmula (nodos, mediana sobre semillas)")
+    ax.set_ylabel("MSE de solución (mediana sobre semillas)")
+    ax.set_title("Interpretabilidad frente a precisión (abajo a la izquierda es mejor; las líneas grises unen el mismo problema)", fontsize=8.5)
     ax.legend(frameon=False)
     ax.grid(alpha=0.25)
     os.makedirs(FIGS, exist_ok=True)

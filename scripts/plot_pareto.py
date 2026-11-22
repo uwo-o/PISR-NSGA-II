@@ -53,9 +53,9 @@ def plot(b, df):
     floor = 1e-35
 
     pairs = [
-        ("mse_domain", "mse_boundary", "Domain residual MSE", "Boundary MSE", "Physics vs. boundary"),
-        ("mse_domain", "tree_size", "Domain residual MSE", "Complexity (nodes)", "Physics vs. complexity"),
-        ("mse_boundary", "tree_size", "Boundary MSE", "Complexity (nodes)", "Boundary vs. complexity"),
+        ("mse_domain", "mse_boundary", "MSE del residuo de dominio", "MSE de frontera", "Física frente a frontera"),
+        ("mse_domain", "tree_size", "MSE del residuo de dominio", "Complejidad (nodos)", "Física frente a complejidad"),
+        ("mse_boundary", "tree_size", "MSE de frontera", "Complejidad (nodos)", "Frontera frente a complejidad"),
     ]
     fig, axes = plt.subplots(1, 3, figsize=(13, 3.8), layout="constrained")
     for ax, (xc, yc, xl, yl, title) in zip(axes, pairs):
@@ -64,18 +64,18 @@ def plot(b, df):
         fx = (lambda s: s.clip(lower=floor)) if xlog else (lambda s: s)
         fy = (lambda s: s.clip(lower=floor)) if ylog else (lambda s: s)
         if not dom.empty:
-            ax.scatter(fx(dom[xc]), fy(dom[yc]), s=14, color=C_DOM, alpha=0.6, label="Dominated", zorder=1)
+            ax.scatter(fx(dom[xc]), fy(dom[yc]), s=14, color=C_DOM, alpha=0.6, label="Dominados", zorder=1)
         ax.scatter(fx(front[xc]), fy(front[yc]), s=30, color=C_FRONT, edgecolor="white", linewidth=0.5,
-                   label="Pareto front (rank 1)", zorder=2)
+                   label="Frente de Pareto (rango 1)", zorder=2)
         if xlog: ax.set_xscale("log")
         if ylog: ax.set_yscale("log")
         ax.set_xlabel(xl); ax.set_ylabel(yl); ax.set_title(title)
         if bnd_flat and "mse_boundary" in (xc, yc):
-            ax.text(0.5, 0.92, "Exact boundary ansatz: boundary MSE ≡ 0", transform=ax.transAxes,
+            ax.text(0.5, 0.92, "Ansatz de frontera exacto: MSE de frontera ≡ 0", transform=ax.transAxes,
                     ha="center", va="top", fontsize=8, color="#666666", style="italic")
     axes[0].legend(loc="best")
     name = f"{b.display} ({b.dim}D)".replace("\\'e", "é").replace('\\"o', "ö").replace("--", "–").replace("$", "")
-    fig.suptitle(f"Pareto trade-offs — {name}", fontsize=12, fontweight="bold")
+    fig.suptitle(f"Compromisos de Pareto — {name}", fontsize=12, fontweight="bold")
     return fig
 
 
