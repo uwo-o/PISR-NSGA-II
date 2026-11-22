@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Navier-Stokes_2D,1011,0.00010953140359163375,6.687977611243347e-05,19,1861.234318256378,10.725936889648438,True,tanh(y*(x + y + y - 1.6164316*sin(x*(y + 0.14135134))))*1.0771112,"Mul(Float('1.0771112', precision=53), tanh(Mul(Symbol('y'), Add(Symbol('x'), Symbol('y'), Symbol('y'), Mul(Integer(-1), Mul(Float('1.6164316000000001', precision=53), sin(Mul(Symbol('x'), Add(Symbol('y'), Float('0.14135133999999999', precision=53))))))))))"

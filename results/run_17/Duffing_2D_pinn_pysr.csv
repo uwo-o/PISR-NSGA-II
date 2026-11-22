@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Duffing_2D,1017,3.201460663033708e-05,3.2151163511577234e-05,19,1831.6029641628265,12.97267770767212,True,tanh(exp(-(x + y - 0.67349565) + 0.1859034/(x/(y + 0.4396695) + y + y))),"tanh(exp(Add(Mul(Integer(-1), Add(Symbol('x'), Symbol('y'), Float('-0.67349565', precision=53))), Mul(Float('0.1859034', precision=53), Pow(Add(Mul(Symbol('x'), Pow(Add(Symbol('y'), Float('0.43966949999999999', precision=53)), Integer(-1))), Symbol('y'), Symbol('y')), Integer(-1))))))"

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Lane-Emden_1D,1005,1.8866458602440506e-09,7.02478003114575e-11,15,1128.7992703914642,16.272178173065186,True,cos(sin(x/(-1.7357026))/cos(cos(x*(-5.8693194))*(-0.03358234)*x)),"cos(Mul(sin(Mul(Pow(Float('-1.7357026', precision=53), Integer(-1)), Symbol('x'))), Pow(cos(Mul(Float('-0.033582340000000002', precision=53), Symbol('x'), cos(Mul(Float('-5.8693194000000002', precision=53), Symbol('x'))))), Integer(-1))))"

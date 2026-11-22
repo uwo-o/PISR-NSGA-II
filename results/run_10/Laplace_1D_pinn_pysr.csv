@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Laplace_1D,1010,2.5817528758975325e-09,4.588141794223611e-13,21,857.7142734527588,9.625334024429321,True,x - (0.000122009355 + x*(-9.21784e-5))*tanh(x*x*(x*exp(x) + x)) - 2.519556e-5,"Add(Symbol('x'), Mul(Integer(-1), Mul(Add(Float('0.00012200935499999999', precision=53), Mul(Float('-9.2178399999999998e-5', precision=53), Symbol('x'))), tanh(Mul(Symbol('x'), Symbol('x'), Add(Mul(Symbol('x'), exp(Symbol('x'))), Symbol('x')))))), Float('-2.519556e-5', precision=53))"

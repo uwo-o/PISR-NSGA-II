@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Navier-Stokes-Unsteady_2D,1019,0.0001509652191878646,2.543818091972829e-05,15,1847.642583847046,17.24073839187622,True,(0.97518456 + t*(-0.1846984))*sin(y*3.1379604)*sin(x*3.1434183),"Mul(Add(Float('0.97518455999999998', precision=53), Mul(Float('-0.18469840000000001', precision=53), Symbol('t'))), sin(Mul(Float('3.1379603999999999', precision=53), Symbol('y'))), sin(Mul(Float('3.1434183', precision=53), Symbol('x'))))"

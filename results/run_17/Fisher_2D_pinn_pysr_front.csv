@@ -1,0 +1,19 @@
+part,complexity,loss,equation
+re,1,0.0062182555,0.7247543
+re,4,0.0036262902,cos(sin(cos(y)))
+re,5,0.0033267043,sin(tanh(y + 0.7277995))
+re,6,0.00016515603,cos(cos(tanh(x + y)))
+re,7,0.0001367436,cos(cos(tanh(y + sin(x))))
+re,8,8.397624e-05,cos(cos(tanh((y + x) * 0.9457284)))
+re,11,4.5554843e-05,cos(cos((y + x) * cos(tanh(x + y))))
+re,13,2.9992823e-05,cos(cos((y + x) * cos(tanh(y + x) - -0.012517099)))
+re,14,2.4597632e-05,cos(cos((y + sin(x)) * cos(tanh(y + sin(tanh(x))))))
+re,16,2.4577655e-05,cos(cos((sin(x) + y) * (cos(tanh(sin(tanh(x)) + y)) + -1.7284392e-5)))
+re,18,1.6958138e-05,cos(cos(sin((x * cos(sin(sin(((y + 0.7146852) * x) + y)))) + tanh(y))))
+re,20,1.526876e-05,cos(cos(sin((x * cos(sin(sin(((y * y) + x) + (y + -0.14770949))))) + tanh(y))))
+re,21,1.5164972e-05,cos(cos(sin((x * cos(sin(sin(y + (sin(y * y) + (-0.14573947 + x)))))) + tanh(y))))
+re,22,1.45699205e-05,cos(cos(sin((x * cos(sin(sin((tanh(x) + (y * y)) + tanh(y))))) + tanh(y)))) * 1.0023011
+re,23,1.4107334e-05,cos(cos(sin((cos(sin(sin((tanh(x + -0.18673253) + 0.08818835) + (y + (y * y))))) * x) + tanh(y))))
+re,24,1.3996245e-05,cos(cos(sin((cos(sin(sin((tanh(x * tanh(x * 2.3392828)) + y) + (y * y)))) * x) + tanh(y))))
+re,25,1.3527695e-05,cos(cos(sin((x * cos(sin(sin((y + tanh(x)) + (y * sin(y))) * tanh(x * 5.472244)))) + tanh(y))))
+re,26,1.3473752e-05,cos(cos(sin((x * cos(sin(sin((y + tanh(x)) + (y * sin(y))) * tanh(tanh(x) * 5.472244)))) + tanh(y))))

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Poisson_1D,1004,2.4038825920042472e-11,1.324458527399164e-11,14,892.5462963581085,14.029234886169434,True,sin(x*3.1415958)*cos(x*0.007490461*sin(x*10.713631)),"Mul(sin(Mul(Float('3.1415958000000002', precision=53), Symbol('x'))), cos(Mul(Float('0.0074904610000000003', precision=53), Symbol('x'), sin(Mul(Float('10.713630999999999', precision=53), Symbol('x'))))))"

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Navier-Stokes_2D,1005,7.59486759204228e-05,4.6093225373398276e-05,25,1861.0694425106049,11.17676043510437,True,tanh(y*(y*y*(y - tanh(x/y))/tanh(exp(x)) + y + tanh(tanh(x + y)))),"tanh(Mul(Symbol('y'), Add(Mul(Symbol('y'), Symbol('y'), Add(Symbol('y'), Mul(Integer(-1), tanh(Mul(Symbol('x'), Pow(Symbol('y'), Integer(-1)))))), Pow(tanh(exp(Symbol('x'))), Integer(-1))), Symbol('y'), tanh(tanh(Add(Symbol('x'), Symbol('y')))))))"

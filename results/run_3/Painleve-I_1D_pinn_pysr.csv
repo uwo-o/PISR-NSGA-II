@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Painleve-I_1D,1003,9.362218673432303e-12,2.4765499478578383e-11,18,934.5221006870269,11.57270336151123,True,x*x*x*(exp(x)*x*0.004152875 + 0.16827513) + x*0.3204331,"Add(Mul(Symbol('x'), Symbol('x'), Symbol('x'), Add(Mul(Float('0.0041528750000000003', precision=53), Symbol('x'), exp(Symbol('x'))), Float('0.16827512999999999', precision=53))), Mul(Float('0.32043310000000003', precision=53), Symbol('x')))"

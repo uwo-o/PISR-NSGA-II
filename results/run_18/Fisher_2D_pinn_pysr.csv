@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Fisher_2D,1018,4.7548851957396425e-07,5.656752781088906e-07,10,1514.8021700382233,12.641250133514404,True,cos(0.9981027 - 0.3466193*(x + y))*0.92061687,"Mul(Float('0.92061687000000003', precision=53), cos(Add(Float('0.99810270000000001', precision=53), Mul(Integer(-1), Mul(Float('0.34661930000000002', precision=53), Add(Symbol('x'), Symbol('y')))))))"

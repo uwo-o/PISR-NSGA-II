@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Poisson_1D,1026,3.6497755880596815e-10,4.979129057887944e-07,2.1945029911479173e-10,1047.315731048584,7801,10000,97,30.0

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Lane-Emden_1D,1007,1.175323805152564e-09,6.734787009859438e-07,8.421998160761143e-09,1115.4247720241547,7801,10000,48,30.0

@@ -1,0 +1,19 @@
+part,complexity,loss,equation
+re,1,0.032011006,0.66793835
+re,3,0.019187033,tanh(cos(x))
+re,4,0.016812284,0.7991574 * cos(x)
+re,5,0.0032063373,cos(x) * cos(y)
+re,6,0.0014329636,cos(x) - (y * 0.3702407)
+re,7,0.0002899834,tanh(exp((0.79338163 - x) - y))
+re,9,6.7423905e-05,tanh(exp((0.68819666 - y) - x)) / 0.9351478
+re,10,5.409994e-05,sin(tanh(exp((0.093907356 - x) - y)) / 0.5227343)
+re,11,4.9472437e-05,tanh(exp(((0.7464666 - y) - x) / 0.9454473)) / 0.961583
+re,13,4.8888753e-05,tanh(exp(((0.7175652 - x) - y) / 0.9476746) / 0.96783173) / 0.9630468
+re,16,3.5317742e-05,tanh(exp((cos(sin(cos(cos(x) * cos(y)))) - x) - y) / 0.97788465)
+re,17,2.0199326e-05,tanh(exp((cos(sin(cos(sin(cos(y) * cos(x))))) - y) - x)) / 0.9752159
+re,19,1.6052696e-05,tanh(exp((cos(sin(cos(tanh(cos(y)) * cos(x * x)))) - y) - x)) / 0.96942353
+re,21,1.5366766e-05,tanh(exp((cos(sin(cos(-0.94280356 * (tanh(cos(y)) * cos(x * x))))) - y) - x)) / 0.96562153
+re,22,1.2651922e-05,tanh(exp((cos(sin(cos(tanh(cos(y - x) * (cos(x) * cos(y)))))) - y) - x)) / 0.96297956
+re,23,1.1717326e-05,tanh(exp((cos(sin(cos(tanh(cos(x) * (cos(tanh(y - x)) * cos(y)))))) - y) - x)) / 0.9640251
+re,24,1.1198728e-05,tanh(exp((cos(sin(cos(tanh((cos(y) * cos(x)) * cos((x - y) * 0.8357434))))) - y) - x)) / 0.9645895
+re,29,1.1010021e-05,tanh(exp((cos(sin(cos((cos(x * x) * -0.93287534) * tanh(cos(tanh(y * y)) * cos(y * y))))) - y) - x)) / 0.9655069

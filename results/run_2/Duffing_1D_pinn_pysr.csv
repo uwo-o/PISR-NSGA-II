@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Duffing_1D,1002,7.035574645788471e-09,6.929739613416292e-09,21,750.8091511726379,13.488420009613037,True,x*(1.5900234 - x) + sin(x*(sin(x) - sin(sin(x)) - 1.3241979)) + x/x,"Add(Mul(Symbol('x'), Add(Float('1.5900234', precision=53), Mul(Integer(-1), Symbol('x')))), sin(Mul(Symbol('x'), Add(sin(Symbol('x')), Mul(Integer(-1), sin(sin(Symbol('x')))), Float('-1.3241978999999999', precision=53)))), Mul(Pow(Symbol('x'), Integer(-1)), Symbol('x')))"

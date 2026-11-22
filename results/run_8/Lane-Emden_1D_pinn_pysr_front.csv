@@ -1,0 +1,12 @@
+part,complexity,loss,equation
+re,1,0.0019396864,0.9490563
+re,4,2.452681e-06,cos(x * 0.55377835)
+re,5,2.6774538e-09,cos(sin(x * 0.57604647))
+re,7,2.693756e-10,cos(sin((0.0011209544 - x) * 0.5768706))
+re,9,2.6762384e-10,cos(sin((0.0027930967 - (x + 0.0016907164)) * -0.57686263))
+re,13,2.676073e-10,cos(sin(((((0.0027930967 - x) - 0.0016907164) - 0.0027930967) + 0.0027930967) * -0.57686263))
+re,21,2.3500712e-10,cos(sin(x * tanh(tanh(sin(cos(sin(sin(tanh(tanh(x + (0.785845 + x)) / 0.3707196) / 0.37067848))))))))
+re,23,2.3344285e-10,cos(sin(x * tanh(tanh(sin(cos(sin(sin(tanh(tanh(x + (x + 0.785845)) * 2.698144) / 0.37067842))) * 0.9999587)))))
+re,24,2.2425536e-10,cos(sin(x * tanh(tanh(sin(cos(sin(sin(tanh(tanh((tanh(x) + sin(tanh(x))) + 0.77329785) / 0.37039205) / 0.3703896))))))))
+re,27,2.1698643e-10,cos(sin(x * tanh(tanh(sin(cos(sin(tanh(sin(tanh(x / tanh(x * cos(tanh(sin(x) / 0.3595127))))) / 0.37048167)) / 0.3063145))))))
+re,30,2.0991271e-10,cos(sin(x * tanh(tanh(sin(cos(sin(tanh(sin(tanh(x / tanh(cos(sin(sin(tanh(x) / -0.3602137))) * tanh(sin(x))))) / 0.37048528)) / 0.30649593))))))

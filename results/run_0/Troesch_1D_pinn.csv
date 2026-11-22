@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Troesch_1D,1000,5.906521602578875e-10,6.99143895774072e-06,9.509061241113443e-10,1171.604493379593,7801,10000,148,30.0

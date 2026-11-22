@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Laplace_1D,1024,3.8219914565367984e-10,1.4870502525369656e-06,6.96949493327135e-12,879.1516489982605,7801,10000,31,30.0

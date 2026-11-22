@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Thomas-Fermi_2D,1021,3.0055818456409542e-06,0.00024131335604084503,1.3772981575958607e-05,1811.3074080944061,7851,4023,1150,30.0

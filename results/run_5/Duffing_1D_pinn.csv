@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Duffing_1D,1005,5.373018144863509e-12,2.1653911084095494e-07,1.068429964340948e-13,890.4326376914978,7801,10000,146,30.0

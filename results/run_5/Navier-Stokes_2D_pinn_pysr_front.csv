@@ -1,0 +1,23 @@
+part,complexity,loss,equation
+re,1,0.002995501,y
+re,3,0.0026078317,y * 1.0341549
+re,5,0.0014442919,(y + -0.060087845) * 1.1369554
+re,6,0.00063606806,sin(y * (y + 0.5287659))
+re,7,0.00057407387,tanh(y * (exp(y) + -0.5616092))
+re,9,0.00055106427,sin(((y + 0.24284935) * 1.5261723) * tanh(y))
+re,11,0.00055018737,sin((((y + 0.24284935) * tanh(y)) * 0.99764097) * 1.5261723)
+re,12,0.0005477631,sin(tanh(tanh(y + 0.43914735) * y) * (y + 0.98245656))
+re,13,0.0003203712,tanh((((x + exp(y - x)) + -0.85412973) * y) * 1.6110523)
+re,15,0.00030641985,tanh(y * ((((x + y) + exp(y - x)) + -0.71836966) * 0.8382171))
+re,16,0.00026455347,tanh(y * (tanh(exp(-0.8715623 + x)) + (y + (y * (y - x)))))
+re,17,0.00017165819,tanh((((y * ((y * y) - x)) + tanh(x + y)) + y) * y)
+re,18,0.000121326186,tanh(y * ((tanh(tanh(y) + x) + y) + (y * ((y * y) - x))))
+re,19,9.455756e-05,tanh(((tanh(y) + (((y * y) - sin(x)) * y)) + tanh(x + y)) * y)
+re,20,9.375961e-05,tanh(((y * ((((y * 0.80205584) * y) - x) - x)) + (y + (y + x))) * y)
+re,21,7.254933e-05,tanh(y * (y + (tanh(tanh(y + x)) + ((y * (y - tanh(x / y))) * y))))
+re,23,5.8368885e-05,tanh(y * ((tanh(tanh(y + x)) + y) + (((y - tanh(x / y)) * (y * 1.1392294)) * y)))
+re,25,4.6093217e-05,tanh(((y + (y * (((y - tanh(x / y)) / tanh(exp(x))) * y))) + tanh(tanh(x + y))) * y)
+re,26,4.505862e-05,tanh(((((y / tanh(exp(x))) - tanh(x / sin(y))) * (y * y)) + (y + tanh(tanh(x + y)))) * y)
+re,27,4.455267e-05,tanh(((y + tanh(tanh(x + y))) + (((y - tanh(x / y)) * (y * y)) / tanh(exp(x / y)))) * y)
+re,28,4.160672e-05,tanh(((y * (((y - tanh(x / y)) * y) / sin(x + tanh(exp(x))))) + (tanh(tanh(y + x)) + y)) * y)
+re,30,4.0612747e-05,tanh((y + (tanh(tanh(y + x)) + ((y - tanh(x / y)) * (((y * y) / sin(x + tanh(exp(x)))) + -0.009960689)))) * y)

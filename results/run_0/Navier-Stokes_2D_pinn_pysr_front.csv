@@ -1,0 +1,25 @@
+part,complexity,loss,equation
+re,1,0.003166523,y
+re,3,0.002787923,y * 1.0336152
+re,5,0.0015721607,(y + -0.060595587) * 1.137942
+re,6,0.0007141553,sin((y + 0.52559984) * y)
+re,8,0.0006760739,sin((y + 0.57277083) * y) + -0.018850183
+re,9,0.00062612776,sin((tanh(y) * 1.5284526) * (y + 0.24167381))
+re,10,0.0006218564,sin((sin(sin(y)) * (y + 0.22085431)) * 1.5735338)
+re,11,0.00045962277,sin((y + tanh(cos(cos(x - y)))) * y)
+re,13,0.00026717607,sin(y * ((sin(x + (y * 1.8360316)) * 0.58345544) + y))
+re,14,0.00023919078,sin((y + (sin(tanh(y) + (y + x)) * 0.58255154)) * y)
+re,15,0.00023148314,sin(y * ((sin(x + (sin(y) / sin(0.52224654))) * 0.57942384) + y))
+re,17,0.00022743834,sin(y * ((sin(x + (sin(sin(y)) / sin(exp(-0.76304424)))) * 0.57942384) + y))
+re,18,0.00015634991,sin(y * (y + (sin(x + (tanh(y) + y)) * cos(cos(0.5609391 - x)))))
+re,19,0.00014796904,sin((y + (cos(cos(x - tanh(y))) * sin(x + (y + tanh(y))))) * y)
+re,20,0.0001250118,sin(y * (y + (cos(cos(sin(x) - y)) * sin(sin(y) + (tanh(x) + y)))))
+re,21,9.848316e-05,sin(((cos(cos(sin(x) - tanh(y))) * sin((y + sin(x)) + tanh(y))) + y) * y)
+re,22,9.796433e-05,sin(((cos(cos(sin(x) - sin(sin(y)))) * sin(y + (tanh(y) + sin(x)))) + y) * y)
+re,23,9.261371e-05,sin(y * (y + (cos(cos(tanh(tanh(x + x)) - y)) * sin(sin(y) + (tanh(x) + y)))))
+re,24,7.8076766e-05,sin(y * ((cos(cos(x - (sin(y + y) / 1.482771))) * sin((tanh(y) + sin(y)) + x)) + y))
+re,25,5.8527254e-05,sin(y * (y + (sin((x + y) + tanh(y)) * cos(cos(x - tanh(tanh(sin(y * (y * 3.3418021)))))))))
+re,27,5.7980993e-05,sin(y * (y + (sin(y + (x + sin(y))) * cos(cos(x - tanh(tanh(sin((y + y) * (x + y)))))))))
+re,28,5.1748462e-05,sin((y + (sin(y + (x + tanh(y))) * cos(cos(x - tanh(tanh(sin((y * 2.0067432) * (y + tanh(x))))))))) * y)
+re,29,4.2221687e-05,sin(((sin((tanh(y) + x) + y) * cos(cos(tanh(tanh(sin((x + (y + y)) * (y * 1.2125677)))) - x))) + y) * y)
+re,30,4.067416e-05,sin(y * (y + (sin((x + tanh(y)) + y) * cos(cos(tanh(tanh(sin((y * 1.2725908) * ((y + y) + tanh(x))))) - x)))))

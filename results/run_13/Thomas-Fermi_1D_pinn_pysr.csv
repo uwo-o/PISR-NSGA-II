@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Thomas-Fermi_1D,1013,0.0003470072285359642,7.779611815478703e-08,18,1029.8596086502075,20.666077375411987,True,exp(sin((-x - 0.17875268)*exp(-0.1591311/tanh(x + tanh(tanh(tanh(x))) + 0.104104295)))),"exp(sin(Mul(Add(Mul(Integer(-1), Symbol('x')), Float('-0.17875268', precision=53)), exp(Mul(Integer(-1), Float('0.1591311', precision=53), Pow(tanh(Add(Symbol('x'), tanh(tanh(tanh(Symbol('x')))), Float('0.104104295', precision=53))), Integer(-1)))))))"

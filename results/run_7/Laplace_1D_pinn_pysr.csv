@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Laplace_1D,1007,3.1576817170168376e-10,2.684717206355878e-13,24,933.9125051498413,9.452322721481323,True,x + sin((x + sin(x + x))*((x + x*x)*sin(x + x) - 0.17376913))*(-3.3115426e-5),"Add(Symbol('x'), Mul(Float('-3.3115426000000003e-5', precision=53), sin(Mul(Add(Symbol('x'), sin(Add(Symbol('x'), Symbol('x')))), Add(Mul(Add(Symbol('x'), Mul(Symbol('x'), Symbol('x'))), sin(Add(Symbol('x'), Symbol('x')))), Float('-0.17376912999999999', precision=53))))))"

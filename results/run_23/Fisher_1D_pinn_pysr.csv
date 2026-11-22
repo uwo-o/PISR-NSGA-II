@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Fisher_1D,1023,2.786555495246285e-10,2.9610976139241617e-10,17,953.8036546707154,22.267796754837036,True,tanh(sin(x*(x*(x*0.019243333*x + 0.038677182) + 0.5575377) + 0.5815253)),"tanh(sin(Add(Mul(Symbol('x'), Add(Mul(Symbol('x'), Add(Mul(Float('0.019243333000000001', precision=53), Symbol('x'), Symbol('x')), Float('0.038677181999999997', precision=53))), Float('0.55753770000000002', precision=53))), Float('0.58152530000000002', precision=53))))"

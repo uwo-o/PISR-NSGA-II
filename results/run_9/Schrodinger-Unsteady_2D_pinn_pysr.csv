@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Schrodinger-Unsteady_2D,1009,0.8870225876242681,0.8877705714124665,12,1864.7547240257263,28.711501359939575,True,sin(t/0.044972222)*(-0.40759185) - 0.33217123*I*cos(-37.28781/t),"Add(Mul(Float('-0.40759184999999998', precision=53), sin(Mul(Pow(Float('0.044972221999999999', precision=53), Integer(-1)), Symbol('t')))), Mul(Integer(-1), Float('0.33217122999999998', precision=53), I, cos(Mul(Integer(-1), Float('37.28781', precision=53), Pow(Symbol('t'), Integer(-1))))))"

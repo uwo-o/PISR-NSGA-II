@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Airy_2D,1001,2.371125994523319e-09,2.8379583874508864e-07,6.81167614965199e-09,1808.7201700210571,7851,2972,1100,30.0

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Airy_1D,1015,3.038083435487115e-09,1.472619296403793e-09,16,912.4669480323792,16.388887643814087,True,tanh(-1.0127313*x + x + tanh(tanh(tanh(exp(x/(-0.9480091))*0.4372865)))),"tanh(Add(Mul(Integer(-1), Mul(Float('1.0127313', precision=53), Symbol('x'))), Symbol('x'), tanh(tanh(tanh(Mul(Float('0.43728650000000002', precision=53), exp(Mul(Pow(Float('-0.94800910000000005', precision=53), Integer(-1)), Symbol('x')))))))))"

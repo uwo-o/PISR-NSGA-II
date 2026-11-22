@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Painleve-I_1D,1015,3.402625139008316e-09,1.9043504793239192e-09,12,856.4676775932312,17.0600368976593,True,sin(exp(sin(x*1.0033832 - 1.5433097)))*x*0.887904,"Mul(Float('0.88790400000000003', precision=53), Symbol('x'), sin(exp(sin(Add(Mul(Float('1.0033832', precision=53), Symbol('x')), Float('-1.5433097', precision=53))))))"

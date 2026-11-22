@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Navier-Stokes-Unsteady_2D,1008,0.0006970985355956112,0.030155119049200332,0.00045472650825381,1809.9463169574738,7901,1092,350,30.0

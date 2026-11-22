@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Painleve-I_1D,1009,1.1893239905551873e-11,4.1530639900440785e-07,5.2321010815143674e-14,926.6321394443512,7801,10000,94,30.0

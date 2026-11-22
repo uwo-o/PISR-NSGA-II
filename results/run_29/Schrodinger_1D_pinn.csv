@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Schrodinger_1D,1029,5.530989845196109e-12,3.421430483411245e-07,2.8192416562929626e-14,1055.426920413971,7852,10000,449,30.0

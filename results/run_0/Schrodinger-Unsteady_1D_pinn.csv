@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,mse_domain,mse_boundary,runtime_s,n_params,adam_iters,lbfgs_iters,budget_min
+PINN,Schrodinger-Unsteady_1D,1000,2.7582015248980465e-07,1.3041397809372682e-05,2.1082195960542018e-07,1803.2930371761322,7902,3209,1050,30.0

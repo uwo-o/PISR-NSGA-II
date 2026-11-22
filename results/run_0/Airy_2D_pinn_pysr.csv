@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Airy_2D,1000,4.808692008537979e-07,4.879343327361543e-07,14,1449.7390637397766,24.034974336624146,True,tanh(tanh(tanh(tanh(tanh(tanh(exp((x + y)*(-0.9987617) - 0.70833004))))))),"tanh(tanh(tanh(tanh(tanh(tanh(exp(Add(Mul(Float('-0.99876169999999997', precision=53), Add(Symbol('x'), Symbol('y'))), Float('-0.70833003999999999', precision=53)))))))))"

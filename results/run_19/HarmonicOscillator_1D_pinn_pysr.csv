@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,HarmonicOscillator_1D,1019,4.740262683345164e-10,2.097706324182836e-12,22,980.7037332057952,19.117199182510376,True,cos(x*cos(x*0.40938756*cos(x*0.1457193*cos(cos(x*exp(cos(x)))*0.85294765)))),"cos(Mul(Symbol('x'), cos(Mul(Float('0.40938755999999998', precision=53), Symbol('x'), cos(Mul(Float('0.1457193', precision=53), Symbol('x'), cos(Mul(Float('0.85294764999999995', precision=53), cos(Mul(Symbol('x'), exp(cos(Symbol('x')))))))))))))"

@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Airy_2D,1001,1.3831910239200037e-08,1.4846479244713298e-08,15,1825.5699763298032,16.849806308746338,True,(-x - y - sin(sin(x + y) - 0.30000675) + 3.204255)*0.10118722,"Mul(Float('0.10118721999999999', precision=53), Add(Mul(Integer(-1), Symbol('x')), Mul(Integer(-1), Symbol('y')), Mul(Integer(-1), sin(Add(sin(Add(Symbol('x'), Symbol('y'))), Float('-0.30000674999999999', precision=53)))), Float('3.2042549999999999', precision=53)))"

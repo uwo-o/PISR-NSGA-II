@@ -1,0 +1,19 @@
+part,complexity,loss,equation
+re,1,0.0044830986,0.63454926
+re,3,0.0023275549,cos(cos(x))
+re,4,0.00023670931,cos(cos(tanh(x)))
+re,5,0.00022374539,cos(cos(sin(sin(x))))
+re,6,5.284955e-06,tanh(tanh(exp(x) * 0.61545044))
+re,8,8.795203e-07,tanh(tanh(exp(x * 0.96476173) * 0.6230983))
+re,9,7.146242e-07,tanh(tanh(tanh(exp(x) * 0.5299087))) * 1.1898994
+re,10,5.9558414e-07,tanh(sin(tanh(tanh(exp(x) * 0.42578954))) * 1.4857224)
+re,18,4.860803e-07,tanh(tanh(tanh(tanh(tanh(exp(tanh(exp(tanh(tanh(cos(exp(x)))))) * 0.5058055)))) * exp(x)))
+re,19,8.313515e-08,tanh(tanh(tanh(tanh(tanh(exp(cos(cos(exp(x + 0.35629845))) * 0.31626275)))) * exp(x + 0.0198567)))
+re,21,3.4730625e-08,tanh(tanh(exp(x + 0.019611135) * tanh(tanh(tanh(exp(cos(cos(exp(x) + (x + 0.22548631))) * 0.31881326))))))
+re,22,2.8517295e-08,tanh(tanh(tanh(tanh(tanh(exp(cos(cos((exp(x) + sin(x)) + 0.2519526)) * 0.31594154)))) * exp(x + 0.020166095)))
+re,23,1.9240362e-08,tanh(tanh(exp(x + 0.020301752) * tanh(tanh(tanh(exp(cos(cos((exp(x) / 0.8413014) + tanh(tanh(x)))) * 0.31596217))))))
+re,24,1.3691886e-08,tanh(tanh(exp(x + 0.020774228) * tanh(tanh(tanh(exp(cos(cos((tanh(tanh(tanh(x))) + exp(x)) / 0.855153)) * 0.31394365))))))
+re,25,1.2890718e-08,tanh(tanh(exp(x + 0.020686835) * tanh(tanh(tanh(exp(cos(cos((exp(x) + tanh(tanh(sin(tanh(x))))) / 0.85015595)) * 0.3146531))))))
+re,26,1.28607045e-08,tanh(tanh(tanh(tanh(tanh(exp(cos(cos((exp(x) + tanh(sin(sin(sin(tanh(x)))))) / 0.8501556)) * 0.31465214)))) * exp(x + 0.020682555)))
+re,27,1.2853491e-08,tanh(tanh(tanh(tanh(tanh(exp(cos(cos((exp(x) + sin(sin(sin(sin(sin(tanh(x))))))) / 0.8501556)) * 0.31465188)))) * exp(x + 0.020681452)))
+re,28,1.2340827e-08,tanh(tanh(exp(x + 0.020196253) * tanh(tanh(tanh(exp(cos(cos((exp(x) + sin(sin(sin(tanh(tanh(x + -0.0015251822)))))) / 0.85061514)) * 0.3177872))))))

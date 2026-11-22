@@ -1,0 +1,2 @@
+method,pde,seed,solution_mse,fit_mse_vs_pinn,complexity,runtime_s,pysr_runtime_s,ok,expr,expr_srepr
+PINN+PySR,Laplace_1D,1012,2.5890355012883634e-11,1.1861452285359817e-12,16,842.2483088970184,10.427685976028442,True,-(-1.000067)*x + (x*(-0.00011385883)*x - 1*2.2054671e-6)*cos(x*x),"Add(Mul(Integer(-1), Mul(Float('-1.000067', precision=53), Symbol('x'))), Mul(Add(Mul(Float('-0.00011385883', precision=53), Symbol('x'), Symbol('x')), Mul(Integer(-1), Float('2.2054671e-6', precision=53))), cos(Mul(Symbol('x'), Symbol('x')))))"
